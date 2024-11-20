@@ -1,0 +1,29 @@
+# EditorConfig is awesome: https://editorconfig.org
+
+# All files
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 2
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Match Markdown files (e.g., README.md)
+[*.md]
+trim_trailing_whitespace = false
+
+# Match JSON files
+[*.json]
+indent_style = space
+indent_size = 2
+
+# Match YAML files
+[*.yml]
+indent_style = space
+indent_size = 2
+
+# Match HTML, CSS, and JavaScript/TypeScript files
+[*.{html,css,scss,js,ts,tsx}]
+indent_style = space
+indent_size = 2
