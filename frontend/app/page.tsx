@@ -8,7 +8,6 @@ import AppNavbar from './components/AppNavbar';
 import Header from './components/Header';
 import SideMenu from './components/SideMenu';
 import AppTheme from './theme/AppTheme';
-import { Button } from '@mui/material';
 
 export default function Home(props: { disableCustomTheme?: boolean }) {
   return (

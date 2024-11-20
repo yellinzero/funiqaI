@@ -63,6 +63,7 @@ export default function CustomDatePicker() {
         onChange={(newValue) => setValue(newValue)}
         slots={{ field: ButtonField }}
         slotProps={{
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           field: { setOpen } as any,
           nextIconButton: { size: 'small' },
           previousIconButton: { size: 'small' },

@@ -26,6 +26,7 @@
     "react-dom": "19.0.0-rc-66855b96-20241106"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^3.9.2",
     "@commitlint/cli": "^19.6.0",
     "@commitlint/config-conventional": "^19.6.0",
     "@commitlint/types": "^19.5.0",
@@ -33,7 +34,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10.4.20",
-    "eslint": "^9.15.0",
+    "eslint": "^8",
     "eslint-config-next": "15.0.3",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
