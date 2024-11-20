@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // mui-theme.d.ts
 import { Theme as MuiTheme } from '@mui/material/styles';
 
