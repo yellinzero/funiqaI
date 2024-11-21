@@ -1,13 +1,13 @@
 'use client'
-import * as React from 'react';
-import Stack from '@mui/material/Stack';
-import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
-import NavbarBreadcrumbs from './NavbarBreadcrumbs';
-import MenuButton from './MenuButton';
-import ColorModeIconDropdown from '../theme/ColorModeIconDropdown';
+import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded'
+import Stack from '@mui/material/Stack'
+import * as React from 'react'
+import ColorModeIconDropdown from '../theme/ColorModeIconDropdown'
+import CustomDatePicker from './CustomDatePicker'
+import MenuButton from './MenuButton'
 
-import Search from './Search';
-import CustomDatePicker from './CustomDatePicker';
+import NavbarBreadcrumbs from './NavbarBreadcrumbs'
+import Search from './Search'
 
 export default function Header() {
   return (
@@ -33,5 +33,5 @@ export default function Header() {
         <ColorModeIconDropdown />
       </Stack>
     </Stack>
-  );
+  )
 }

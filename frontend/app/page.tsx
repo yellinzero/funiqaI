@@ -1,13 +1,13 @@
 'use client'
-import * as React from 'react';
-import { alpha } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import AppNavbar from '@/components/AppNavbar';
-import Header from '@/components/Header';
-import SideMenu from '@/components/SideMenu';
-import AppTheme from '@/theme/AppTheme';
+import AppNavbar from '@/components/AppNavbar'
+import Header from '@/components/Header'
+import SideMenu from '@/components/SideMenu'
+import AppTheme from '@/theme/AppTheme'
+import Box from '@mui/material/Box'
+import CssBaseline from '@mui/material/CssBaseline'
+import Stack from '@mui/material/Stack'
+import { alpha } from '@mui/material/styles'
+import * as React from 'react'
 
 export default function Home(props: { disableCustomTheme?: boolean }) {
   return (
@@ -19,7 +19,7 @@ export default function Home(props: { disableCustomTheme?: boolean }) {
         {/* Main content */}
         <Box
           component="main"
-          sx={(theme) => ({
+          sx={theme => ({
             flexGrow: 1,
             backgroundColor: theme.vars
               ? `rgba(${theme.vars.palette.background.defaultChannel} / 1)`
@@ -34,7 +34,7 @@ export default function Home(props: { disableCustomTheme?: boolean }) {
               mx: 3,
               pb: 5,
               mt: { xs: 8, md: 0 },
-              
+
             }}
           >
             <Header />
@@ -43,5 +43,5 @@ export default function Home(props: { disableCustomTheme?: boolean }) {
         </Box>
       </Box>
     </AppTheme>
-  );
+  )
 }

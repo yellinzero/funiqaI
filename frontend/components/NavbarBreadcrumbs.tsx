@@ -1,9 +1,9 @@
 'use client'
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Typography from '@mui/material/Typography';
-import Breadcrumbs, { breadcrumbsClasses } from '@mui/material/Breadcrumbs';
-import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
+import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded'
+import Breadcrumbs, { breadcrumbsClasses } from '@mui/material/Breadcrumbs'
+import { styled } from '@mui/material/styles'
+import Typography from '@mui/material/Typography'
+import * as React from 'react'
 
 const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
   margin: theme.spacing(1, 0),
@@ -14,7 +14,7 @@ const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
   [`& .${breadcrumbsClasses.ol}`]: {
     alignItems: 'center',
   },
-}));
+}))
 
 export default function NavbarBreadcrumbs() {
   return (
@@ -26,5 +26,5 @@ export default function NavbarBreadcrumbs() {
         Home
       </Typography>
     </StyledBreadcrumbs>
-  );
+  )
 }
