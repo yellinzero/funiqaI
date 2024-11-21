@@ -1,10 +1,11 @@
 'use client'
-import * as React from 'react';
-import Badge, { badgeClasses } from '@mui/material/Badge';
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
+import type { IconButtonProps } from '@mui/material/IconButton'
+import Badge, { badgeClasses } from '@mui/material/Badge'
+import IconButton from '@mui/material/IconButton'
+import * as React from 'react'
 
 export interface MenuButtonProps extends IconButtonProps {
-  showBadge?: boolean;
+  showBadge?: boolean
 }
 
 export default function MenuButton({
@@ -20,5 +21,5 @@ export default function MenuButton({
     >
       <IconButton size="small" {...props} />
     </Badge>
-  );
+  )
 }

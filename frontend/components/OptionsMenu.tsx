@@ -1,30 +1,30 @@
 'use client'
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Divider, { dividerClasses } from '@mui/material/Divider';
-import Menu from '@mui/material/Menu';
-import MuiMenuItem from '@mui/material/MenuItem';
-import { paperClasses } from '@mui/material/Paper';
-import { listClasses } from '@mui/material/List';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemIcon, { listItemIconClasses } from '@mui/material/ListItemIcon';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
-import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
-import MenuButton from './MenuButton';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
+import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded'
+import Divider, { dividerClasses } from '@mui/material/Divider'
+import { listClasses } from '@mui/material/List'
+import ListItemIcon, { listItemIconClasses } from '@mui/material/ListItemIcon'
+import ListItemText from '@mui/material/ListItemText'
+import Menu from '@mui/material/Menu'
+import MuiMenuItem from '@mui/material/MenuItem'
+import { paperClasses } from '@mui/material/Paper'
+import { styled } from '@mui/material/styles'
+import * as React from 'react'
+import MenuButton from './MenuButton'
 
 const MenuItem = styled(MuiMenuItem)({
   margin: '2px 0',
-});
+})
 
 export default function OptionsMenu() {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const open = Boolean(anchorEl);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
+  const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+  }
   const handleClose = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
   return (
     <React.Fragment>
       <MenuButton
@@ -76,5 +76,5 @@ export default function OptionsMenu() {
         </MenuItem>
       </Menu>
     </React.Fragment>
-  );
+  )
 }

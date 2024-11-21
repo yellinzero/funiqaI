@@ -1,23 +1,23 @@
 'use client'
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import CssBaseline from '@mui/material/CssBaseline';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Divider from '@mui/material/Divider';
-import FormLabel from '@mui/material/FormLabel';
-import FormControl from '@mui/material/FormControl';
-import Link from '@mui/material/Link';
-import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
-import Stack from '@mui/material/Stack';
-import MuiCard from '@mui/material/Card';
-import { styled } from '@mui/material/styles';
-import ForgotPassword from '@/modules/auth/components/ForgotPassword';
-import { GoogleIcon, FacebookIcon, SitemarkIcon } from '@/components/CustomIcons';
-import AppTheme from '@/theme/AppTheme';
-import ColorModeSelect from '@/theme/ColorModeSelect';
+import { FacebookIcon, GoogleIcon, SitemarkIcon } from '@/components/CustomIcons'
+import ForgotPassword from '@/modules/auth/components/ForgotPassword'
+import AppTheme from '@/theme/AppTheme'
+import ColorModeSelect from '@/theme/ColorModeSelect'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import MuiCard from '@mui/material/Card'
+import Checkbox from '@mui/material/Checkbox'
+import CssBaseline from '@mui/material/CssBaseline'
+import Divider from '@mui/material/Divider'
+import FormControl from '@mui/material/FormControl'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormLabel from '@mui/material/FormLabel'
+import Link from '@mui/material/Link'
+import Stack from '@mui/material/Stack'
+import { styled } from '@mui/material/styles'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import * as React from 'react'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -36,12 +36,12 @@ const Card = styled(MuiCard)(({ theme }) => ({
     boxShadow:
       'hsla(220, 30%, 5%, 0.5) 0px 5px 15px 0px, hsla(220, 25%, 10%, 0.08) 0px 15px 35px -5px',
   }),
-}));
+}))
 
 const SignInContainer = styled(Stack)(({ theme }) => ({
-  height: 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
-  minHeight: '100%',
-  padding: theme.spacing(2),
+  'height': 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
+  'minHeight': '100%',
+  'padding': theme.spacing(2),
   [theme.breakpoints.up('sm')]: {
     padding: theme.spacing(4),
   },
@@ -59,61 +59,63 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
         'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
     }),
   },
-}));
+}))
 
 export default function SignIn(props: { disableCustomTheme?: boolean }) {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [open, setOpen] = React.useState(false);
+  const [emailError, setEmailError] = React.useState(false)
+  const [emailErrorMessage, setEmailErrorMessage] = React.useState('')
+  const [passwordError, setPasswordError] = React.useState(false)
+  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('')
+  const [open, setOpen] = React.useState(false)
 
   const handleClickOpen = () => {
-    setOpen(true);
-  };
+    setOpen(true)
+  }
 
   const handleClose = () => {
-    setOpen(false);
-  };
+    setOpen(false)
+  }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     if (emailError || passwordError) {
-      event.preventDefault();
-      return;
+      event.preventDefault()
+      return
     }
-    const data = new FormData(event.currentTarget);
+    const data = new FormData(event.currentTarget)
     console.log({
       email: data.get('email'),
       password: data.get('password'),
-    });
-  };
+    })
+  }
 
   const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement;
-    const password = document.getElementById('password') as HTMLInputElement;
+    const email = document.getElementById('email') as HTMLInputElement
+    const password = document.getElementById('password') as HTMLInputElement
 
-    let isValid = true;
+    let isValid = true
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
+    if (!email.value || !/\S[^\s@]*@\S+\.\S+/.test(email.value)) {
+      setEmailError(true)
+      setEmailErrorMessage('Please enter a valid email address.')
+      isValid = false
+    }
+    else {
+      setEmailError(false)
+      setEmailErrorMessage('')
     }
 
     if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
+      setPasswordError(true)
+      setPasswordErrorMessage('Password must be at least 6 characters long.')
+      isValid = false
+    }
+    else {
+      setPasswordError(false)
+      setPasswordErrorMessage('')
     }
 
-    return isValid;
-  };
+    return isValid
+  }
 
   return (
     <AppTheme {...props}>
@@ -202,7 +204,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => alert('Sign in with Google')}
+              onClick={() => console.log('Sign in with Google')}
               startIcon={<GoogleIcon />}
             >
               Sign in with Google
@@ -210,13 +212,14 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <Button
               fullWidth
               variant="outlined"
-              onClick={() => alert('Sign in with Facebook')}
+              onClick={() => console.log('Sign in with Facebook')}
               startIcon={<FacebookIcon />}
             >
               Sign in with Facebook
             </Button>
             <Typography sx={{ textAlign: 'center' }}>
-              Don&apos;t have an account?{' '}
+              Don&apos;t have an account?
+              {' '}
               <Link
                 href="/material-ui/getting-started/templates/sign-in/"
                 variant="body2"
@@ -229,5 +232,5 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
         </Card>
       </SignInContainer>
     </AppTheme>
-  );
+  )
 }
