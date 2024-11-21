@@ -11,7 +11,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "pnpm lint --fix"
+      "eslint --fix"
     ]
   },
   "dependencies": {
