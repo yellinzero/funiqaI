@@ -4,10 +4,10 @@ import { alpha } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import AppNavbar from './components/AppNavbar';
-import Header from './components/Header';
-import SideMenu from './components/SideMenu';
-import AppTheme from './theme/AppTheme';
+import AppNavbar from '@/components/AppNavbar';
+import Header from '@/components/Header';
+import SideMenu from '@/components/SideMenu';
+import AppTheme from '@/theme/AppTheme';
 
 export default function Home(props: { disableCustomTheme?: boolean }) {
   return (
