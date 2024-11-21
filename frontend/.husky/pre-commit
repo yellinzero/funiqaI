@@ -1,3 +1,5 @@
-echo "Husky pre-commit hook is running"
+# frontend/.husky/pre-commit
+cd frontend
+echo "Husky pre-commit hook is running on Frontend"
 
 npx lint-staged
