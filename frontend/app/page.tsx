@@ -7,7 +7,6 @@ import Box from '@mui/material/Box'
 import CssBaseline from '@mui/material/CssBaseline'
 import Stack from '@mui/material/Stack'
 import { alpha } from '@mui/material/styles'
-import * as React from 'react'
 
 export default function Home(props: { disableCustomTheme?: boolean }) {
   return (

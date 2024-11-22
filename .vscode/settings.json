@@ -1,12 +1,37 @@
 {
-    "prettier.enable": false,
-    "eslint.format.enable": true,
-    "editor.formatOnSave": false,
-    "editor.codeActionsOnSave": {
-      "source.fixAll.eslint": "explicit"
-    },
-    "ruff.enable": true,
-    "ruff.lint.enable": true,
-    "css.customData": [".vscode/tailwind.json"]
+  "prettier.enable": false,
+  "eslint.format.enable": true,
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  },
+  "[css]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[scss]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[javascriptreact]": {
+     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescript]": {
+     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "[typescriptscript]": {
+     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+  },
+  "css.customData": [".vscode/tailwind.json"],
+  "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
+  "ruff.enable": true,
+  "ruff.lint.enable": true,
+  "ruff.path": ["${workspaceFolder}/backend/.venv/bin/ruff"],
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff"
   }
+}
   
