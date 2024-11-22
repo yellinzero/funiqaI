@@ -12,7 +12,6 @@ import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Stack from '@mui/material/Stack'
-import * as React from 'react'
 
 const mainListItems = [
   { text: 'Home', icon: <HomeRoundedIcon /> },

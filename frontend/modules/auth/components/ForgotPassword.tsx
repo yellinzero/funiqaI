@@ -1,15 +1,15 @@
-import * as React from 'react';
-import Button from '@mui/material/Button';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
-import OutlinedInput from '@mui/material/OutlinedInput';
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+import OutlinedInput from '@mui/material/OutlinedInput'
+import * as React from 'react'
 
 interface ForgotPasswordProps {
-  open: boolean;
-  handleClose: () => void;
+  open: boolean
+  handleClose: () => void
 }
 
 export default function ForgotPassword({ open, handleClose }: ForgotPasswordProps) {
@@ -20,8 +20,8 @@ export default function ForgotPassword({ open, handleClose }: ForgotPasswordProp
       PaperProps={{
         component: 'form',
         onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-          event.preventDefault();
-          handleClose();
+          event.preventDefault()
+          handleClose()
         },
         sx: { backgroundImage: 'none' },
       }}
@@ -53,5 +53,5 @@ export default function ForgotPassword({ open, handleClose }: ForgotPasswordProp
         </Button>
       </DialogActions>
     </Dialog>
-  );
+  )
 }

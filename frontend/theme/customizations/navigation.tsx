@@ -1,13 +1,14 @@
-import * as React from 'react';
-import { Theme, alpha, Components } from '@mui/material/styles';
-import { SvgIconProps } from '@mui/material/SvgIcon';
-import { buttonBaseClasses } from '@mui/material/ButtonBase';
-import { dividerClasses } from '@mui/material/Divider';
-import { menuItemClasses } from '@mui/material/MenuItem';
-import { selectClasses } from '@mui/material/Select';
-import { tabClasses } from '@mui/material/Tab';
-import UnfoldMoreRoundedIcon from '@mui/icons-material/UnfoldMoreRounded';
-import { gray, brand } from '../themePrimitives';
+import type { Components, Theme } from '@mui/material/styles'
+import type { SvgIconProps } from '@mui/material/SvgIcon'
+import UnfoldMoreRoundedIcon from '@mui/icons-material/UnfoldMoreRounded'
+import { buttonBaseClasses } from '@mui/material/ButtonBase'
+import { dividerClasses } from '@mui/material/Divider'
+import { menuItemClasses } from '@mui/material/MenuItem'
+import { selectClasses } from '@mui/material/Select'
+import { alpha } from '@mui/material/styles'
+import { tabClasses } from '@mui/material/Tab'
+import * as React from 'react'
+import { brand, gray } from '../themePrimitives'
 
 export const navigationCustomizations: Components<Theme> = {
   MuiMenuItem: {
@@ -57,18 +58,17 @@ export const navigationCustomizations: Components<Theme> = {
   },
   MuiSelect: {
     defaultProps: {
-      // eslint-disable-next-line react/display-name
       IconComponent: React.forwardRef<SVGSVGElement, SvgIconProps>((props, ref) => (
         <UnfoldMoreRoundedIcon fontSize="small" {...props} ref={ref} />
       )),
     },
     styleOverrides: {
       root: ({ theme }) => ({
-        borderRadius: (theme.vars || theme).shape.borderRadius,
-        border: '1px solid',
-        borderColor: gray[200],
-        backgroundColor: (theme.vars || theme).palette.background.paper,
-        boxShadow: `inset 0 1px 0 1px hsla(220, 0%, 100%, 0.6), inset 0 -1px 0 1px hsla(220, 35%, 90%, 0.5)`,
+        'borderRadius': (theme.vars || theme).shape.borderRadius,
+        'border': '1px solid',
+        'borderColor': gray[200],
+        'backgroundColor': (theme.vars || theme).palette.background.paper,
+        'boxShadow': `inset 0 1px 0 1px hsla(220, 0%, 100%, 0.6), inset 0 -1px 0 1px hsla(220, 35%, 90%, 0.5)`,
         '&:hover': {
           borderColor: gray[300],
           backgroundColor: (theme.vars || theme).palette.background.paper,
@@ -83,10 +83,10 @@ export const navigationCustomizations: Components<Theme> = {
         },
 
         ...theme.applyStyles('dark', {
-          borderRadius: (theme.vars || theme).shape.borderRadius,
-          borderColor: gray[700],
-          backgroundColor: (theme.vars || theme).palette.background.paper,
-          boxShadow: `inset 0 1px 0 1px ${alpha(gray[700], 0.15)}, inset 0 -1px 0 1px hsla(220, 0%, 0%, 0.7)`,
+          'borderRadius': (theme.vars || theme).shape.borderRadius,
+          'borderColor': gray[700],
+          'backgroundColor': (theme.vars || theme).palette.background.paper,
+          'boxShadow': `inset 0 1px 0 1px ${alpha(gray[700], 0.15)}, inset 0 -1px 0 1px hsla(220, 0%, 0%, 0.7)`,
           '&:hover': {
             borderColor: alpha(gray[700], 0.7),
             backgroundColor: (theme.vars || theme).palette.background.paper,
@@ -105,8 +105,8 @@ export const navigationCustomizations: Components<Theme> = {
         display: 'flex',
         alignItems: 'center',
         ...theme.applyStyles('dark', {
-          display: 'flex',
-          alignItems: 'center',
+          'display': 'flex',
+          'alignItems': 'center',
           '&:focus-visible': {
             backgroundColor: gray[900],
           },
@@ -120,11 +120,11 @@ export const navigationCustomizations: Components<Theme> = {
     },
     styleOverrides: {
       root: ({ theme }) => ({
-        color: (theme.vars || theme).palette.text.primary,
-        fontWeight: 500,
-        position: 'relative',
-        textDecoration: 'none',
-        width: 'fit-content',
+        'color': (theme.vars || theme).palette.text.primary,
+        'fontWeight': 500,
+        'position': 'relative',
+        'textDecoration': 'none',
+        'width': 'fit-content',
         '&::before': {
           content: '""',
           position: 'absolute',
@@ -184,15 +184,15 @@ export const navigationCustomizations: Components<Theme> = {
   MuiTab: {
     styleOverrides: {
       root: ({ theme }) => ({
-        padding: '6px 8px',
-        marginBottom: '8px',
-        textTransform: 'none',
-        minWidth: 'fit-content',
-        minHeight: 'fit-content',
-        color: (theme.vars || theme).palette.text.secondary,
-        borderRadius: (theme.vars || theme).shape.borderRadius,
-        border: '1px solid',
-        borderColor: 'transparent',
+        'padding': '6px 8px',
+        'marginBottom': '8px',
+        'textTransform': 'none',
+        'minWidth': 'fit-content',
+        'minHeight': 'fit-content',
+        'color': (theme.vars || theme).palette.text.secondary,
+        'borderRadius': (theme.vars || theme).shape.borderRadius,
+        'border': '1px solid',
+        'borderColor': 'transparent',
         ':hover': {
           color: (theme.vars || theme).palette.text.primary,
           backgroundColor: gray[100],
@@ -227,11 +227,11 @@ export const navigationCustomizations: Components<Theme> = {
   MuiStepIcon: {
     styleOverrides: {
       root: ({ theme }) => ({
-        color: 'transparent',
-        border: `1px solid ${gray[400]}`,
-        width: 12,
-        height: 12,
-        borderRadius: '50%',
+        'color': 'transparent',
+        'border': `1px solid ${gray[400]}`,
+        'width': 12,
+        'height': 12,
+        'borderRadius': '50%',
         '& text': {
           display: 'none',
         },
@@ -244,7 +244,7 @@ export const navigationCustomizations: Components<Theme> = {
           color: (theme.vars || theme).palette.success.main,
         },
         ...theme.applyStyles('dark', {
-          border: `1px solid ${gray[700]}`,
+          'border': `1px solid ${gray[700]}`,
           '&.Mui-active': {
             border: 'none',
             color: (theme.vars || theme).palette.primary.light,
@@ -254,7 +254,7 @@ export const navigationCustomizations: Components<Theme> = {
             color: (theme.vars || theme).palette.success.light,
           },
         }),
-        variants: [
+        'variants': [
           {
             props: { completed: true },
             style: {
@@ -276,4 +276,4 @@ export const navigationCustomizations: Components<Theme> = {
       }),
     },
   },
-};
+}

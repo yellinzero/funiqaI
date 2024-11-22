@@ -1,5 +1,6 @@
-import { alpha, Theme, Components } from '@mui/material/styles';
-import { gray } from '../themePrimitives';
+import type { Components, Theme } from '@mui/material/styles'
+import { alpha } from '@mui/material/styles'
+import { gray } from '../themePrimitives'
 
 export const surfacesCustomizations: Components<Theme> = {
   MuiAccordion: {
@@ -9,11 +10,11 @@ export const surfacesCustomizations: Components<Theme> = {
     },
     styleOverrides: {
       root: ({ theme }) => ({
-        padding: 4,
-        overflow: 'clip',
-        backgroundColor: (theme.vars || theme).palette.background.default,
-        border: '1px solid',
-        borderColor: (theme.vars || theme).palette.divider,
+        'padding': 4,
+        'overflow': 'clip',
+        'backgroundColor': (theme.vars || theme).palette.background.default,
+        'border': '1px solid',
+        'borderColor': (theme.vars || theme).palette.divider,
         ':before': {
           backgroundColor: 'transparent',
         },
@@ -34,8 +35,8 @@ export const surfacesCustomizations: Components<Theme> = {
   MuiAccordionSummary: {
     styleOverrides: {
       root: ({ theme }) => ({
-        border: 'none',
-        borderRadius: 8,
+        'border': 'none',
+        'borderRadius': 8,
         '&:hover': { backgroundColor: gray[50] },
         '&:focus-visible': { backgroundColor: 'transparent' },
         ...theme.applyStyles('dark', {
@@ -83,14 +84,14 @@ export const surfacesCustomizations: Components<Theme> = {
               },
             },
           ],
-        };
+        }
       },
     },
   },
   MuiCardContent: {
     styleOverrides: {
       root: {
-        padding: 0,
+        'padding': 0,
         '&:last-child': { paddingBottom: 0 },
       },
     },
@@ -109,4 +110,4 @@ export const surfacesCustomizations: Components<Theme> = {
       },
     },
   },
-};
+}
