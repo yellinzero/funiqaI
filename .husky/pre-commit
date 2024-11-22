@@ -1,0 +1,55 @@
+# .husky/pre-commit
+echo "Husky pre-commit hook is running"
+
+# get the list of modified files
+files=$(git diff --cached --name-only)
+
+# check if backend or frontend directory is modified
+
+backend_modified=false
+frontend_modified=false
+
+for file in $files
+do
+    if [[ $file == "backend/"* && $file == *.py ]]; then
+        # set backend_modified flag to true
+        backend_modified=true
+    elif [[ $file == "frontend/"* ]]; then
+        # set frontend_modified flag to true
+        frontend_modified=true
+    fi
+done
+
+# run linters based on the modified modules
+
+if $backend_modified; then
+    echo "Running Ruff linter on backend module"
+    cd ./backend || exit 1
+
+    # python style checks rely on `ruff` in path
+    if ! command -v ruff &> /dev/null; then
+        echo "Installing linting tools (Ruff, dotenv-linter ...) ..."
+        poetry install -C backend --only lint
+    fi
+
+    # run Ruff linter auto-fixing
+    poetry run ruff check --fix .
+
+    # run Ruff linter checks
+    poetry run ruff check --preview . || status=$?
+
+    status=${status:-0}
+
+
+    if [ $status -ne 0 ]; then
+      echo "Ruff linter on backend module error, exit code: $status"
+      echo "Please run 'dev/reformat' to fix the fixable linting errors."
+      exit 1
+    fi
+    cd ..
+fi
+
+if $frontend_modified; then
+    echo "Running ESLint on frontend module"
+    npx lint-staged
+fi

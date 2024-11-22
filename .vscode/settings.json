@@ -1,0 +1,12 @@
+{
+    "prettier.enable": false,
+    "eslint.format.enable": true,
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit"
+    },
+    "ruff.enable": true,
+    "ruff.lint.enable": true,
+    "css.customData": [".vscode/tailwind.json"]
+  }
+  
