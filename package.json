@@ -1,0 +1,29 @@
+{
+  "name": "funiqai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "",
+  "packageManager": "pnpm@9.12.2",
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "prepare": "husky || true",
+    "cleanup": "rimraf 'frontend/node_modules' 'node_modules'"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.0",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@commitlint/types": "^19.5.0",
+    "husky": "^9.1.7",
+    "rimraf": "6.0.1",
+    "lint-staged": "^15.2.10"
+  },
+  "lint-staged": {
+    "frontend/**/*.{js,jsx,ts,tsx}": [
+      "eslint --config ./frontend/eslint.config.js --fix"
+    ]
+  },
+  "keywords": [],
+  "author": "Yellin"
+}

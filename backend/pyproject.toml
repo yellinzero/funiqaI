@@ -1,0 +1,128 @@
+[tool.poetry]
+name = "funiq-ai-be"
+version = "0.1.0"
+readme = "README.md"
+package-mode = false
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.13"
+flask = "~3.0.1"
+flask-compress = "~1.14"
+flask-cors = "~4.0.0"
+flask-login = "~0.6.3"
+flask-migrate = "~4.0.5"
+flask-restful = "~0.3.10"
+flask-sqlalchemy = "~3.1.1"
+python-dotenv = "1.0.0"
+
+
+############################################################
+# [ Dev ] dependency group
+# Required for development and running tests
+############################################################
+pytest = "^8.3.3"
+ruff = "0.6.9"
+[tool.poetry.group.dev]
+optional = true
+[tool.poetry.group.dev.dependencies]
+coverage = "~7.2.4"
+pytest = "~8.3.2"
+pytest-benchmark = "~4.0.0"
+pytest-env = "~1.1.3"
+pytest-mock = "~3.14.0"
+
+############################################################
+# [ Lint ] dependency group
+# Required for code style linting
+############################################################
+[tool.poetry.group.lint]
+optional = true
+[tool.poetry.group.lint.dependencies]
+dotenv-linter = "~0.5.0"
+ruff = "~0.6.9"
+
+
+############################################################
+# [ Ruff ] ruff configuration
+############################################################
+[tool.ruff]
+# Exclude certain directories from linting, such as migration files, build artifacts, and cache
+exclude = [
+    "migrations/*",
+    "__pycache__/*",
+    "build/*",
+    "dist/*",
+]
+# Maximum line length for the project (commonly 88 or 120 characters)
+line-length = 120
+
+[tool.ruff.lint]
+# Enable preview rules for new and experimental linting features
+preview = true
+
+# Enable specific rulesets and categories for linting
+select = [
+    "B",    # flake8-bugbear: Detect common code issues and potential bugs
+    "C4",   # flake8-comprehensions: Optimize list, set, and dict comprehensions
+    "E",    # pycodestyle: Basic PEP 8 style rules
+    "F",    # pyflakes: Check for unused variables, imports, etc.
+    "FURB", # refurb: Suggest better Python code patterns
+    "I",    # isort: Ensure consistent import order
+    "N",    # pep8-naming: Enforce naming conventions
+    "PT",   # flake8-pytest-style: Improve pytest structure and readability
+    "PLC",  # pylint-compatible: Provide enhanced rule suggestions
+    "RUF",  # ruff-specific: Ruff’s custom rules
+    "S",    # bandit: Security linting for common Python vulnerabilities
+    "SIM",  # flake8-simplify: Suggest simpler alternatives for complex logic
+    "UP",   # pyupgrade: Recommend modern Python syntax
+    "PLR0402", # manual-from-import
+    "PLR1711", # useless-return
+    "PLR1714", # repeated-equality-comparison
+    "W191", # tab-indentation
+    "W605", # invalid-escape-sequence
+]
+
+# Ignore specific rules based on project requirements
+ignore = [
+    "E402", # Allow imports not placed at the top of the file (useful for dynamic imports)
+    "E712", # Allow comparisons to True/False (sometimes used for dynamic conditions)
+    "F841", # Ignore unused variables (useful for debugging or placeholders)
+    "SIM102", # Avoid collapsing independent if-else statements (retain clarity)
+    "SIM117", # Allow multiple with statements for better readability
+    "B006", # Ignore mutable argument defaults in certain cases
+    "PT011", # Allow broad exception handling in pytest raises
+]
+
+# Per-file specific ignores for project-specific exceptions
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = [
+    "F401", # Allow unused imports in __init__.py for module initialization
+    "F811", # Allow redefinition of imports in __init__.py
+]
+"tests/*" = [
+    "F401", # Ignore unused imports in test files
+    "F811", # Allow redefinition of variables in test files
+]
+"configs/*" = [
+    "N802", # Ignore invalid function names in config files
+]
+
+# Extend Pyflakes to handle additional generic patterns
+[tool.ruff.lint.pyflakes]
+extend-generics = [
+    "_pytest.monkeypatch", # Recognize pytest's monkeypatch utility
+    "tests.integration_tests", # Extend to support integration test modules
+]
+
+# Format-related settings
+[tool.ruff.format]
+# Exclude specific directories from automatic formatting
+exclude = [
+    "migrations/*",
+    "tests/snapshots/*",
+]
