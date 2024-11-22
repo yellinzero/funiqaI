@@ -21,7 +21,7 @@
   },
   "lint-staged": {
     "frontend/**/*.{js,jsx,ts,tsx}": [
-      "eslint --config ./frontend/eslint.config.js --fix"
+      "cd frontend && eslint --fix"
     ]
   },
   "keywords": [],
