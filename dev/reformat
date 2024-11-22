@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -x
+
+# style checks rely on commands in path
+if ! command -v ruff &> /dev/null || ! command -v dotenv-linter &> /dev/null; then
+    echo "Installing linting tools (Ruff, dotenv-linter ...) ..."
+    poetry install -C backend --only lint
+fi
+
+# run ruff linter
+poetry run -C backend ruff check --fix ./backend
+
+# run ruff formatter
+poetry run -C backend ruff format ./backend
+
+# run dotenv-linter linter
+poetry run -C backend dotenv-linter ./backend/.env.example ./frontend/.env.example

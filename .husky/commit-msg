@@ -1,2 +1,1 @@
-cd frontend
 pnpm exec commitlint --config commitlint.config.ts --edit "${1}"
