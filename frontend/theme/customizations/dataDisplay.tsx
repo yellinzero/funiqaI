@@ -1,10 +1,11 @@
-import { Theme, alpha, Components } from '@mui/material/styles';
-import { svgIconClasses } from '@mui/material/SvgIcon';
-import { typographyClasses } from '@mui/material/Typography';
-import { buttonBaseClasses } from '@mui/material/ButtonBase';
-import { chipClasses } from '@mui/material/Chip';
-import { iconButtonClasses } from '@mui/material/IconButton';
-import { gray, red, green } from '../themePrimitives';
+import type { Components, Theme } from '@mui/material/styles'
+import { buttonBaseClasses } from '@mui/material/ButtonBase'
+import { chipClasses } from '@mui/material/Chip'
+import { iconButtonClasses } from '@mui/material/IconButton'
+import { alpha } from '@mui/material/styles'
+import { svgIconClasses } from '@mui/material/SvgIcon'
+import { typographyClasses } from '@mui/material/Typography'
+import { gray, green, red } from '../themePrimitives'
 
 export const dataDisplayCustomizations: Components<Theme> = {
   MuiList: {
@@ -29,14 +30,14 @@ export const dataDisplayCustomizations: Components<Theme> = {
           fontWeight: 500,
         },
         [`& .${buttonBaseClasses.root}`]: {
-          display: 'flex',
-          gap: 8,
-          padding: '2px 8px',
-          borderRadius: (theme.vars || theme).shape.borderRadius,
-          opacity: 0.7,
+          'display': 'flex',
+          'gap': 8,
+          'padding': '2px 8px',
+          'borderRadius': (theme.vars || theme).shape.borderRadius,
+          'opacity': 0.7,
           '&.Mui-selected': {
-            opacity: 1,
-            backgroundColor: alpha(theme.palette.action.selected, 0.3),
+            'opacity': 1,
+            'backgroundColor': alpha(theme.palette.action.selected, 0.3),
             [`& .${svgIconClasses.root}`]: {
               color: (theme.vars || theme).palette.text.primary,
             },
@@ -229,4 +230,4 @@ export const dataDisplayCustomizations: Components<Theme> = {
       },
     },
   },
-};
+}
