@@ -1,11 +1,9 @@
 {
   "prettier.enable": false,
   "eslint.format.enable": true,
-  "editor.formatOnSave": true,
+  "editor.formatOnSave": false,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "explicit",
-    "source.fixAll": "explicit",
-    "source.organizeImports": "explicit"
   },
   "[css]": {
     "editor.defaultFormatter": "dbaeumer.vscode-eslint"
@@ -31,6 +29,10 @@
   "ruff.lint.enable": true,
   "ruff.path": ["${workspaceFolder}/backend/.venv/bin/ruff"],
   "[python]": {
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit"
+    },
     "editor.defaultFormatter": "charliermarsh.ruff"
   }
 }
