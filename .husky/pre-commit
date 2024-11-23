@@ -32,10 +32,10 @@ if $backend_modified; then
         poetry install -C backend --only lint
     fi
 
-    # run Ruff linter auto-fixing
+    echo "Run fuff linter auto-fixing"
     poetry run ruff check --fix .
 
-    # run Ruff linter checks
+    echo "Run ruff linter checks"
     poetry run ruff check --preview . || status=$?
 
     status=${status:-0}
