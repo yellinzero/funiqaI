@@ -17,12 +17,13 @@ export default antfu({
   stylistic: true,
   rules: {
     'no-console': 'warn',
+    'react/no-array-index-key': 'off',
   },
 }).append(
   ...compat.extends('plugin:@next/next/recommended'),
   ...tailwindcss.configs['flat/recommended'],
   {
     files: ['**/*.js', '**/*.ts', '**/*.jsx', '**/*.tsx'],
-    ignores: ['**/node_modules/*', '.next', '.vscode'],
+    ignores: ['**/node_modules/*', '.next', '.vscode', 'output', 'dist', 'out'],
   },
 )

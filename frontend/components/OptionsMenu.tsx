@@ -26,7 +26,7 @@ export default function OptionsMenu() {
     setAnchorEl(null)
   }
   return (
-    <React.Fragment>
+    <>
       <MenuButton
         aria-label="Open menu"
         onClick={handleClick}
@@ -75,6 +75,6 @@ export default function OptionsMenu() {
           </ListItemIcon>
         </MenuItem>
       </Menu>
-    </React.Fragment>
+    </>
   )
 }
