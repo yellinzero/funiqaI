@@ -1,8 +1,16 @@
 {
-  "name": "funiqai",
+  "name": "funiq-ai",
   "version": "0.1.0",
   "private": true,
-  "description": "",
+  "author": "Yellin",
+  "license": "Apache-2.0",
+  "description": "A personal, experimental, playful project designed to simplify the process of creating and managing agent-based workflows.",
+  "keywords": [
+    "ai",
+    "fun",
+    "agent",
+    "workflows"
+  ],
   "packageManager": "pnpm@9.12.2",
   "workspaces": [
     "frontend"
@@ -23,7 +31,5 @@
     "frontend/**/*.{js,jsx,ts,tsx}": [
       "cd frontend && eslint --fix"
     ]
-  },
-  "keywords": [],
-  "author": "Yellin"
+  }
 }
