@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "funiq-ai-be"
+name = "funiq-ai-server"
 version = "0.1.0"
 readme = "README.md"
 package-mode = false

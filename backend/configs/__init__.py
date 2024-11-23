@@ -1,3 +1,3 @@
-from .app_config import FuniqAIConfig
+from .app_config import FuniqAIConfigSettings
 
-funiq_ai_config = FuniqAIConfig()
+funiq_ai_config = FuniqAIConfigSettings()
