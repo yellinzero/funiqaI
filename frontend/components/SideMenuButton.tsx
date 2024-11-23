@@ -7,7 +7,7 @@ export interface MenuButtonProps extends IconButtonProps {
   showBadge?: boolean
 }
 
-export default function MenuButton({
+export default function SideMenuButton({
   showBadge = false,
   ...props
 }: MenuButtonProps) {

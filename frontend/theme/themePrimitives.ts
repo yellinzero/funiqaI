@@ -184,7 +184,7 @@ export function getDesignTokens(mode: PaletteMode) {
       },
     },
     typography: {
-      fontFamily: 'Inter, sans-serif',
+      fontFamily: 'var(--font-roboto)',
       h1: {
         fontSize: defaultTheme.typography.pxToRem(48),
         fontWeight: 600,
