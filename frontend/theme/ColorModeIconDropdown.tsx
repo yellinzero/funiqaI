@@ -6,10 +6,15 @@ import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import { useColorScheme } from '@mui/material/styles'
+import { useRouter } from 'next/navigation'
 import * as React from 'react'
+import { useCookies } from 'react-cookie'
+import { themeCookieName } from './configs'
 
 export default function ColorModeIconDropdown(props: IconButtonOwnProps) {
+  const router = useRouter()
   const { mode, systemMode, setMode } = useColorScheme()
+  const [_cookies, setCookie] = useCookies([themeCookieName])
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -19,6 +24,8 @@ export default function ColorModeIconDropdown(props: IconButtonOwnProps) {
     setAnchorEl(null)
   }
   const handleMode = (targetMode: 'system' | 'light' | 'dark') => () => {
+    setCookie(themeCookieName, targetMode)
+    router.refresh()
     setMode(targetMode)
     handleClose()
   }

@@ -10,13 +10,13 @@ import MuiMenuItem from '@mui/material/MenuItem'
 import { paperClasses } from '@mui/material/Paper'
 import { styled } from '@mui/material/styles'
 import * as React from 'react'
-import MenuButton from './MenuButton'
+import MenuButton from './SideMenuButton'
 
 const MenuItem = styled(MuiMenuItem)({
   margin: '2px 0',
 })
 
-export default function OptionsMenu() {
+export default function UserActionsMenu() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {

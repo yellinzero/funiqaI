@@ -1,15 +1,12 @@
 'use client'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
-import Divider from '@mui/material/Divider'
 import MuiDrawer, { drawerClasses } from '@mui/material/Drawer'
 import Stack from '@mui/material/Stack'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
-import CardAlert from './CardAlert'
-import MenuContent from './MenuContent'
-import OptionsMenu from './OptionsMenu'
-import SelectContent from './SelectContent'
+import SideMenuContent from './SideMenuContent'
+import UserActionsMenu from './UserActionsMenu'
 
 const drawerWidth = 240
 
@@ -35,18 +32,7 @@ export default function SideMenu() {
         },
       }}
     >
-      <Box
-        sx={{
-          display: 'flex',
-          mt: 'calc(var(--template-frame-height, 0px) + 4px)',
-          p: 1.5,
-        }}
-      >
-        <SelectContent />
-      </Box>
-      <Divider />
-      <MenuContent />
-      <CardAlert />
+      <SideMenuContent />
       <Stack
         direction="row"
         sx={{
@@ -71,7 +57,7 @@ export default function SideMenu() {
             riley@email.com
           </Typography>
         </Box>
-        <OptionsMenu />
+        <UserActionsMenu />
       </Stack>
     </Drawer>
   )
