@@ -5,7 +5,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5001:5000"
-    environment:
-      - FLASK_ENV=development
     volumes:
       - .:/app
+    env_file:
+      - .env
+    command: python app.py
