@@ -1,12 +1,10 @@
 'use client'
 import { FacebookIcon, GoogleIcon, SitemarkIcon } from '@/components/CustomIcons'
-import AppTheme from '@/theme/AppTheme'
 import ColorModeSelect from '@/theme/ColorModeSelect'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
 import Checkbox from '@mui/material/Checkbox'
-import CssBaseline from '@mui/material/CssBaseline'
 import Divider from '@mui/material/Divider'
 import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
@@ -60,7 +58,7 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
   },
 }))
 
-export default function SignUp(props: { disableCustomTheme?: boolean }) {
+export default function SignUp() {
   const [emailError, setEmailError] = React.useState(false)
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('')
   const [passwordError, setPasswordError] = React.useState(false)
@@ -123,8 +121,8 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
   }
 
   return (
-    <AppTheme {...props}>
-      <CssBaseline enableColorScheme />
+    <>
+
       <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
       <SignUpContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
@@ -233,6 +231,6 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
           </Box>
         </Card>
       </SignUpContainer>
-    </AppTheme>
+    </>
   )
 }
