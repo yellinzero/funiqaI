@@ -1,29 +1,16 @@
-import type { PaletteMode } from '@mui/material/styles'
 import Header from '@/components/Header'
 import MobileNavbar from '@/components/MobileNavbar'
 import SideMenu from '@/components/SideMenu'
-import { useTranslation as translation } from '@/plugins/i18n/server'
-import { themeCookieName } from '@/theme/configs'
-import { getDesignTokens } from '@/theme/themePrimitives'
+import { translationOnServer } from '@/plugins/i18n/server'
+import { getThemeVarsOnServer } from '@/theme/server'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 import { alpha } from '@mui/material/styles'
-import { cookies } from 'next/headers'
 import React from 'react'
 
-export default async function Home({
-  params,
-}: {
-  params: Promise<{
-    lang: string
-  }>
-}) {
-  const { lang } = await params
-
-  const { t } = await translation(lang, 'global')
-  const cookieStore = await cookies()
-  const themeCookie = cookieStore.get(themeCookieName)?.value as PaletteMode
-  const themeVars = getDesignTokens(themeCookie)
+export default async function Home() {
+  const { t } = await translationOnServer('global')
+  const themeVars = await getThemeVarsOnServer()
   return (
     <Box sx={{ display: 'flex', height: '100vh', width: '100vw' }}>
       <SideMenu />

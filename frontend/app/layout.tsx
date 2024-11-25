@@ -1,13 +1,14 @@
 import type { ThemeProviderProps } from '@mui/material/styles/ThemeProvider'
 import type { Metadata } from 'next'
+import { getLangOnServer } from '@/plugins/i18n/server'
 import { languages } from '@/plugins/i18n/settings'
 import theme from '@/theme'
 import { themeCookieName } from '@/theme/configs'
 import { CssBaseline } from '@mui/material'
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 import { ThemeProvider } from '@mui/material/styles'
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
 
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
 import { dir } from 'i18next'
 import { Roboto } from 'next/font/google'
 import { cookies } from 'next/headers'
@@ -37,14 +38,10 @@ export const viewport = {
 
 export default async function RootLayout({
   children,
-  params,
 }: Readonly<{
   children: React.ReactNode
-  params: {
-    lang: string
-  }
 }>) {
-  const { lang } = await params
+  const lang = await getLangOnServer()
   const cookieStore = await cookies()
   let themeCookie = cookieStore.get(themeCookieName)?.value as ThemeProviderProps['defaultMode']
   if (!themeCookie) {

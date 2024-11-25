@@ -1,4 +1,8 @@
 {
   "product_name": "Funiq AI",
-  "welcome": "欢迎"
+  "welcome": "欢迎",
+  "chats": "对话",
+  "workflows": "工作流",
+  "store": "商店",
+  "integrationHub": "集成中心"
 }
