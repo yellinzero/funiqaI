@@ -1,5 +1,6 @@
 services:
-  backend:
+  server:
+    container_name: funiq_ai_server
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,4 +10,35 @@ services:
       - .:/app
     env_file:
       - .env
-    command: python app.py
+    depends_on:
+      - db
+      - redis
+
+  db:
+    image: postgres:15-alpine
+    container_name: ${PGHOST:-funiq_ai_postgres}
+    restart: always
+    environment:
+      PGUSER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-funiq_ai_db_pass}
+      POSTGRES_DB: ${POSTGRES_DB:-funiq_ai_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ${PGDATA_HOST_VOLUME:-./volumes/db/data}:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  redis:
+    image: redis:6-alpine
+    user: redis
+    container_name: funiq_ai_redis
+    volumes:
+      - ${REDIS_HOST_VOLUME:-./volumes/redis/data}:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
