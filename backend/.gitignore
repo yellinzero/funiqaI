@@ -679,3 +679,5 @@ dmypy.json
 cython_debug/
 
 deployment_meta.json
+
+/volumes/*
