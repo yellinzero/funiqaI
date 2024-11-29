@@ -1,4 +1,3 @@
-import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -8,7 +7,9 @@ from fastapi.requests import Request
 from fastapi.responses import JSONResponse, ORJSONResponse
 
 from app.errors.base import FuniqAIError
-from app.errors.common import NotFoundError
+from app_manager import app_manager
+from database import shutdown_database
+from middleware import install_global_middlewares
 
 
 # Define the FastAPI application with essential configurations
@@ -22,6 +23,9 @@ def create_app() -> FastAPI:
         lifespan=lifespan,  # Register lifecycle hooks
     )
 
+    install_global_middlewares(app)
+    app_manager.install_apps(["app.auth"])
+    app_manager.apply_modules_to_fastapi(app)
     # Register routes and exception handlers
     register_routes(app)
     register_exception_handlers(app)
@@ -29,17 +33,10 @@ def create_app() -> FastAPI:
     return app
 
 
-# Define lifecycle hooks for startup and shutdown operations
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    Manage resources during the application lifecycle.
-    """
-    await asyncio.sleep(0)
-    print("Application startup tasks...")  # Placeholder for startup logic
     yield
-    await asyncio.sleep(0)
-    print("Application cleanup tasks...")  # Placeholder for cleanup logic
+    await shutdown_database()
 
 
 # Define a health check route
@@ -50,10 +47,6 @@ def register_routes(app: FastAPI):
     @app.get("/api/health", tags=["Health Check"])
     def health_check():
         return {"status": "healthy"}
-
-    @app.get("/api/error-code-test", tags=["Error Code Test"])
-    def error_code_test():
-        raise NotFoundError()
     
 
 # Exception handler registration
