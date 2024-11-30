@@ -1,7 +1,7 @@
 
 from pydantic import BaseModel, EmailStr
 
-from .models import AccountStatus
+from ..user.models import AccountStatus
 
 
 class SignupRequest(BaseModel):
@@ -15,7 +15,7 @@ class LoginRequest(BaseModel):
     password: str
 
 
-class AccountResponse(BaseModel):
+class SignupResponse(BaseModel):
     id: str
     email: EmailStr
     status: AccountStatus
