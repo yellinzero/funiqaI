@@ -61,10 +61,9 @@ class BaseErrorCode(Enum):
     def to_dict(self):
         """Convert the error code to a dictionary."""
         return {"code": self.code, "message": self.message}
-
-
-class UnknownErrorCode(BaseErrorCode):
-    UNKNOWN = ("A0000", "An unknown error occurred.")
+    
+    def exception(self, data: dict | str | None = None, status_code: int = 500):
+        return FuniqAIError(self, data=data, status_code=status_code)
     
 
 class FuniqAIError(Exception):
@@ -72,8 +71,8 @@ class FuniqAIError(Exception):
     Base exception for the application.
     Allows for standardized error handling with error codes and optional data.
     """
-    _default_code: str = UnknownErrorCode.UNKNOWN.code  # Fallback code if no specific error is provided
-    _default_message: str = UnknownErrorCode.UNKNOWN.message  # Default message
+    _default_code: str = "A0000"  # Fallback code if no specific error is provided
+    _default_message: str = "An unknown error occurred."  # Default message
     _default_status_code: int = 500  # Default HTTP status code
 
     def __init__(
@@ -105,3 +104,4 @@ class FuniqAIError(Exception):
             "message": self.message,
             "data": self.data,
         }
+        
