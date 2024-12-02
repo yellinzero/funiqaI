@@ -1,4 +1,4 @@
-from app.errors.base import BaseErrorCode, FuniqAIError
+from app.errors.base import BaseErrorCode
 
 
 class CommonErrorCode(BaseErrorCode):
@@ -19,15 +19,3 @@ class SystemErrorCode(BaseErrorCode):
     DATABASE_ERROR = ("C0001", "Database Error")
     CACHE_ERROR = ("C0002", "Cache Error")
     TIMEOUT_ERROR = ("C0003", "Request Timeout")
-    
-    
-class UnauthorizedError(FuniqAIError):
-    _default_code = CommonErrorCode.UNAUTHORIZED.code
-    _default_message = CommonErrorCode.UNAUTHORIZED.message
-    _default_status_code = 401
-
-
-class NotFoundError(FuniqAIError):
-    _default_code = CommonErrorCode.NOT_FOUND.code
-    _default_message = CommonErrorCode.NOT_FOUND.message
-    _default_status_code = 404

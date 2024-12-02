@@ -2,8 +2,8 @@
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.schemas import LoginRequest, SignupRequest
 from app.user.models import Account, AccountStatus
-from app.user.schemas import LoginRequest, SignupRequest
 from utils.security import create_access_token, hash_password, verify_password
 
 
