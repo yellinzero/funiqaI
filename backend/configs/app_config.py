@@ -9,6 +9,10 @@ class FuniqAIConfigSettings(
 ):
     DEBUG: bool
     SECRET_KEY: str
+    PGHOST: str
+    PGUSER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
     SYNC_DATABASE_URL: str
     DATABASE_ECHO: bool = False
     SYNC_DATABASE_POOL_SIZE: int = 5
