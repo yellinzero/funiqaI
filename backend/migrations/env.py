@@ -3,13 +3,13 @@ from logging.config import fileConfig
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from configs import funiq_ai_config
-from database import DBBase
+from database import DBBase, load_models
 from alembic import context
 
+load_models('app.models')
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url", funiq_ai_config.SYNC_DATABASE_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
@@ -19,8 +19,12 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
-# target_metadata = mymodel.Base.metadata
+# target_metadata = mymodel.DBBase.metadata
 target_metadata = DBBase.metadata
+
+def get_db_url():
+    return funiq_ai_config.SYNC_DATABASE_URL.replace(f"@{funiq_ai_config.PGHOST}", "@localhost")
+config.set_main_option("sqlalchemy.url", get_db_url())
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

@@ -1,5 +1,5 @@
 # Use Python 3.10 slim as base
-FROM python:3.10-slim
+FROM python:3.10-slim-bookworm
 
 # Set the working directory
 WORKDIR /app

@@ -1,17 +1,21 @@
 
-from datetime import datetime
-from typing import Any, Type, TypeVar, Union
+import uuid
+from datetime import datetime, timezone
+from typing import Any, Generic, Type, TypeVar, Union
 
 import inflect
 import stringcase
-from sqlalchemy import delete, func, insert, update
+from sqlalchemy import Integer, delete, func, insert, update
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.ext.asyncio import AsyncAttrs, AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import DeclarativeBase, Mapped, declared_attr, mapped_column
 from sqlalchemy.sql import Select
+from sqlalchemy_utils import generic_repr
 
 # Type variable for the generic DBBase
 T = TypeVar("T", bound="DBBase")
+ID = TypeVar("ID", bound=Union[int, uuid.UUID])
 
 
 def resolve_table_name(name: str) -> str:
@@ -22,12 +26,13 @@ def resolve_table_name(name: str) -> str:
     return "_".join(parts)
 
 
+@generic_repr
 class DBBase(AsyncAttrs, DeclarativeBase):
     """
-    Base class for ORM models, providing common database operation methods.
+    DBBase class for ORM models, providing common database operation methods.
     """
 
-    @declared_attr
+    @declared_attr.directive
     def __tablename__(self) -> str:
         """Automatically generate table names based on class names."""
         return resolve_table_name(self.__name__)
@@ -107,7 +112,7 @@ class DBBase(AsyncAttrs, DeclarativeBase):
                 setattr(self, key, value)
 
     @classmethod
-    def select(cls) -> Select:
+    def select(cls: Type[T]) -> Select[T]:
         """Return a SQLAlchemy Select statement for the model."""
         return select(cls)
 
@@ -122,15 +127,31 @@ class DBBase(AsyncAttrs, DeclarativeBase):
         return self.__class__.get_column_names()
 
 
-class DBModelMixin:
+class DBModelMixin(Generic[ID]):
     """
     Mixin class for models, providing default fields like ID, created_at, and updated_at.
     """
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
-    updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, onupdate=datetime.utcnow)
+    id: Mapped[ID]
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    updated_at: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
+    )
 
     def refresh_updated_at(self) -> None:
         """Manually refresh the updated_at field to the current timestamp."""
-        self.updated_at = datetime.utcnow()
+        self.updated_at = datetime.now(timezone.utc)
+        
+        
+class DBIntIDModelMixin(DBModelMixin[int]):
+    """
+    Model implementation using an auto-incrementing integer as the primary key ID.
+    """
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+
+
+class DBUUIDIDModelMixin(DBModelMixin[uuid.UUID]):
+    """
+    Model implementation using a UUID as the primary key ID.
+    """
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
