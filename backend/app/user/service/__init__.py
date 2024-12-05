@@ -1,56 +1,67 @@
 # services/account_service.py
-from fastapi import HTTPException, status
+from fastapi import Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.schemas import LoginRequest, SignupRequest
-from app.user.models import Account, AccountStatus
-from utils.security import create_access_token, hash_password, verify_password
+from app.errors.user import UserErrorCode
+from app.models.user import Account, AccountStatus
+from utils.security import create_access_token
 
 
 class AccountService:
     @staticmethod
-    async def signup(session: AsyncSession, payload: SignupRequest) -> Account:
+    async def signup(session: AsyncSession, payload: SignupRequest, request: Request) -> Account:
         """Register a new account."""
-        # Check if the email is already registered
-        existing_account = await session.execute(
-            Account.select().where(Account.email == payload.email)
+        # Check if the email/name is already registered
+        result = await session.execute(
+            Account.select().where(Account.email == payload.email | Account.name == payload.name)
         )
-        if existing_account.scalar_one_or_none():
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email is already registered.",
-            )
-
+        
+        existing_account: Account | None = result.scalars().one_or_none()
+        if existing_account:
+            if existing_account.email == payload.email:
+                raise UserErrorCode.EMAIL_ALREADY_REGISTERED.exception(
+                    data={"email": payload.email}, 
+                    status_code=status.HTTP_400_BAD_REQUEST
+                )
+            elif existing_account.name == payload.name:
+                raise UserErrorCode.NAME_ALREADY_REGISTERED.exception(
+                    data={"name": payload.name}, 
+                    status_code=status.HTTP_400_BAD_REQUEST
+                )
+                
         # Create new account
+        # TODO: Set to PENDING by default, and update to ACTIVE once verified in the code.
         account = Account(
+            name=payload.name,
             email=payload.email,
-            password_hash=hash_password(payload.password),
-            status=AccountStatus.PENDING,
+            status=AccountStatus.ACTIVE,
+            last_login_ip=request.client.host,
         )
-        session.add(account)
-        await session.commit()
+            
+        account.set_password(payload.password)
+        account.save()
         return account
+    
+    # TODO - Add invite code support
+    # async def signup_by_invite_code() -> Account:
 
+    # TODO - Support login by username or oauth in the futrue
     @staticmethod
     async def login(session: AsyncSession, payload: LoginRequest) -> str:
         """Authenticate an account and return a JWT token."""
         # Find the account
-        account = await session.execute(
+        result = await session.execute(
             Account.select().where(Account.email == payload.email)
         )
-        account = account.scalar_one_or_none()
+        
+        account: Account | None = result.scalars().one_or_none()
 
-        if not account or not verify_password(payload.password, account.password_hash):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid email or password.",
-            )
+        if not account or not account.verify_password(payload.password):
+            raise UserErrorCode.INVALID_EMAIL_PASSWORD.exception(status_code=status.HTTP_401_UNAUTHORIZED)
 
         if account.status != AccountStatus.ACTIVE:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Account is not active.",
-            )
+            raise UserErrorCode.ACCOUNT_NOT_ACTIVE.exception(status_code=status.HTTP_403_FORBIDDEN)
 
         # Generate JWT token
         token = create_access_token({"sub": account.id})
