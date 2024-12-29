@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    environment:
+      MODE: "web"
     ports:
       - "5001:5000"
     volumes:
@@ -12,6 +14,20 @@ services:
       - .env
     depends_on:
       - db
+      - redis
+
+  celery_worker:
+    container_name: funiq_ai_celery_worker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      MODE: "worker"
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
       - redis
 
   db:
@@ -35,10 +51,14 @@ services:
   redis:
     image: redis:6-alpine
     user: redis
-    container_name: funiq_ai_redis
     volumes:
-      - ${REDIS_HOST_VOLUME:-./volumes/redis/data}:/data
+      - ./volumes/redis/data:/data
+    command: redis-server --requirepass ${REDIS_PASSWORD:-funiq_ai_redis_pass}
     ports:
       - "6379:6379"
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-funiq_ai_redis_pass}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+

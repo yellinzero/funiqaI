@@ -133,14 +133,15 @@ class DBModelMixin(Generic[ID]):
     """
 
     id: Mapped[ID]
-    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    created_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     updated_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc)
+        default=lambda: datetime.now(timezone.utc).replace(tzinfo=None), 
+        onupdate=lambda: datetime.now(timezone.utc).replace(tzinfo=None)
     )
 
     def refresh_updated_at(self) -> None:
         """Manually refresh the updated_at field to the current timestamp."""
-        self.updated_at = datetime.now(timezone.utc)
+        self.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
         
         
 class DBIntIDModelMixin(DBModelMixin[int]):

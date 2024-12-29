@@ -1,5 +1,7 @@
 import contextlib
 import functools
+import logging
+import time
 from inspect import signature
 from typing import Any, AsyncGenerator, Callable
 
@@ -155,3 +157,83 @@ def provide_session(fn: Callable[..., Any]):
             return await fn(*args, **kwargs)
 
     return wrapper
+
+
+class RedisRateLimiter:
+    """
+    A Redis-based rate limiter for tracking request limits by key (e.g., email or IP).
+    """
+
+    def __init__(
+        self, 
+        prefix: str = "redis_rate_limiter", 
+        max_attempts: int = 5, 
+        time_window: int = 60
+    ):
+        """
+        Initialize the rate limiter.
+
+        :param redis_client: Redis client instance.
+        :param prefix: Redis key prefix.
+        :param max_attempts: Max allowed attempts in the time window.
+        :param time_window: Time window in seconds.
+        """
+        self.prefix = prefix
+        self.max_attempts = max_attempts
+        self.time_window = time_window
+        self.logger = logging.getLogger(self.__class__.__name__)
+
+    def generate_key(self, identifier: str) -> str:
+        """
+        Generate a unique Redis key for a given identifier (e.g., email or IP).
+
+        :param identifier: Unique identifier for the user or IP.
+        :return: Redis key.
+        """
+        return f"{self.prefix}:{identifier}"
+
+    async def check_limit_exceeded(self, identifier: str) -> bool:
+        """
+        Check if the rate limit is exceeded for the given identifier.
+
+        :param identifier: Unique identifier for the user or IP.
+        :return: True if the limit is exceeded, False otherwise.
+        """
+        key = self.generate_key(identifier)
+        current_time = int(time.time())
+        window_start_time = current_time - self.time_window
+
+        # Remove expired attempts
+        await redis.zremrangebyscore(key, "-inf", window_start_time)
+
+        # Check current attempts count
+        attempts = await redis.zcard(key)
+        if attempts and int(attempts) >= self.max_attempts:
+            self.logger.warning(f"Rate limit exceeded for identifier: {identifier}")
+            return True
+        return False
+
+    async def record_attempt(self, identifier: str):
+        """
+        Record an attempt for the given identifier.
+
+        :param identifier: Unique identifier for the user or IP.
+        """
+        key = self.generate_key(identifier)
+        current_time = int(time.time())
+
+        # Add the current timestamp to the sorted set
+        await redis.zadd(key, {current_time: current_time})
+
+        # Set expiration time for the key to automatically clear old data
+        await redis.expire(key, self.time_window * 2)
+
+    async def reset_attempts(self, identifier: str):
+        """
+        Reset the attempts for the given identifier.
+
+        :param identifier: Unique identifier for the user or IP.
+        """
+        key = self.generate_key(identifier)
+        await redis.delete(key)
+        self.logger.info(f"Rate limit reset for identifier: {identifier}")
