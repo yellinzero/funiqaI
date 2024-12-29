@@ -63,7 +63,7 @@ class BaseErrorCode(Enum):
         return {"code": self.code, "message": self.message}
     
     def exception(self, data: dict | str | None = None, status_code: int = 500):
-        return FuniqAIError(self, data=data, status_code=status_code)
+        return FuniqAIError(code=self.code, message=self.message, data=data, status_code=status_code)
     
 
 class FuniqAIError(Exception):

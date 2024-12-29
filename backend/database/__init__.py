@@ -2,6 +2,7 @@ import importlib
 import pkgutil
 
 from .core import (
+    RedisRateLimiter,
     SessionFactory,
     engine,
     get_session,

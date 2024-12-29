@@ -7,6 +7,8 @@ from app.errors import register_exception_handlers
 from app_manager import app_manager
 from database import shutdown_database
 from middleware import install_global_middlewares
+from services.celery import init_celery
+from services.email_service import init_email_service
 
 
 # Define the FastAPI application with essential configurations
@@ -26,6 +28,10 @@ def create_app() -> FastAPI:
     # Register routes and exception handlers
     register_routes(app)
     register_exception_handlers(app)
+    # Register Email server
+    init_email_service(app)
+    # Resister Celery server
+    init_celery(app)
 
     return app
 
@@ -46,3 +52,5 @@ def register_routes(app: FastAPI):
         return {"status": "healthy"}
     
 
+app = create_app()
+celery = app.state.celery
