@@ -35,8 +35,9 @@ class Account(DBBase, DBUUIDIDModelMixin):
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     password_hash: Mapped[str | None] = mapped_column(String(255))
     status: Mapped[AccountStatus] = mapped_column(String(50), default=AccountStatus.ACTIVE)
-    last_login_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc))
+    last_login_at: Mapped[datetime] = mapped_column(default=lambda: datetime.now(timezone.utc).replace(tzinfo=None))
     last_login_ip:  Mapped[str | None] = mapped_column(String(255))
+    language: Mapped[str | None] = mapped_column(String(50))
     
     oauth_providers: Mapped[list["OAuthProvider"]] = relationship(
         "OAuthProvider", back_populates="account", cascade="all, delete-orphan"
@@ -70,7 +71,6 @@ class User(DBBase, DBUUIDIDModelMixin):
     tenant_id: Mapped[str] = mapped_column(ForeignKey("tenants.id"), nullable=False)
     role: Mapped[TenantUserRole] = mapped_column(String(50), default=TenantUserRole.MEMBER)
     avatar: Mapped[str | None] = mapped_column(String(2048))  # User avatar (URL)
-    language: Mapped[str | None] = mapped_column(String(50))
 
     account: Mapped["Account"] = relationship("Account", back_populates="users")
     tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="users")

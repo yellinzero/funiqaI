@@ -37,7 +37,7 @@ def register_exception_handlers(app: FastAPI):
         """
         return JSONResponse(
             status_code=400,
-            content=CommonErrorCode.INVALID_ARGUMENT.to_dict | {
+            content=CommonErrorCode.INVALID_ARGUMENT.to_dict() | {
                 "code": "INVALID_ARGUMENT",
                 "message": "Invalid input data",
                 "data": jsonable_encoder(exc.errors()),

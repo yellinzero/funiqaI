@@ -16,8 +16,12 @@ RUN poetry config virtualenvs.create false && poetry install --no-dev --no-inter
 # Copy the application code
 COPY . /app
 
-# Expose the FastAPI port
+# Expose FastAPI port
 EXPOSE 5000
 
-# Command to run the FastAPI application
-CMD ["python", "app.py"]
+# Copy the entrypoint script and set executable permissions
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Default entrypoint
+ENTRYPOINT ["/entrypoint.sh"]

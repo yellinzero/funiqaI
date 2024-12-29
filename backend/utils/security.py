@@ -6,12 +6,13 @@ from passlib.context import CryptContext
 
 from configs import funiq_ai_config
 
+from .datatime import utcnow
+
 # Password hashing configuration
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # JWT configuration
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 # -------- Password Hashing --------
@@ -44,7 +45,7 @@ def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] 
         str: The encoded JWT.
     """
     to_encode = data.copy()
-    expire = datetime.datetime.utcnow() + (expires_delta or datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = utcnow() + (expires_delta or datetime.timedelta(minutes=funiq_ai_config.ACCESS_TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, funiq_ai_config.SECRET_KEY, algorithm=ALGORITHM)
 
