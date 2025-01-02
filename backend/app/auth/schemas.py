@@ -1,4 +1,3 @@
-
 from pydantic import BaseModel, EmailStr
 
 
@@ -6,13 +5,13 @@ class SignupRequest(BaseModel):
     name: str
     email: EmailStr
     password: str
-    language: str = 'en'
+    language: str | None = None
     invite_code: str | None = None
     
 
 class ActivateAccountRequest(BaseModel):
     email: str
-    language: str = 'en'
+    language: str | None = None
 
 
 class SignupVerifyRequest(BaseModel):
@@ -23,7 +22,7 @@ class SignupVerifyRequest(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
-    language: str = 'en'
+    language: str | None = None
 
 
 class SignupResponse(BaseModel):
@@ -34,7 +33,7 @@ class ActivateAccountResponse(BaseModel):
     token: str
 
 
-class LoginResponse(BaseModel):
+class SignInResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     

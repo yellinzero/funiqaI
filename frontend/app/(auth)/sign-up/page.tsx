@@ -1,15 +1,18 @@
 'use client'
-import { FacebookIcon, GoogleIcon, SitemarkIcon } from '@/components/CustomIcons'
+import { signupApi } from '@/apis/modules/auth'
+import LangSelect from '@/components/LangSelect'
+import { SiteLogo } from '@/components/SiteLogo'
+import Toast from '@/components/Toast'
+import { getLangOnClient, useTranslation } from '@/plugins/i18n/client'
+// import { FacebookIcon, GoogleIcon } from '@/components/CustomIcons'
 import ColorModeSelect from '@/theme/ColorModeSelect'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
 import Checkbox from '@mui/material/Checkbox'
-import Divider from '@mui/material/Divider'
 import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FormLabel from '@mui/material/FormLabel'
-import Link from '@mui/material/Link'
 import Stack from '@mui/material/Stack'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
@@ -59,6 +62,7 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }))
 
 export default function SignUp() {
+  const { t } = useTranslation('global')
   const [emailError, setEmailError] = React.useState(false)
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('')
   const [passwordError, setPasswordError] = React.useState(false)
@@ -75,7 +79,7 @@ export default function SignUp() {
 
     if (!email.value || !/\S[^\s@]*@\S+\.\S+/.test(email.value)) {
       setEmailError(true)
-      setEmailErrorMessage('Please enter a valid email address.')
+      setEmailErrorMessage(t('enter_valid_email'))
       isValid = false
     }
     else {
@@ -85,7 +89,7 @@ export default function SignUp() {
 
     if (!password.value || password.value.length < 6) {
       setPasswordError(true)
-      setPasswordErrorMessage('Password must be at least 6 characters long.')
+      setPasswordErrorMessage(t('enter_valid_password'))
       isValid = false
     }
     else {
@@ -95,7 +99,7 @@ export default function SignUp() {
 
     if (!name.value || name.value.length < 1) {
       setNameError(true)
-      setNameErrorMessage('Name is required.')
+      setNameErrorMessage(t('name_required'))
       isValid = false
     }
     else {
@@ -106,33 +110,37 @@ export default function SignUp() {
     return isValid
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     if (nameError || emailError || passwordError) {
       event.preventDefault()
       return
     }
+    event.preventDefault()
     const data = new FormData(event.currentTarget)
-    console.log({
-      name: data.get('name'),
-      lastName: data.get('lastName'),
-      email: data.get('email'),
-      password: data.get('password'),
+    const langCookie = getLangOnClient()
+    await signupApi({
+      name: data.get('name') as string,
+      email: data.get('email') as string,
+      password: data.get('password') as string,
+      language: langCookie,
     })
   }
 
   return (
     <>
-
-      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+      <Box sx={{ display: 'flex', alignItems: 'center', position: 'fixed', top: '1rem', right: '1rem', gap: 1 }}>
+        <LangSelect />
+        <ColorModeSelect />
+      </Box>
       <SignUpContainer direction="column" justifyContent="space-between">
         <Card variant="outlined">
-          <SitemarkIcon />
+          <SiteLogo />
           <Typography
             component="h1"
             variant="h4"
             sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
           >
-            Sign up
+            {t('sign_up')}
           </Typography>
           <Box
             component="form"
@@ -140,21 +148,21 @@ export default function SignUp() {
             sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
           >
             <FormControl>
-              <FormLabel htmlFor="name">Full name</FormLabel>
+              <FormLabel htmlFor="name">{t('full_name')}</FormLabel>
               <TextField
                 autoComplete="name"
                 name="name"
                 required
                 fullWidth
                 id="name"
-                placeholder="Jon Snow"
+                placeholder={t('full_name')}
                 error={nameError}
                 helperText={nameErrorMessage}
                 color={nameError ? 'error' : 'primary'}
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="email">Email</FormLabel>
+              <FormLabel htmlFor="email">{t('email')}</FormLabel>
               <TextField
                 required
                 fullWidth
@@ -169,7 +177,7 @@ export default function SignUp() {
               />
             </FormControl>
             <FormControl>
-              <FormLabel htmlFor="password">Password</FormLabel>
+              <FormLabel htmlFor="password">{t('password')}</FormLabel>
               <TextField
                 required
                 fullWidth
@@ -194,13 +202,13 @@ export default function SignUp() {
               variant="contained"
               onClick={validateInputs}
             >
-              Sign up
+              {t('sign_up')}
             </Button>
           </Box>
-          <Divider>
+          {/* <Divider>
             <Typography sx={{ color: 'text.secondary' }}>or</Typography>
-          </Divider>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          </Divider> */}
+          {/* <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Button
               fullWidth
               variant="outlined"
@@ -228,7 +236,7 @@ export default function SignUp() {
                 Sign in
               </Link>
             </Typography>
-          </Box>
+          </Box> */}
         </Card>
       </SignUpContainer>
     </>

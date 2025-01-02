@@ -9,7 +9,7 @@ from .schemas import (
     ActivateAccountRequest,
     ActivateAccountResponse,
     LoginRequest,
-    LoginResponse,
+    SignInResponse,
     SignupRequest,
     SignupResponse,
     SignupVerifyRequest,
@@ -25,7 +25,7 @@ async def signup(payload: SignupRequest, request: Request):
     return ResponseModel(data={"token": token})
 
 
-@auth_router.post("/login", response_model=ResponseModel[LoginResponse])
+@auth_router.post("/login", response_model=ResponseModel[SignInResponse])
 async def login(payload: LoginRequest, request: Request):
     token = await AccountService.login(db.session, payload, request)
     return ResponseModel(data={"access_token": token})
