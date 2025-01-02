@@ -124,6 +124,16 @@ export interface components {
             /** Language */
             language?: string | null;
         };
+        /** LoginResponse */
+        LoginResponse: {
+            /** Access Token */
+            access_token: string;
+            /**
+             * Token Type
+             * @default bearer
+             */
+            token_type: string;
+        };
         /** ResponseModel[ActivateAccountResponse] */
         ResponseModel_ActivateAccountResponse_: {
             /**
@@ -138,8 +148,8 @@ export interface components {
             msg: string;
             data: components["schemas"]["ActivateAccountResponse"];
         };
-        /** ResponseModel[SignInResponse] */
-        ResponseModel_SignInResponse_: {
+        /** ResponseModel[LoginResponse] */
+        ResponseModel_LoginResponse_: {
             /**
              * Code
              * @default 0
@@ -150,7 +160,7 @@ export interface components {
              * @default success
              */
             msg: string;
-            data: components["schemas"]["SignInResponse"];
+            data: components["schemas"]["LoginResponse"];
         };
         /** ResponseModel[SignupResponse] */
         ResponseModel_SignupResponse_: {
@@ -179,16 +189,6 @@ export interface components {
              */
             msg: string;
             data: components["schemas"]["SignupVerifyResponse"];
-        };
-        /** SignInResponse */
-        SignInResponse: {
-            /** Access Token */
-            access_token: string;
-            /**
-             * Token Type
-             * @default bearer
-             */
-            token_type: string;
         };
         /** SignupRequest */
         SignupRequest: {
@@ -298,7 +298,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ResponseModel_SignInResponse_"];
+                    "application/json": components["schemas"]["ResponseModel_LoginResponse_"];
                 };
             };
             /** @description Validation Error */

@@ -33,7 +33,7 @@ class ActivateAccountResponse(BaseModel):
     token: str
 
 
-class SignInResponse(BaseModel):
+class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     
