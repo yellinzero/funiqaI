@@ -12,7 +12,6 @@ import MuiMenuItem from '@mui/material/MenuItem'
 import { paperClasses } from '@mui/material/Paper'
 import { styled } from '@mui/material/styles'
 import * as React from 'react'
-import { useCookies } from 'react-cookie'
 import MenuButton from './SideMenuButton'
 
 const MenuItem = styled(MuiMenuItem)({

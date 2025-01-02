@@ -23,7 +23,6 @@
   "[typescriptscript]": {
      "editor.defaultFormatter": "dbaeumer.vscode-eslint"
   },
-  "css.customData": [".vscode/tailwind.json"],
   "python.defaultInterpreterPath": "${workspaceFolder}/backend/.venv/bin/python",
   "ruff.enable": true,
   "ruff.lint.enable": true,

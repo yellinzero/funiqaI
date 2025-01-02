@@ -4,5 +4,13 @@
   "chats": "Chats",
   "workflows": "Workflows",
   "store": "Store",
-  "integrationHub": "IntegrationHub"
+  "integrationHub": "IntegrationHub",
+  "enter_valid_email": "Please enter a valid email address.",
+  "enter_valid_password": "Password must be at least 6 characters long.",
+  "email": "Email",
+  "password": "Password",
+  "sign_in": "Sign in",
+  "sign_up": "Sign up",
+  "full_name": "Full name",
+  "name_required": "Name is required."
 }

@@ -3,8 +3,6 @@ import { fileURLToPath } from 'node:url'
 import antfu from '@antfu/eslint-config'
 import { FlatCompat } from '@eslint/eslintrc'
 
-import tailwindcss from 'eslint-plugin-tailwindcss'
-
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
@@ -16,12 +14,14 @@ export default antfu({
   react: true,
   stylistic: true,
   rules: {
-    'no-console': 'warn',
+    'no-console': ['warn', {
+      allow: ['info', 'error'],
+    }],
     'react/no-array-index-key': 'off',
+    'node/prefer-global/process': 'off',
   },
 }).append(
   ...compat.extends('plugin:@next/next/recommended'),
-  ...tailwindcss.configs['flat/recommended'],
   {
     files: ['**/*.js', '**/*.ts', '**/*.jsx', '**/*.tsx'],
     ignores: ['**/node_modules/*', '.next', '.vscode', 'output', 'dist', 'out'],

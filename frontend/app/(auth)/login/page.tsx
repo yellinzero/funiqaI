@@ -1,21 +1,23 @@
 'use client'
-import { FacebookIcon, GoogleIcon, SitemarkIcon } from '@/components/CustomIcons'
-import ForgotPassword from '@/modules/auth/components/ForgotPassword'
+import { loginApi } from '@/apis/modules/auth'
+import LangSelect from '@/components/LangSelect'
+// import { FacebookIcon, GoogleIcon } from '@/components/CustomIcons'
+import { SiteLogo } from '@/components/SiteLogo'
+import Toast from '@/components/Toast'
+import { getLangOnClient } from '@/plugins/i18n/client'
 import ColorModeSelect from '@/theme/ColorModeSelect'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
-import Checkbox from '@mui/material/Checkbox'
-import Divider from '@mui/material/Divider'
+// import Divider from '@mui/material/Divider'
 import FormControl from '@mui/material/FormControl'
-import FormControlLabel from '@mui/material/FormControlLabel'
 import FormLabel from '@mui/material/FormLabel'
-import Link from '@mui/material/Link'
 import Stack from '@mui/material/Stack'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
 import * as React from 'react'
+import { useTranslation } from 'react-i18next'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -36,7 +38,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
   }),
 }))
 
-const SignInContainer = styled(Stack)(({ theme }) => ({
+const LoginContainer = styled(Stack)(({ theme }) => ({
   'height': 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
   'minHeight': '100%',
   'padding': theme.spacing(2),
@@ -59,30 +61,25 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
   },
 }))
 
-export default function SignIn() {
+export default function Login() {
+  const { t } = useTranslation('global')
   const [emailError, setEmailError] = React.useState(false)
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('')
   const [passwordError, setPasswordError] = React.useState(false)
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('')
-  const [open, setOpen] = React.useState(false)
 
-  const handleClickOpen = () => {
-    setOpen(true)
-  }
-
-  const handleClose = () => {
-    setOpen(false)
-  }
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     if (emailError || passwordError) {
       event.preventDefault()
       return
     }
+    event.preventDefault()
     const data = new FormData(event.currentTarget)
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+    const langCookie = getLangOnClient()
+    await loginApi({
+      email: data.get('email') as string,
+      password: data.get('password') as string,
+      language: langCookie,
     })
   }
 
@@ -94,7 +91,7 @@ export default function SignIn() {
 
     if (!email.value || !/\S[^\s@]*@\S+\.\S+/.test(email.value)) {
       setEmailError(true)
-      setEmailErrorMessage('Please enter a valid email address.')
+      setEmailErrorMessage(t('enter_valid_email'))
       isValid = false
     }
     else {
@@ -104,7 +101,7 @@ export default function SignIn() {
 
     if (!password.value || password.value.length < 6) {
       setPasswordError(true)
-      setPasswordErrorMessage('Password must be at least 6 characters long.')
+      setPasswordErrorMessage(t('enter_valid_password'))
       isValid = false
     }
     else {
@@ -116,16 +113,20 @@ export default function SignIn() {
   }
 
   return (
-    <SignInContainer direction="column" justifyContent="space-between">
-      <ColorModeSelect sx={{ position: 'fixed', top: '1rem', right: '1rem' }} />
+    <LoginContainer direction="column" justifyContent="space-between">
+      <Box sx={{ display: 'flex', alignItems: 'center', position: 'fixed', top: '1rem', right: '1rem', gap: 1 }}>
+        <LangSelect />
+        <ColorModeSelect />
+      </Box>
+
       <Card variant="outlined">
-        <SitemarkIcon />
+        <SiteLogo />
         <Typography
           component="h1"
           variant="h4"
           sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
         >
-          Sign in
+          {t('sign_in')}
         </Typography>
         <Box
           component="form"
@@ -139,7 +140,7 @@ export default function SignIn() {
           }}
         >
           <FormControl>
-            <FormLabel htmlFor="email">Email</FormLabel>
+            <FormLabel htmlFor="email">{t('email')}</FormLabel>
             <TextField
               error={emailError}
               helperText={emailErrorMessage}
@@ -156,7 +157,7 @@ export default function SignIn() {
             />
           </FormControl>
           <FormControl>
-            <FormLabel htmlFor="password">Password</FormLabel>
+            <FormLabel htmlFor="password">{t('password')}</FormLabel>
             <TextField
               error={passwordError}
               helperText={passwordErrorMessage}
@@ -172,20 +173,16 @@ export default function SignIn() {
               color={passwordError ? 'error' : 'primary'}
             />
           </FormControl>
-          <FormControlLabel
-            control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
-          />
-          <ForgotPassword open={open} handleClose={handleClose} />
+          {/* <ForgotPassword open={open} handleClose={handleClose} /> */}
           <Button
             type="submit"
             fullWidth
             variant="contained"
             onClick={validateInputs}
           >
-            Sign in
+            {t('sign_in')}
           </Button>
-          <Link
+          {/* <Link
             component="button"
             type="button"
             onClick={handleClickOpen}
@@ -193,9 +190,9 @@ export default function SignIn() {
             sx={{ alignSelf: 'center' }}
           >
             Forgot your password?
-          </Link>
+          </Link> */}
         </Box>
-        <Divider>or</Divider>
+        {/* <Divider>or</Divider>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           <Button
             fullWidth
@@ -224,8 +221,8 @@ export default function SignIn() {
               Sign up
             </Link>
           </Typography>
-        </Box>
+        </Box> */}
       </Card>
-    </SignInContainer>
+    </LoginContainer>
   )
 }

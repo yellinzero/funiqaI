@@ -55,7 +55,7 @@ class AccountService:
         account = Account(
             name=payload.name,
             email=payload.email,
-            language=payload.language,
+            language=payload.language or 'en',
             status=AccountStatus.PENDING,
             last_login_ip=request.client.host,
         )
@@ -180,7 +180,7 @@ class AccountService:
         code = "".join([str(secrets.randbelow(10)) for _ in range(6)])
         token = await token_manager.generate_signup_email_verification_token(account.email, code)
         send_signup_verification_email_task.delay(
-            language=account.language,
+            language=account.language or 'en',
             to=account.email,
             code=code,
         )
