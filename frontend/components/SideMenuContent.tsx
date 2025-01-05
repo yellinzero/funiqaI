@@ -1,5 +1,4 @@
 'use client'
-import { useTranslation } from '@/plugins/i18n/client'
 import { AccountTree, Hub, QuestionAnswer, Storefront } from '@mui/icons-material'
 import List from '@mui/material/List'
 import ListItem from '@mui/material/ListItem'
@@ -7,9 +6,10 @@ import ListItemButton from '@mui/material/ListItemButton'
 import ListItemIcon from '@mui/material/ListItemIcon'
 import ListItemText from '@mui/material/ListItemText'
 import Stack from '@mui/material/Stack'
+import { useTranslation } from 'react-i18next'
 
 export default function SideMenuContent() {
-  const { t } = useTranslation('global')
+  const { t } = useTranslation()
   const mainListItems = [
     { text: t('chats'), icon: <QuestionAnswer /> },
     { text: t('workflows'), icon: <AccountTree /> },

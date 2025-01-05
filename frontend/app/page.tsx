@@ -1,16 +1,16 @@
 import Header from '@/components/Header'
 import MobileNavbar from '@/components/MobileNavbar'
 import SideMenu from '@/components/SideMenu'
-import { translationOnServer } from '@/plugins/i18n/server'
-import { getThemeVarsOnServer } from '@/theme/server'
+import { initTranslations } from '@/plugins/i18n'
+import { getLocaleFromServer } from '@/plugins/i18n/server'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
-import { alpha } from '@mui/material/styles'
 import React from 'react'
 
+const namespaces = ['global']
 export default async function Home() {
-  const { t } = await translationOnServer('global')
-  const themeVars = await getThemeVarsOnServer()
+  const locale = await getLocaleFromServer()
+  const { i18n: { t } } = await initTranslations(locale, namespaces)
   return (
     <Box sx={{ display: 'flex', height: '100vh', width: '100vw' }}>
       <SideMenu />
@@ -20,7 +20,7 @@ export default async function Home() {
         component="main"
         sx={{
           flexGrow: 1,
-          backgroundColor: alpha(themeVars.palette.background.default, 1),
+          backgroundColor: 'background.default',
           overflow: 'auto',
         }}
       >

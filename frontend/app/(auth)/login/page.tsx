@@ -1,23 +1,22 @@
 'use client'
 import { loginApi } from '@/apis/modules/auth'
 import LangSelect from '@/components/LangSelect'
-// import { FacebookIcon, GoogleIcon } from '@/components/CustomIcons'
 import { SiteLogo } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
-import { getLangOnClient } from '@/plugins/i18n/client'
 import ColorModeSelect from '@/theme/ColorModeSelect'
+import { zodResolver } from '@hookform/resolvers/zod'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
-// import Divider from '@mui/material/Divider'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
 import Stack from '@mui/material/Stack'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import * as React from 'react'
+import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import * as z from 'zod'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -61,55 +60,33 @@ const LoginContainer = styled(Stack)(({ theme }) => ({
   },
 }))
 
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+})
+type LoginFormInputs = z.infer<typeof loginSchema>
+
 export default function Login() {
-  const { t } = useTranslation('global')
-  const [emailError, setEmailError] = React.useState(false)
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('')
-  const [passwordError, setPasswordError] = React.useState(false)
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('')
+  const { t, i18n } = useTranslation()
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    if (emailError || passwordError) {
-      event.preventDefault()
-      return
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormInputs>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: { email: '', password: '' },
+  })
+
+  const onSubmit = async (data: LoginFormInputs) => {
+    try {
+      await loginApi({ ...data, language: i18n.language })
+      Toast.success({ message: t('login_success') })
     }
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    const langCookie = getLangOnClient()
-    await loginApi({
-      email: data.get('email') as string,
-      password: data.get('password') as string,
-      language: langCookie,
-    })
-  }
-
-  const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement
-    const password = document.getElementById('password') as HTMLInputElement
-
-    let isValid = true
-
-    if (!email.value || !/\S[^\s@]*@\S+\.\S+/.test(email.value)) {
-      setEmailError(true)
-      setEmailErrorMessage(t('enter_valid_email'))
-      isValid = false
+    catch (e) {
+      console.error('Login error:', e)
+      Toast.error({ message: t('login_failed') })
     }
-    else {
-      setEmailError(false)
-      setEmailErrorMessage('')
-    }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true)
-      setPasswordErrorMessage(t('enter_valid_password'))
-      isValid = false
-    }
-    else {
-      setPasswordError(false)
-      setPasswordErrorMessage('')
-    }
-
-    return isValid
   }
 
   return (
@@ -130,98 +107,54 @@ export default function Login() {
         </Typography>
         <Box
           component="form"
-          onSubmit={handleSubmit}
+          onSubmit={handleSubmit(onSubmit)}
           noValidate
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            width: '100%',
-            gap: 2,
-          }}
+          sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
         >
           <FormControl>
             <FormLabel htmlFor="email">{t('email')}</FormLabel>
-            <TextField
-              error={emailError}
-              helperText={emailErrorMessage}
-              id="email"
-              type="email"
+            <Controller
               name="email"
-              placeholder="your@email.com"
-              autoComplete="email"
-              autoFocus
-              required
-              fullWidth
-              variant="outlined"
-              color={emailError ? 'error' : 'primary'}
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  autoComplete="email"
+                  fullWidth
+                  variant="outlined"
+                  error={!!errors.email}
+                  helperText={errors.email ? t('enter_valid_email') : undefined}
+                />
+              )}
             />
           </FormControl>
           <FormControl>
             <FormLabel htmlFor="password">{t('password')}</FormLabel>
-            <TextField
-              error={passwordError}
-              helperText={passwordErrorMessage}
+            <Controller
               name="password"
-              placeholder="••••••"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-              autoFocus
-              required
-              fullWidth
-              variant="outlined"
-              color={passwordError ? 'error' : 'primary'}
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  id="password"
+                  type="password"
+                  placeholder="••••••"
+                  autoComplete="current-password"
+                  fullWidth
+                  variant="outlined"
+                  error={!!errors.password}
+                  helperText={errors.password ? t('enter_valid_password') : undefined}
+                />
+              )}
             />
           </FormControl>
-          {/* <ForgotPassword open={open} handleClose={handleClose} /> */}
-          <Button
-            type="submit"
-            fullWidth
-            variant="contained"
-            onClick={validateInputs}
-          >
+          <Button type="submit" fullWidth variant="contained">
             {t('sign_in')}
           </Button>
-          {/* <Link
-            component="button"
-            type="button"
-            onClick={handleClickOpen}
-            variant="body2"
-            sx={{ alignSelf: 'center' }}
-          >
-            Forgot your password?
-          </Link> */}
         </Box>
-        {/* <Divider>or</Divider>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={() => console.log('Sign in with Google')}
-            startIcon={<GoogleIcon />}
-          >
-            Sign in with Google
-          </Button>
-          <Button
-            fullWidth
-            variant="outlined"
-            onClick={() => console.log('Sign in with Facebook')}
-            startIcon={<FacebookIcon />}
-          >
-            Sign in with Facebook
-          </Button>
-          <Typography sx={{ textAlign: 'center' }}>
-            Don&apos;t have an account?
-            {' '}
-            <Link
-              href="/material-ui/getting-started/templates/sign-in/"
-              variant="body2"
-              sx={{ alignSelf: 'center' }}
-            >
-              Sign up
-            </Link>
-          </Typography>
-        </Box> */}
       </Card>
     </LoginContainer>
   )

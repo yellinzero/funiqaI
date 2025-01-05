@@ -27,6 +27,15 @@
   "ruff.enable": true,
   "ruff.lint.enable": true,
   "ruff.path": ["${workspaceFolder}/backend/.venv/bin/ruff"],
+  "i18n-ally.localesPaths": [
+    "frontend/locales"
+  ],
+  "i18n-ally.enabledFrameworks": [
+    "react-i18next"
+  ],
+  "i18n-ally.enabledParsers": [
+    "json"
+  ],
   "[python]": {
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
