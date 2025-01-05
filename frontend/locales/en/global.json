@@ -12,5 +12,9 @@
   "sign_in": "Sign in",
   "sign_up": "Sign up",
   "full_name": "Full name",
-  "name_required": "Name is required."
+  "name_required": "Name is required.",
+  "signup_success": "Sign up successfully",
+  "signup_failed": "Signup Failed",
+  "login_success": "Login successfully",
+  "login_failed": "Login Failed"
 }

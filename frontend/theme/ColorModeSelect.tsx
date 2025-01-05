@@ -10,7 +10,7 @@ import { themeCookieName } from './configs'
 export default function ColorModeSelect(props: SelectProps) {
   const router = useRouter()
   const { mode, setMode } = useColorScheme()
-  const [_cookies, setCookie] = useCookies([themeCookieName])
+  const [_cookies, setCookie] = useCookies()
   if (!mode) {
     return null
   }

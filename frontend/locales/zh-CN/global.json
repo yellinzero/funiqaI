@@ -12,5 +12,9 @@
   "sign_in": "登录",
   "sign_up": "注册",
   "full_name": "名称",
-  "name_required": "名称为必填项"
+  "name_required": "名称为必填项",
+  "signup_success": "注册成功",
+  "signup_failed": "注册失败",
+  "login_success": "登录成功",
+  "login_failed": "登录失败"
 }

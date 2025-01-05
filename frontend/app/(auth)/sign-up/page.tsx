@@ -1,23 +1,23 @@
 'use client'
+
 import { signupApi } from '@/apis/modules/auth'
 import LangSelect from '@/components/LangSelect'
 import { SiteLogo } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
-import { getLangOnClient, useTranslation } from '@/plugins/i18n/client'
-// import { FacebookIcon, GoogleIcon } from '@/components/CustomIcons'
 import ColorModeSelect from '@/theme/ColorModeSelect'
+import { zodResolver } from '@hookform/resolvers/zod'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
-import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
-import FormControlLabel from '@mui/material/FormControlLabel'
 import FormLabel from '@mui/material/FormLabel'
 import Stack from '@mui/material/Stack'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
-import * as React from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import * as z from 'zod'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -61,69 +61,41 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
   },
 }))
 
+const signUpSchema = z.object({
+  name: z.string().nonempty(),
+  email: z.string().email(),
+  password: z.string().min(6),
+})
+type SignUpFormInputs = z.infer<typeof signUpSchema>
+
 export default function SignUp() {
-  const { t } = useTranslation('global')
-  const [emailError, setEmailError] = React.useState(false)
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('')
-  const [passwordError, setPasswordError] = React.useState(false)
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('')
-  const [nameError, setNameError] = React.useState(false)
-  const [nameErrorMessage, setNameErrorMessage] = React.useState('')
+  const { t, i18n } = useTranslation()
 
-  const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement
-    const password = document.getElementById('password') as HTMLInputElement
-    const name = document.getElementById('name') as HTMLInputElement
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignUpFormInputs>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: {
+      name: '',
+      email: '',
+      password: '',
+    },
+  })
 
-    let isValid = true
-
-    if (!email.value || !/\S[^\s@]*@\S+\.\S+/.test(email.value)) {
-      setEmailError(true)
-      setEmailErrorMessage(t('enter_valid_email'))
-      isValid = false
+  const onSubmit = async (data: SignUpFormInputs) => {
+    try {
+      await signupApi({
+        ...data,
+        language: i18n.language,
+      })
+      Toast.success({ message: t('signup_success') })
     }
-    else {
-      setEmailError(false)
-      setEmailErrorMessage('')
+    catch (e) {
+      console.error('Signup error:', e)
+      Toast.error({ message: t('signup_failed') })
     }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true)
-      setPasswordErrorMessage(t('enter_valid_password'))
-      isValid = false
-    }
-    else {
-      setPasswordError(false)
-      setPasswordErrorMessage('')
-    }
-
-    if (!name.value || name.value.length < 1) {
-      setNameError(true)
-      setNameErrorMessage(t('name_required'))
-      isValid = false
-    }
-    else {
-      setNameError(false)
-      setNameErrorMessage('')
-    }
-
-    return isValid
-  }
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    if (nameError || emailError || passwordError) {
-      event.preventDefault()
-      return
-    }
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    const langCookie = getLangOnClient()
-    await signupApi({
-      name: data.get('name') as string,
-      email: data.get('email') as string,
-      password: data.get('password') as string,
-      language: langCookie,
-    })
   }
 
   return (
@@ -144,99 +116,71 @@ export default function SignUp() {
           </Typography>
           <Box
             component="form"
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
           >
             <FormControl>
               <FormLabel htmlFor="name">{t('full_name')}</FormLabel>
-              <TextField
-                autoComplete="name"
+              <Controller
                 name="name"
-                required
-                fullWidth
-                id="name"
-                placeholder={t('full_name')}
-                error={nameError}
-                helperText={nameErrorMessage}
-                color={nameError ? 'error' : 'primary'}
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    id="name"
+                    placeholder={t('full_name')}
+                    fullWidth
+                    variant="outlined"
+                    error={!!errors.name}
+                    helperText={errors.name ? t('name_required') : undefined}
+                  />
+                )}
               />
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="email">{t('email')}</FormLabel>
-              <TextField
-                required
-                fullWidth
-                id="email"
-                placeholder="your@email.com"
+              <Controller
                 name="email"
-                autoComplete="email"
-                variant="outlined"
-                error={emailError}
-                helperText={emailErrorMessage}
-                color={passwordError ? 'error' : 'primary'}
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    id="email"
+                    type="email"
+                    placeholder="your@email.com"
+                    autoComplete="email"
+                    fullWidth
+                    variant="outlined"
+                    error={!!errors.email}
+                    helperText={errors.email ? t('enter_valid_email') : undefined}
+                  />
+                )}
               />
             </FormControl>
             <FormControl>
               <FormLabel htmlFor="password">{t('password')}</FormLabel>
-              <TextField
-                required
-                fullWidth
+              <Controller
                 name="password"
-                placeholder="••••••"
-                type="password"
-                id="password"
-                autoComplete="new-password"
-                variant="outlined"
-                error={passwordError}
-                helperText={passwordErrorMessage}
-                color={passwordError ? 'error' : 'primary'}
+                control={control}
+                render={({ field }) => (
+                  <TextField
+                    {...field}
+                    id="password"
+                    type="password"
+                    placeholder="••••••"
+                    autoComplete="new-password"
+                    fullWidth
+                    variant="outlined"
+                    error={!!errors.password}
+                    helperText={errors.email ? t('enter_valid_password') : undefined}
+                  />
+                )}
               />
             </FormControl>
-            <FormControlLabel
-              control={<Checkbox value="allowExtraEmails" color="primary" />}
-              label="I want to receive updates via email."
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              onClick={validateInputs}
-            >
+            <Button type="submit" fullWidth variant="contained">
               {t('sign_up')}
             </Button>
           </Box>
-          {/* <Divider>
-            <Typography sx={{ color: 'text.secondary' }}>or</Typography>
-          </Divider> */}
-          {/* <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => console.log('Sign up with Google')}
-              startIcon={<GoogleIcon />}
-            >
-              Sign up with Google
-            </Button>
-            <Button
-              fullWidth
-              variant="outlined"
-              onClick={() => console.log('Sign up with Facebook')}
-              startIcon={<FacebookIcon />}
-            >
-              Sign up with Facebook
-            </Button>
-            <Typography sx={{ textAlign: 'center' }}>
-              Already have an account?
-              {' '}
-              <Link
-                href="/material-ui/getting-started/templates/sign-in/"
-                variant="body2"
-                sx={{ alignSelf: 'center' }}
-              >
-                Sign in
-              </Link>
-            </Typography>
-          </Box> */}
         </Card>
       </SignUpContainer>
     </>

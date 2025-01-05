@@ -14,7 +14,7 @@ import { themeCookieName } from './configs'
 export default function ColorModeIconDropdown(props: IconButtonOwnProps) {
   const router = useRouter()
   const { mode, systemMode, setMode } = useColorScheme()
-  const [_cookies, setCookie] = useCookies([themeCookieName])
+  const [_cookies, setCookie] = useCookies()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {

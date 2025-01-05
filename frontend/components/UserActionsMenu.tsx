@@ -1,6 +1,5 @@
 'use client'
-import { getLangOnClient, useChangeLanguage } from '@/plugins/i18n/client'
-import { languagesOptions } from '@/plugins/i18n/settings'
+import { i18nCookieName, languagesOptions } from '@/plugins/i18n/settings'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded'
 import Divider, { dividerClasses } from '@mui/material/Divider'
@@ -11,7 +10,10 @@ import Menu from '@mui/material/Menu'
 import MuiMenuItem from '@mui/material/MenuItem'
 import { paperClasses } from '@mui/material/Paper'
 import { styled } from '@mui/material/styles'
+import { useRouter } from 'next/navigation'
 import * as React from 'react'
+import { useCookies } from 'react-cookie'
+import { useTranslation } from 'react-i18next'
 import MenuButton from './SideMenuButton'
 
 const MenuItem = styled(MuiMenuItem)({
@@ -19,12 +21,14 @@ const MenuItem = styled(MuiMenuItem)({
 })
 
 export default function UserActionsMenu() {
-  const changeLanguage = useChangeLanguage()
-  const langCookie = getLangOnClient()
+  const { i18n } = useTranslation()
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
   const [langsMenuAnchorEl, setLangsMessnuAnchorEl] = React.useState<null | HTMLElement>(null)
   const open = Boolean(anchorEl)
   const langsMenuOpen = Boolean(langsMenuAnchorEl)
+  const [_cookie, setCookie] = useCookies()
+  const router = useRouter()
+
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget)
   }
@@ -41,9 +45,11 @@ export default function UserActionsMenu() {
   }
 
   const handleChangeLangs = (lang: string) => {
-    changeLanguage(lang)
+    i18n.changeLanguage(lang)
+    setCookie(i18nCookieName, lang, { path: '/' })
     handleLangsMenuClose()
     handleClose()
+    router.refresh()
   }
   return (
     <>
@@ -108,7 +114,7 @@ export default function UserActionsMenu() {
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
         {languagesOptions.map(item => (
-          <MenuItem key={item.value} onClick={() => handleChangeLangs(item.value)} selected={item.value === langCookie}>{item.label}</MenuItem>
+          <MenuItem key={item.value} onClick={() => handleChangeLangs(item.value)} selected={item.value === i18n.language}>{item.label}</MenuItem>
         ))}
 
       </Menu>

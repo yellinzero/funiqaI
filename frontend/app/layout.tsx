@@ -1,47 +1,26 @@
 import type { ThemeProviderProps } from '@mui/material/styles/ThemeProvider'
-import type { Metadata } from 'next'
-import { getLangOnServer } from '@/plugins/i18n/server'
-import { languages } from '@/plugins/i18n/settings'
-import theme from '@/theme'
+import I18nProvider from '@/components/I18nProvider'
+import { initTranslations } from '@/plugins/i18n'
+import { getLocaleFromServer } from '@/plugins/i18n/server'
+import { roboto, theme } from '@/theme'
 import { themeCookieName } from '@/theme/configs'
+
 import { CssBaseline } from '@mui/material'
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 import { ThemeProvider } from '@mui/material/styles'
-
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
-import { dir } from 'i18next'
-import { Roboto } from 'next/font/google'
 import { cookies } from 'next/headers'
 import React from 'react'
 import '@/assets/css/globals.css'
 
-const roboto = Roboto({
-  weight: ['300', '400', '500', '700'],
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-roboto',
-})
-
-export async function generateStaticParams() {
-  return languages.map(lang => ({ lang }))
-}
-
-export const metadata: Metadata = {
-  title: 'Funiq AI',
-  description: 'AI with fun',
-}
-
-export const viewport = {
-  width: 'device-width',
-  initialScale: 1,
-}
-
+const namespaces = ['global']
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const lang = await getLangOnServer()
+  const locale = await getLocaleFromServer()
+  await initTranslations(locale, namespaces)
   const cookieStore = await cookies()
   let themeCookie = cookieStore.get(themeCookieName)?.value as ThemeProviderProps['defaultMode']
   if (!themeCookie) {
@@ -50,14 +29,21 @@ export default async function RootLayout({
   }
   return (
     <React.StrictMode>
-      <html lang={lang} dir={dir(lang)} className={roboto.variable} suppressHydrationWarning>
-        <body>
+      <html lang={locale} className={roboto.variable} suppressHydrationWarning>
+        <body style={
+          {
+            width: '100vw',
+            height: '100vh',
+          }
+        }
+        >
           <InitColorSchemeScript attribute="data-mui-color-scheme" />
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
             <ThemeProvider theme={theme} defaultMode={themeCookie}>
               <CssBaseline enableColorScheme />
-
-              {children}
+              <I18nProvider locale={locale}>
+                {children}
+              </I18nProvider>
             </ThemeProvider>
           </AppRouterCacheProvider>
         </body>
