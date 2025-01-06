@@ -1,6 +1,6 @@
 {
   "product_name": "Funiq AI",
-  "welcome": "Welcome",
+  "welcome": "Welcome to {{name}}",
   "chats": "Chats",
   "workflows": "Workflows",
   "store": "Store",

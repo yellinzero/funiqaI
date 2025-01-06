@@ -3,17 +3,17 @@ import { loginApi } from '@/apis/modules/auth'
 import LangSelect from '@/components/LangSelect'
 import { SiteLogo } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
-import ColorModeSelect from '@/theme/ColorModeSelect'
+import { useSession } from '@/plugins/session'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
 import FormControl from '@mui/material/FormControl'
 import FormLabel from '@mui/material/FormLabel'
-import Stack from '@mui/material/Stack'
 import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import Typography from '@mui/material/Typography'
+import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import * as z from 'zod'
@@ -37,29 +37,6 @@ const Card = styled(MuiCard)(({ theme }) => ({
   }),
 }))
 
-const LoginContainer = styled(Stack)(({ theme }) => ({
-  'height': 'calc((1 - var(--template-frame-height, 0)) * 100dvh)',
-  'minHeight': '100%',
-  'padding': theme.spacing(2),
-  [theme.breakpoints.up('sm')]: {
-    padding: theme.spacing(4),
-  },
-  '&::before': {
-    content: '""',
-    display: 'block',
-    position: 'absolute',
-    zIndex: -1,
-    inset: 0,
-    backgroundImage:
-      'radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))',
-    backgroundRepeat: 'no-repeat',
-    ...theme.applyStyles('dark', {
-      backgroundImage:
-        'radial-gradient(at 50% 50%, hsla(210, 100%, 16%, 0.5), hsl(220, 30%, 5%))',
-    }),
-  },
-}))
-
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
@@ -68,6 +45,8 @@ type LoginFormInputs = z.infer<typeof loginSchema>
 
 export default function Login() {
   const { t, i18n } = useTranslation()
+  const { setSession } = useSession()
+  const router = useRouter()
 
   const {
     control,
@@ -80,7 +59,12 @@ export default function Login() {
 
   const onSubmit = async (data: LoginFormInputs) => {
     try {
-      await loginApi({ ...data, language: i18n.language })
+      const { data: token } = await loginApi({ ...data, language: i18n.language })
+      if (token) {
+        setSession(token.data.access_token)
+      }
+
+      router.push('/')
       Toast.success({ message: t('login_success') })
     }
     catch (e) {
@@ -90,20 +74,40 @@ export default function Login() {
   }
 
   return (
-    <LoginContainer direction="column" justifyContent="space-between">
-      <Box sx={{ display: 'flex', alignItems: 'center', position: 'fixed', top: '1rem', right: '1rem', gap: 1 }}>
-        <LangSelect />
-        <ColorModeSelect />
-      </Box>
-
-      <Card variant="outlined">
+    <Box
+      component="main"
+      sx={{
+        display: 'flex',
+        backgroundColor: 'background.default',
+        overflow: 'auto',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%',
+      }}
+    >
+      <Box sx={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        position: 'fixed',
+        width: '100%',
+        top: '0',
+        padding: '12px',
+      }}
+      >
         <SiteLogo />
+        <LangSelect />
+      </Box>
+      <Card variant="outlined" sx={{ height: '70%' }}>
         <Typography
           component="h1"
           variant="h4"
-          sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
+          sx={{ width: '100%', fontSize: '1.5rem' }}
         >
-          {t('sign_in')}
+          {t('welcome', {
+            name: t('product_name'),
+          })}
         </Typography>
         <Box
           component="form"
@@ -156,6 +160,6 @@ export default function Login() {
           </Button>
         </Box>
       </Card>
-    </LoginContainer>
+    </Box>
   )
 }
