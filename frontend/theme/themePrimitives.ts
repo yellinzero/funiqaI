@@ -250,7 +250,7 @@ export const shape = {
 
 const defaultShadows: Shadows = [
   'none',
-  'var(--template-palette-baseShadow)',
+  'var(--funiq-ai-palette-baseShadow)',
   ...defaultTheme.shadows.slice(2),
 ] as Shadows
 

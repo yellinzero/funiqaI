@@ -74,6 +74,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/forgot_password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Forgot Password */
+        post: operations["forgot_password_auth_forgot_password_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/reset_password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset Password */
+        post: operations["reset_password_auth_reset_password_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/resend_verification_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Resend Verification Code */
+        post: operations["resend_verification_code_auth_resend_verification_code_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/activate_account_verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Activate Account Verify */
+        post: operations["activate_account_verify_auth_activate_account_verify_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/auth/account_info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Account Info */
+        get: operations["account_info_auth_account_info_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/health": {
         parameters: {
             query?: never;
@@ -95,6 +180,30 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AccountInfoResponse */
+        AccountInfoResponse: {
+            /** Name */
+            name: string;
+            /** Email */
+            email: string;
+            status: components["schemas"]["AccountStatus"];
+            /** Language */
+            language: string;
+            /** Last Login At */
+            last_login_at: string;
+            /** Last Login Ip */
+            last_login_ip: string | null;
+        };
+        /**
+         * AccountStatus
+         * @enum {string}
+         */
+        AccountStatus: "pending" | "active" | "inactive" | "disabled";
+        /**
+         * AccountTokenType
+         * @enum {string}
+         */
+        AccountTokenType: "signup_email" | "activate_account_email" | "reset_password_email";
         /** ActivateAccountRequest */
         ActivateAccountRequest: {
             /** Email */
@@ -104,6 +213,31 @@ export interface components {
         };
         /** ActivateAccountResponse */
         ActivateAccountResponse: {
+            /** Token */
+            token: string;
+        };
+        /** ActivateAccountVerifyRequest */
+        ActivateAccountVerifyRequest: {
+            /** Token */
+            token: string;
+            /** Code */
+            code: string;
+        };
+        /** ActivateAccountVerifyResponse */
+        ActivateAccountVerifyResponse: {
+            /** Access Token */
+            access_token: string;
+        };
+        /** ForgotPasswordRequest */
+        ForgotPasswordRequest: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+        };
+        /** ForgotPasswordResponse */
+        ForgotPasswordResponse: {
             /** Token */
             token: string;
         };
@@ -134,6 +268,48 @@ export interface components {
              */
             token_type: string;
         };
+        /** ResendVerificationCodeRequest */
+        ResendVerificationCodeRequest: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            code_type: components["schemas"]["AccountTokenType"];
+        };
+        /** ResendVerificationCodeResponse */
+        ResendVerificationCodeResponse: {
+            /** Token */
+            token: string;
+        };
+        /** ResetPasswordRequest */
+        ResetPasswordRequest: {
+            /** Token */
+            token: string;
+            /** Code */
+            code: string;
+            /** New Password */
+            new_password: string;
+        };
+        /** ResetPasswordResponse */
+        ResetPasswordResponse: {
+            /** Access Token */
+            access_token: string;
+        };
+        /** ResponseModel[AccountInfoResponse] */
+        ResponseModel_AccountInfoResponse_: {
+            /**
+             * Code
+             * @default 0
+             */
+            code: string;
+            /**
+             * Msg
+             * @default success
+             */
+            msg: string;
+            data: components["schemas"]["AccountInfoResponse"];
+        };
         /** ResponseModel[ActivateAccountResponse] */
         ResponseModel_ActivateAccountResponse_: {
             /**
@@ -148,6 +324,34 @@ export interface components {
             msg: string;
             data: components["schemas"]["ActivateAccountResponse"];
         };
+        /** ResponseModel[ActivateAccountVerifyResponse] */
+        ResponseModel_ActivateAccountVerifyResponse_: {
+            /**
+             * Code
+             * @default 0
+             */
+            code: string;
+            /**
+             * Msg
+             * @default success
+             */
+            msg: string;
+            data: components["schemas"]["ActivateAccountVerifyResponse"];
+        };
+        /** ResponseModel[ForgotPasswordResponse] */
+        ResponseModel_ForgotPasswordResponse_: {
+            /**
+             * Code
+             * @default 0
+             */
+            code: string;
+            /**
+             * Msg
+             * @default success
+             */
+            msg: string;
+            data: components["schemas"]["ForgotPasswordResponse"];
+        };
         /** ResponseModel[LoginResponse] */
         ResponseModel_LoginResponse_: {
             /**
@@ -161,6 +365,34 @@ export interface components {
              */
             msg: string;
             data: components["schemas"]["LoginResponse"];
+        };
+        /** ResponseModel[ResendVerificationCodeResponse] */
+        ResponseModel_ResendVerificationCodeResponse_: {
+            /**
+             * Code
+             * @default 0
+             */
+            code: string;
+            /**
+             * Msg
+             * @default success
+             */
+            msg: string;
+            data: components["schemas"]["ResendVerificationCodeResponse"];
+        };
+        /** ResponseModel[ResetPasswordResponse] */
+        ResponseModel_ResetPasswordResponse_: {
+            /**
+             * Code
+             * @default 0
+             */
+            code: string;
+            /**
+             * Msg
+             * @default success
+             */
+            msg: string;
+            data: components["schemas"]["ResetPasswordResponse"];
         };
         /** ResponseModel[SignupResponse] */
         ResponseModel_SignupResponse_: {
@@ -374,6 +606,158 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    forgot_password_auth_forgot_password_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForgotPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_ForgotPasswordResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reset_password_auth_reset_password_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResetPasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_ResetPasswordResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    resend_verification_code_auth_resend_verification_code_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResendVerificationCodeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_ResendVerificationCodeResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    activate_account_verify_auth_activate_account_verify_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ActivateAccountVerifyRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_ActivateAccountVerifyResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    account_info_auth_account_info_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_AccountInfoResponse_"];
                 };
             };
         };

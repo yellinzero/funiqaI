@@ -37,7 +37,7 @@ export default async function RootLayout({
           }
         }
         >
-          <InitColorSchemeScript attribute="data-mui-color-scheme" />
+          <InitColorSchemeScript attribute="data-funiq-ai-color-scheme" />
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
             <ThemeProvider theme={theme} defaultMode={themeCookie}>
               <CssBaseline enableColorScheme />

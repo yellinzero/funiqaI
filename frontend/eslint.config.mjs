@@ -19,7 +19,7 @@ export default antfu({
     }],
     'react/no-array-index-key': 'off',
     'node/prefer-global/process': 'off',
-    'no-unused-vars': [
+    'ts/no-unused-vars': [
       'warn',
       { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
     ],

@@ -62,7 +62,9 @@ class TokenManager:
 
 
 class AccountTokenType(Enum):
-    SIGNUP_EMAIL_VERIFICATION = "signup_email_verification"
+    SIGNUP_EMAIL = "signup_email"
+    ACTIVATE_ACCOUNT_EMAIL = "activate_account_email"
+    RESET_PASSWORD_EMAIL = "reset_password_email"  # noqa: S105
 
 
 class AccountTokenManager(TokenManager):
@@ -72,9 +74,6 @@ class AccountTokenManager(TokenManager):
         email: str,
         additional_data: dict | None
     ):
-        if email is None:
-            raise ValueError("Email must be provided")
-
         old_token = await self._get_current_token_for_account(email, token_type)
         if old_token:
             if isinstance(old_token, bytes):
@@ -99,14 +98,76 @@ class AccountTokenManager(TokenManager):
         :param email: Account email
         :return: Generated token
         """
-        return await self.generate_token(AccountTokenType.SIGNUP_EMAIL_VERIFICATION.value, email, {"code": code})
+        return await self.generate_token(AccountTokenType.SIGNUP_EMAIL.value, email, {"code": code})
     
     async def get_signup_email_verification_data(self, token: str) -> Optional[dict]:
-        return await self.get_token_data(token, AccountTokenType.SIGNUP_EMAIL_VERIFICATION.value)
+        return await self.get_token_data(token, AccountTokenType.SIGNUP_EMAIL.value)
     
     async def revoke_signup_email_verification_token(self, email: str) -> None:
-        await self.revoke_token(email, AccountTokenType.SIGNUP_EMAIL_VERIFICATION.value)
+        await self.revoke_token(email, AccountTokenType.SIGNUP_EMAIL.value)
+
+    async def generate_activate_account_token(self, email: str, code: str) -> str:
+        """
+        Generate a token for account activation.
         
+        :param email: Account email
+        :param code: Verification code
+        :return: Generated token
+        """
+        return await self.generate_token(
+            AccountTokenType.ACTIVATE_ACCOUNT_EMAIL.value,
+            email,
+            {"code": code}
+        )
+
+    async def get_activate_account_verification_data(self, token: str) -> dict | None:
+        """
+        Get verification data for account activation.
+        
+        :param token: Activation token
+        :return: Token data if valid, else None
+        """
+        return await self.get_token_data(token, AccountTokenType.ACTIVATE_ACCOUNT_EMAIL.value)
+
+    async def revoke_activate_account_token(self, email: str) -> None:
+        """
+        Revoke account activation token.
+        
+        :param email: Account email
+        """
+        await self.revoke_token(email, AccountTokenType.ACTIVATE_ACCOUNT_EMAIL.value)
+        
+    async def generate_reset_password_token(self, email: str, code: str) -> str:
+        """
+        Generate a token for password reset verification.
+        
+        :param email: Account email
+        :param code: Verification code
+        :return: Generated token
+        """
+        return await self.generate_token(
+            AccountTokenType.RESET_PASSWORD_EMAIL.value,
+            email,
+            {"code": code}
+        )
+
+    async def get_reset_password_verification_data(self, token: str) -> dict | None:
+        """
+        Get verification data for password reset.
+        
+        :param token: Reset password token
+        :return: Token data if valid, else None
+        """
+        return await self.get_token_data(token, AccountTokenType.RESET_PASSWORD_EMAIL.value)
+
+    async def revoke_reset_password_token(self, email: str) -> None:
+        """
+        Revoke password reset token.
+        
+        :param email: Account email
+        """
+        await self.revoke_token(email, AccountTokenType.RESET_PASSWORD_EMAIL.value)
+                    
     async def _get_current_token_for_account(self, email: str, token_type: str) -> Optional[str]:
         key = self._get_account_token_key(email, token_type)
         current_token = await redis.get(key)

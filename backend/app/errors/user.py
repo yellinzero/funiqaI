@@ -9,20 +9,15 @@ class UserErrorCode(BaseErrorCode):
     NAME_ALREADY_REGISTERED = ("B0002", "The username is already registered")
     INVALID_EMAIL_PASSWORD = ("B0003", "Invalid email or password")
     ACCOUNT_NOT_ACTIVE = ("B0004", "Account is not active")
-    SIGNUP_EMAIL_VERIFICATION_TOO_FREQUENT = (
-        "B0005", 
-        "Signup email verification requests are too frequent. Please try again later."
-    )
-    SIGNUP_EMAIL_VERIFICATION_CODE_EXPIRED = (
-        "B0006", 
-        "The email verification code has expired. Please request a new one."
-    )
     EMAIL_NOT_REGISTERED = (
-        "B0007", 
+        "B0005", 
         "The email address is not registered. Please check and try again."
     )
     ACCOUNT_ALREADY_ACTIVE = (
-        "B0008", 
+        "B0006", 
         "The account is already active. No further action is required."
     )
-    
+    ACCOUNT_NOT_FOUND = (
+        "B0007", 
+        "The account is not found."
+    )
