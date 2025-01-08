@@ -83,4 +83,4 @@ def get_user_id_from_token(token: str) -> str:
         str: The user ID from the token.
     """
     payload = decode_access_token(token)
-    return payload.get("sub")  # 'sub' is commonly used to store user ID
+    return payload.get("aid")  # 'aid' is commonly used to store user ID

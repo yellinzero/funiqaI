@@ -1,5 +1,8 @@
 from pydantic import BaseModel, EmailStr
 
+from app.models.user import AccountStatus
+from utils.token_manager import AccountTokenType
+
 
 class SignupRequest(BaseModel):
     name: str
@@ -42,3 +45,47 @@ class SignupVerifyResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+
+class ForgotPasswordResponse(BaseModel):
+    token: str
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    code: str
+    new_password: str
+
+
+class ResetPasswordResponse(BaseModel):
+    access_token: str
+    
+
+class ResendVerificationCodeRequest(BaseModel):
+    email: EmailStr
+    code_type: AccountTokenType
+
+
+class ResendVerificationCodeResponse(BaseModel):
+    token: str
+
+
+class ActivateAccountVerifyRequest(BaseModel):
+    token: str
+    code: str
+
+
+class ActivateAccountVerifyResponse(BaseModel):
+    access_token: str
+    
+
+class AccountInfoResponse(BaseModel):
+    name: str
+    email: str
+    status: AccountStatus
+    language: str
+    last_login_at: str
+    last_login_ip: str | None

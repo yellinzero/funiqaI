@@ -1,18 +1,18 @@
 'use client'
-import { resendVerificationCodeApi } from '@/apis/modules/auth'
+import { forgotPasswordApi, resendVerificationCodeApi, resetPasswordApi } from '@/apis/modules/auth'
 import LangSelect from '@/components/LangSelect'
 import { SiteLogo } from '@/components/SiteLogo'
-import { useSession } from '@/plugins/session'
+import Toast from '@/components/Toast'
 import { useCountdown } from '@/utils/useCountdown'
-import { styled } from '@mui/material'
 import Box from '@mui/material/Box'
 import MuiCard from '@mui/material/Card'
+import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import SignUpForm from './components/SignUpForm'
-import VerifyEmailForm from './components/VerifyEmailForm'
+import EmailForm from './components/EmailForm'
+import ResetForm from './components/ResetForm'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -26,38 +26,44 @@ const Card = styled(MuiCard)(({ theme }) => ({
   },
 }))
 
-export default function SignUp() {
+export default function ForgotPassword() {
   const { t } = useTranslation()
-  const { setSession } = useSession()
   const router = useRouter()
-  const [showVerifyEmail, setShowVerifyEmail] = useState(false)
+  const [step, setStep] = useState<1 | 2>(1)
   const [token, setToken] = useState('')
-  const { countdown, startCountdown } = useCountdown()
   const [email, setEmail] = useState('')
-
-  const handleSignUpSuccess = (token: string, userEmail: string) => {
-    setShowVerifyEmail(true)
-    setToken(token)
-    setEmail(userEmail)
-    startCountdown()
-  }
-
-  const handleVerifyEmailSuccess = (accessToken: string) => {
-    if (accessToken) {
-      setSession(accessToken)
-      router.push('/')
-    }
-  }
-
-  const handleResendCode = async () => {
-    // Add resend verification code logic here
+  const { countdown, startCountdown } = useCountdown()
+  const onSubmitEmail = async (data: { email: string }) => {
     try {
-      // Call your resend API
-      await resendVerificationCodeApi({ email, code_type: 'signup_email' })
-      startCountdown()
+      setEmail(data.email)
+      const res = await forgotPasswordApi({
+        email: data.email,
+      })
+      if (res.data?.token) {
+        setToken(res.data.token)
+        setStep(2)
+        Toast.success({ message: t('reset_code_sent') })
+      }
     }
     catch (e) {
-      console.error('Resend verification code error:', e)
+      console.error('Send reset code error:', e)
+      Toast.error({ message: t('send_code_failed') })
+    }
+  }
+
+  const onSubmitReset = async (data: { code: string, password: string, confirmPassword: string }) => {
+    try {
+      await resetPasswordApi({
+        token,
+        code: data.code,
+        new_password: data.password,
+      })
+      Toast.success({ message: t('password_reset_success') })
+      router.push('/login')
+    }
+    catch (e) {
+      console.error('Reset password error:', e)
+      Toast.error({ message: t('password_reset_failed') })
     }
   }
 
@@ -106,28 +112,20 @@ export default function SignUp() {
             variant="h4"
             sx={{ width: '100%', fontSize: '1.5rem' }}
           >
-            {t('welcome', {
-              name: t('product_name'),
-            })}
+            {t('forgot_password')}
           </Typography>
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-          >
-            {showVerifyEmail ? t('verify_email') : t('sign_up')}
-          </Typography>
-          {showVerifyEmail
-            ? (
-                <VerifyEmailForm
-                  onSuccess={handleVerifyEmailSuccess}
-                  token={token}
-                  countdown={countdown}
-                  onResend={handleResendCode}
-                />
-              )
+
+          {step === 1
+            ? <EmailForm onSubmit={onSubmitEmail} />
             : (
-                <SignUpForm onSuccess={handleSignUpSuccess} />
+                <ResetForm
+                  onSubmit={onSubmitReset}
+                  countdown={countdown}
+                  onResend={async () => {
+                    await resendVerificationCodeApi({ email, code_type: 'reset_password_email' })
+                    startCountdown()
+                  }}
+                />
               )}
         </Card>
       </Box>

@@ -11,3 +11,11 @@ class CommonErrorCode(BaseErrorCode):
     INVALID_ARGUMENT = ("A0004", "Invalid Argument")
     INTERNAL_SERVER_ERROR = ("A0005", "Internal Server Error")
     INVALID_VERIFICATION_CODE = ("A0006", "Invalid verification code")
+    EMAIL_VERIFICATION_TOO_FREQUENT = (
+        "A0007", 
+        "Email verification requests are too frequent. Please try again later."
+    )
+    EMAIL_VERIFICATION_CODE_EXPIRED = (
+        "A0008", 
+        "The email verification code has expired. Please request a new one."
+    )

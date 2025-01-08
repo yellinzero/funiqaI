@@ -42,6 +42,7 @@
       "source.organizeImports": "explicit"
     },
     "editor.defaultFormatter": "charliermarsh.ruff"
-  }
+  },
+  "i18n-ally.keystyle": "nested"
 }
   

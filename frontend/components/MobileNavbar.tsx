@@ -46,7 +46,7 @@ export default function MobileNavbar() {
         backgroundImage: 'none',
         borderBottom: '1px solid',
         borderColor: 'divider',
-        top: 'var(--template-frame-height, 0px)',
+        top: 'var(--funiq-ai-frame-height, 0px)',
       }}
     >
       <Toolbar variant="regular">
