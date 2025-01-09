@@ -1,6 +1,5 @@
 'use client'
 import type { KeyboardEvent } from 'react'
-import { activateAccountVerifyApi } from '@/apis/modules/auth'
 import Toast from '@/components/Toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Box from '@mui/material/Box'
@@ -12,28 +11,35 @@ import { Controller, useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import * as z from 'zod'
 
-interface VerifyEmailFormProps {
-  onSuccess: () => void
-  token: string
+interface VerificationCodeFormProps {
+  onSubmit: (code: string) => Promise<void>
+  submitButtonText: string
   countdown: number
   onResend: () => void
+  errorMessage?: string
 }
 
-const verifyEmailSchema = z.object({
+const verificationCodeSchema = z.object({
   code: z.string().length(6),
 })
 
-type VerifyEmailFormInputs = z.infer<typeof verifyEmailSchema>
+type VerificationCodeFormInputs = z.infer<typeof verificationCodeSchema>
 
-export default function VerifyEmailForm({ onSuccess, token, countdown, onResend }: VerifyEmailFormProps) {
+export default function VerificationCodeForm({
+  onSubmit,
+  submitButtonText,
+  countdown,
+  onResend,
+  errorMessage = 'verification_failed',
+}: VerificationCodeFormProps) {
   const { t } = useTranslation()
 
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm<VerifyEmailFormInputs>({
-    resolver: zodResolver(verifyEmailSchema),
+  } = useForm<VerificationCodeFormInputs>({
+    resolver: zodResolver(verificationCodeSchema),
     defaultValues: {
       code: '',
     },
@@ -53,24 +59,20 @@ export default function VerifyEmailForm({ onSuccess, token, countdown, onResend 
     }
   }
 
-  const onSubmit = async (data: VerifyEmailFormInputs) => {
+  const handleFormSubmit = async (data: VerificationCodeFormInputs) => {
     try {
-      await activateAccountVerifyApi({
-        token,
-        code: data.code,
-      })
-      onSuccess()
+      await onSubmit(data.code)
     }
     catch (e) {
-      console.error('Activation error:', e)
-      Toast.error({ message: t('activation_failed') })
+      console.error('Verification error:', e)
+      Toast.error({ message: t(errorMessage) })
     }
   }
 
   return (
     <Box
       component="form"
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(handleFormSubmit)}
       sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
     >
       <FormControl>
@@ -111,7 +113,7 @@ export default function VerifyEmailForm({ onSuccess, token, countdown, onResend 
         )}
       </FormControl>
       <Button type="submit" fullWidth variant="contained">
-        {t('activate')}
+        {t(submitButtonText)}
       </Button>
       <Button
         variant="text"

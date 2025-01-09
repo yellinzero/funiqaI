@@ -1,6 +1,7 @@
 import datetime
 from typing import Optional
 
+from fastapi import Request
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
@@ -16,6 +17,7 @@ ALGORITHM = "HS256"
 
 
 # -------- Password Hashing --------
+
 
 def hash_password(password: str) -> str:
     """
@@ -33,14 +35,15 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 # -------- JWT Token Handling --------
 
+
 def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] = None) -> str:
     """
     Create a JSON Web Token (JWT) with an optional expiration time.
-    
+
     Args:
         data (dict): The payload data to encode into the token.
         expires_delta (Optional[datetime.timedelta]): Optional expiration time.
-        
+
     Returns:
         str: The encoded JWT.
     """
@@ -53,13 +56,13 @@ def create_access_token(data: dict, expires_delta: Optional[datetime.timedelta] 
 def decode_access_token(token: str) -> dict:
     """
     Decode and verify a JWT token.
-    
+
     Args:
         token (str): The JWT token to decode.
-        
+
     Returns:
         dict: The decoded payload.
-        
+
     Raises:
         JWTError: If the token is invalid or expired.
     """
@@ -72,15 +75,21 @@ def decode_access_token(token: str) -> dict:
 
 # -------- Utility Functions --------
 
-def get_user_id_from_token(token: str) -> str:
+
+def get_account_id_from_token(token: str) -> str:
     """
     Extract the user ID from the JWT payload.
-    
+
     Args:
         token (str): The JWT token.
-        
+
     Returns:
         str: The user ID from the token.
     """
     payload = decode_access_token(token)
-    return payload.get("aid")  # 'aid' is commonly used to store user ID
+    return str(payload.get("aid"))  # 'aid' is commonly used to store user ID
+
+
+def get_account_id_from_request(request: Request) -> str:
+    token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    return get_account_id_from_token(token)

@@ -1,9 +1,9 @@
 'use client'
-import { forgotPasswordApi, resendVerificationCodeApi, resetPasswordApi } from '@/apis/modules/auth'
+import { forgotPasswordApi, resendVerificationCodeApi, resetPasswordApi } from '@/apis'
 import LangSelect from '@/components/LangSelect'
 import { SiteLogo } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
-import { useCountdown } from '@/utils/useCountdown'
+import { useCountdown } from '@/hooks/useCountdown'
 import Box from '@mui/material/Box'
 import MuiCard from '@mui/material/Card'
 import { styled } from '@mui/material/styles'
@@ -53,13 +53,15 @@ export default function ForgotPassword() {
 
   const onSubmitReset = async (data: { code: string, password: string, confirmPassword: string }) => {
     try {
-      await resetPasswordApi({
+      const res = await resetPasswordApi({
         token,
         code: data.code,
         new_password: data.password,
       })
-      Toast.success({ message: t('password_reset_success') })
-      router.push('/login')
+      if (res.data?.access_token) {
+        Toast.success({ message: t('password_reset_success') })
+        router.push('/sign-in')
+      }
     }
     catch (e) {
       console.error('Reset password error:', e)

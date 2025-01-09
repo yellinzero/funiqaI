@@ -1,5 +1,5 @@
 'use client'
-import { signupApi } from '@/apis/modules/auth'
+import { signupApi } from '@/apis'
 import Toast from '@/components/Toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Box from '@mui/material/Box'

@@ -1,9 +1,11 @@
 'use client'
-import { resendVerificationCodeApi } from '@/apis/modules/auth'
+import { resendVerificationCodeApi, signupVerifyApi } from '@/apis'
 import LangSelect from '@/components/LangSelect'
 import { SiteLogo } from '@/components/SiteLogo'
+import Toast from '@/components/Toast'
+import VerificationCodeForm from '@/components/VerificationCodeForm'
+import { useCountdown } from '@/hooks/useCountdown'
 import { useSession } from '@/plugins/session'
-import { useCountdown } from '@/utils/useCountdown'
 import { styled } from '@mui/material'
 import Box from '@mui/material/Box'
 import MuiCard from '@mui/material/Card'
@@ -12,7 +14,6 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import SignUpForm from './components/SignUpForm'
-import VerifyEmailForm from './components/VerifyEmailForm'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -45,7 +46,7 @@ export default function SignUp() {
   const handleVerifyEmailSuccess = (accessToken: string) => {
     if (accessToken) {
       setSession(accessToken)
-      router.push('/')
+      router.push('/create-tenant')
     }
   }
 
@@ -58,6 +59,14 @@ export default function SignUp() {
     }
     catch (e) {
       console.error('Resend verification code error:', e)
+    }
+  }
+
+  const handleVerificationSubmit = async (code: string) => {
+    const res = await signupVerifyApi({ code, token })
+    if (res.data) {
+      Toast.success({ message: t('email_verified_success') })
+      handleVerifyEmailSuccess(res.data.access_token)
     }
   }
 
@@ -119,11 +128,12 @@ export default function SignUp() {
           </Typography>
           {showVerifyEmail
             ? (
-                <VerifyEmailForm
-                  onSuccess={handleVerifyEmailSuccess}
-                  token={token}
+                <VerificationCodeForm
+                  onSubmit={handleVerificationSubmit}
+                  submitButtonText="verify"
                   countdown={countdown}
                   onResend={handleResendCode}
+                  errorMessage="verification_failed"
                 />
               )
             : (

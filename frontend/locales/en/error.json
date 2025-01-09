@@ -1,3 +1,36 @@
 {
-  "undefined_error": "Undefined error"
+  "undefined_error": "Undefined error",
+  "A0001": "Unauthorized",
+  "A0002": "Permission Denied",
+  "A0003": "Resource Not Found",
+  "A0004": "Invalid Argument",
+  "A0005": "Internal Server Error",
+  "A0006": "Invalid verification code",
+  "A0007": "Email verification requests are too frequent. Please try again later.",
+  "A0008": "The email verification code has expired. Please request a new one.",
+
+  "B0001": "The email address is already registered",
+  "B0002": "The username is already registered",
+  "B0003": "Invalid email or password",
+  "B0004": "Account is not active",
+  "B0005": "The email address is not registered. Please check and try again.",
+  "B0006": "The account is already active. No further action is required.",
+  "B0007": "The account is not found.",
+  "B0008": "Cannot remove the last owner.",
+  "B0009": "The user is not in the tenant.",
+  "B0010": "The tenant is not found.",
+  "B0011": "The user is already in the tenant.",
+
+  "HCODE400": "Bad Request",
+  "HCODE401": "Unauthorized",
+  "HCODE403": "Forbidden",
+  "HCODE404": "Not Found",
+  "HCODE405": "Method Not Allowed",
+  "HCODE408": "Request Timeout",
+  "HCODE409": "Conflict",
+  "HCODE429": "Too Many Requests",
+  "HCODE500": "Internal Server Error",
+  "HCODE502": "Bad Gateway",
+  "HCODE503": "Service Unavailable",
+  "HCODE504": "Gateway Timeout"
 }

@@ -93,7 +93,7 @@ const responseMiddleware: Middleware = {
       switch (status) {
         case 401: {
           Cookies.remove('session')
-          window.location.href = '/login'
+          window.location.href = '/sign-in'
           break
         }
       }
@@ -116,14 +116,19 @@ export function createFetchApi(client: Client<paths>) {
     // eslint-disable-next-line ts/no-empty-object-type
     promise: ReturnType<ClientMethod<{}, Method, Path>>,
   ): Promise<CustomFetchResponse<Path, Method>> => {
-    const response = await promise
-    const data = response.data || response.error
+    const { data, response, error } = await promise
 
     const locale = Cookies.get(i18nCookieName)
     const { t } = await initTranslations(locale || 'en', namespaces)
-    if (data.code !== '0') {
-      Toast.error({ message: t(data.code) || t('undefined_error') })
-      throw new HttpError(data.message, response, data)
+    const errorCode = data?.code || error?.code
+    if (errorCode && errorCode !== '0') {
+      Toast.error({ message: t(errorCode) || t('undefined_error') })
+      throw new HttpError(data?.message || error?.message, response, data)
+    }
+    else if (response.status >= 400 && response.status < 600) {
+      const httpErrorMsg = t(`HCODE${response.status}`)
+      Toast.error({ message: httpErrorMsg })
+      throw new HttpError(httpErrorMsg, response, data)
     }
 
     return {

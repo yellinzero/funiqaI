@@ -1,16 +1,13 @@
 import type { ThemeProviderProps } from '@mui/material/styles/ThemeProvider'
-import I18nProvider from '@/components/I18nProvider'
 import { initTranslations } from '@/plugins/i18n'
 import { getLocaleFromServer } from '@/plugins/i18n/server'
-import { roboto, theme } from '@/theme'
-import { themeCookieName } from '@/theme/configs'
+import { roboto } from '@/theme'
 
-import { CssBaseline } from '@mui/material'
+import { themeCookieName } from '@/theme/configs'
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
-import { ThemeProvider } from '@mui/material/styles'
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter'
 import { cookies } from 'next/headers'
 import React from 'react'
+import Providers from '../components/Providers'
 import '@/assets/css/globals.css'
 
 const namespaces = ['global']
@@ -38,14 +35,9 @@ export default async function RootLayout({
         }
         >
           <InitColorSchemeScript attribute="data-funiq-ai-color-scheme" />
-          <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-            <ThemeProvider theme={theme} defaultMode={themeCookie}>
-              <CssBaseline enableColorScheme />
-              <I18nProvider locale={locale}>
-                {children}
-              </I18nProvider>
-            </ThemeProvider>
-          </AppRouterCacheProvider>
+          <Providers locale={locale} defaultMode={themeCookie}>
+            {children}
+          </Providers>
         </body>
       </html>
     </React.StrictMode>
