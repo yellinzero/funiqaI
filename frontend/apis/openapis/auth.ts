@@ -1,4 +1,4 @@
-import { type ExtractBodyType, fetchApi, fetchPublicApi } from '@/apis/core'
+import { type ExtractBodyType, fetchPublicApi } from '@/apis/core'
 
 const loginUrl = '/auth/login' as const
 export async function loginApi(body: ExtractBodyType<'post', typeof loginUrl>) {
@@ -38,9 +38,4 @@ export async function resetPasswordApi(body: ExtractBodyType<'post', typeof rese
 const resendVerificationCodeUrl = '/auth/resend_verification_code'
 export async function resendVerificationCodeApi(body: ExtractBodyType<'post', typeof resendVerificationCodeUrl>) {
   return await fetchPublicApi.POST(resendVerificationCodeUrl, { body })
-}
-
-const accountInfoUrl = '/auth/account_info'
-export async function accountInfoApi() {
-  return await fetchApi.GET(accountInfoUrl)
 }

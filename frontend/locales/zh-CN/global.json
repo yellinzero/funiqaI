@@ -45,5 +45,12 @@
   "account_activated": "账号激活成功",
   "invalid_activation_link": "无效的激活链接",
   "send_activation_code": "发送激活码",
-  "activation_code_description": "请点击下方按钮发送激活码到您的邮箱 {{email}}。收到激活码后，请在下方输入框中输入6位数字激活码来激活您的账号。"
+  "activation_code_description": "请点击下方按钮发送激活码到您的邮箱 {{email}}。收到激活码后，请在下方输入框中输入6位数字激活码来激活您的账号。",
+  "create_tenant": "创建租户",
+  "create_tenant_description": "为您的组织创建新的租户",
+  "tenant_name": "租户名称",
+  "enter_tenant_name": "请输入租户名称",
+  "tenant_name_required": "租户名称不能为空",
+  "tenant_created_success": "租户创建成功",
+  "tenant_creation_failed": "租户创建失败"
 }

@@ -5,6 +5,7 @@ from fastapi.responses import ORJSONResponse
 
 from app.errors import register_exception_handlers
 from app_manager import app_manager
+from configs import funiq_ai_config
 from database import shutdown_database
 from middleware import install_global_middlewares
 from services.celery import init_celery
@@ -22,16 +23,20 @@ def create_app() -> FastAPI:
         lifespan=lifespan,  # Register lifecycle hooks
     )
 
+    # Install middleware
     install_global_middlewares(app)
-    app_manager.install_apps(["app.auth"])
+
+    # Use INSTALLED_APPS from config
+    app_manager.install_apps(funiq_ai_config.INSTALLED_APPS)
     app_manager.apply_modules_to_fastapi(app)
+
     # Register routes and exception handlers
     register_routes(app)
     register_exception_handlers(app)
-    # Register Email server
-    init_email_service(app)
-    # Resister Celery server
-    init_celery(app)
+
+    # Initialize services
+    init_email_service(app)  # Email service
+    init_celery(app)        # Celery task queue
 
     return app
 
@@ -47,10 +52,11 @@ def register_routes(app: FastAPI):
     """
     Register API routes.
     """
+
     @app.get("/api/health", tags=["Health Check"])
     def health_check():
         return {"status": "healthy"}
-    
+
 
 app = create_app()
 celery = app.state.celery

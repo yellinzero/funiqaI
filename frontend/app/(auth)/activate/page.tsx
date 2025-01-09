@@ -1,9 +1,10 @@
 'use client'
-import { activateAccountApi, resendVerificationCodeApi } from '@/apis/modules/auth'
+import { activateAccountApi, activateAccountVerifyApi, resendVerificationCodeApi } from '@/apis'
 import LangSelect from '@/components/LangSelect'
 import { SiteLogo } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
-import { useCountdown } from '@/utils/useCountdown'
+import VerificationCodeForm from '@/components/VerificationCodeForm'
+import { useCountdown } from '@/hooks/useCountdown'
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
@@ -12,7 +13,6 @@ import Typography from '@mui/material/Typography'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import VerifyEmailForm from './components/VerifyEmailForm'
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -38,7 +38,7 @@ export default function Activate() {
     const email = searchParams.get('email')
     if (!email) {
       Toast.error({ message: t('invalid_activation_link') })
-      router.push('/login')
+      router.push('/sign-in')
       return
     }
     setEmail(email)
@@ -59,13 +59,13 @@ export default function Activate() {
     catch (e) {
       console.error('Send activation code error:', e)
       Toast.error({ message: t('send_code_failed') })
-      router.push('/login')
+      router.push('/sign-in')
     }
   }
 
   const handleActivationSuccess = () => {
     Toast.success({ message: t('account_activated') })
-    router.push('/login')
+    router.push('/sign-in')
   }
 
   const handleResendCode = async () => {
@@ -81,6 +81,11 @@ export default function Activate() {
       console.error('Resend verification code error:', e)
       Toast.error({ message: t('send_code_failed') })
     }
+  }
+
+  const handleVerificationSubmit = async (code: string) => {
+    await activateAccountVerifyApi({ token, code })
+    handleActivationSuccess()
   }
 
   return (
@@ -143,11 +148,12 @@ export default function Activate() {
             </Button>
           )}
           {token && (
-            <VerifyEmailForm
-              onSuccess={handleActivationSuccess}
-              token={token}
+            <VerificationCodeForm
+              onSubmit={handleVerificationSubmit}
+              submitButtonText="activate"
               countdown={countdown}
               onResend={handleResendCode}
+              errorMessage="activation_failed"
             />
           )}
         </Card>

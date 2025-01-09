@@ -1,6 +1,6 @@
 'use client'
+import { loginApi } from '@/apis'
 import { HttpError } from '@/apis/core'
-import { loginApi } from '@/apis/modules/auth'
 import LangSelect from '@/components/LangSelect'
 import { SiteLogo } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
@@ -57,7 +57,9 @@ export default function Login() {
       const res = await loginApi({ ...data, language: i18n.language })
       if (res.data) {
         setSession(res.data.access_token)
+
         router.push('/')
+
         Toast.success({ message: t('login_success') })
       }
     }

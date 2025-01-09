@@ -1,5 +1,6 @@
 from pydantic_settings import SettingsConfigDict
 
+from .apps import AppsConfig
 from .celery import CeleryConfig
 from .database import DatabaseConfig, RedisConfig
 from .mail import MailConfig
@@ -13,7 +14,8 @@ class FuniqAIConfigSettings(
     DatabaseConfig,
     RedisConfig,
     TokenConfig,
-    CeleryConfig
+    CeleryConfig,
+    AppsConfig,
 ):
     DEBUG: bool
     SECRET_KEY: str

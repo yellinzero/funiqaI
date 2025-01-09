@@ -1,7 +1,7 @@
-from app.errors import BaseErrorCode
+from app.errors.base import BaseErrorCode
 
 
-class UserErrorCode(BaseErrorCode):
+class AccountErrorCode(BaseErrorCode):
     """
     User errors (Category B)
     """
@@ -20,4 +20,20 @@ class UserErrorCode(BaseErrorCode):
     ACCOUNT_NOT_FOUND = (
         "B0007", 
         "The account is not found."
+    )
+    CANNOT_REMOVE_LAST_OWNER = (
+        "B0008", 
+        "Cannot remove the last owner."
+    )
+    USER_NOT_IN_TENANT = (
+        "B0009", 
+        "The user is not in the tenant."
+    )
+    TENANT_NOT_FOUND = (
+        "B0010", 
+        "The tenant is not found."
+    )
+    USER_ALREADY_IN_TENANT = (
+        "B0011", 
+        "The user is already in the tenant."
     )

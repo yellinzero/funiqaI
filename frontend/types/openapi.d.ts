@@ -142,18 +142,89 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth/account_info": {
+    "/account/me": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Account Info */
-        get: operations["account_info_auth_account_info_get"];
+        /** Get Account Info */
+        get: operations["get_account_info_account_me_get"];
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/tenants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Account Tenants */
+        get: operations["get_account_tenants_account_tenants_get"];
+        put?: never;
+        /** Create Tenant */
+        post: operations["create_tenant_account_tenants_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/tenants/{tenant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update Tenant */
+        put: operations["update_tenant_account_tenants__tenant_id__put"];
+        post?: never;
+        /** Delete Tenant */
+        delete: operations["delete_tenant_account_tenants__tenant_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/tenants/{tenant_id}/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Tenant User */
+        post: operations["add_tenant_user_account_tenants__tenant_id__users_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/account/tenants/{tenant_id}/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update User Role */
+        put: operations["update_user_role_account_tenants__tenant_id__users__user_id__put"];
+        post?: never;
+        /** Remove Tenant User */
+        delete: operations["remove_tenant_user_account_tenants__tenant_id__users__user_id__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -180,25 +251,26 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** AccountInfoResponse */
-        AccountInfoResponse: {
+        /** AccountResponse */
+        AccountResponse: {
+            /** Id */
+            id: string;
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
             /** Name */
             name: string;
-            /** Email */
-            email: string;
-            status: components["schemas"]["AccountStatus"];
             /** Language */
             language: string;
+            /** Status */
+            status: string;
             /** Last Login At */
-            last_login_at: string;
+            last_login_at?: string | null;
             /** Last Login Ip */
-            last_login_ip: string | null;
+            last_login_ip?: string | null;
         };
-        /**
-         * AccountStatus
-         * @enum {string}
-         */
-        AccountStatus: "pending" | "active" | "inactive" | "disabled";
         /**
          * AccountTokenType
          * @enum {string}
@@ -296,8 +368,8 @@ export interface components {
             /** Access Token */
             access_token: string;
         };
-        /** ResponseModel[AccountInfoResponse] */
-        ResponseModel_AccountInfoResponse_: {
+        /** ResponseModel */
+        ResponseModel: {
             /**
              * Code
              * @default 0
@@ -308,7 +380,22 @@ export interface components {
              * @default success
              */
             msg: string;
-            data: components["schemas"]["AccountInfoResponse"];
+            /** Data */
+            data: unknown;
+        };
+        /** ResponseModel[AccountResponse] */
+        ResponseModel_AccountResponse_: {
+            /**
+             * Code
+             * @default 0
+             */
+            code: string;
+            /**
+             * Msg
+             * @default success
+             */
+            msg: string;
+            data: components["schemas"]["AccountResponse"];
         };
         /** ResponseModel[ActivateAccountResponse] */
         ResponseModel_ActivateAccountResponse_: {
@@ -422,6 +509,49 @@ export interface components {
             msg: string;
             data: components["schemas"]["SignupVerifyResponse"];
         };
+        /** ResponseModel[TenantResponse] */
+        ResponseModel_TenantResponse_: {
+            /**
+             * Code
+             * @default 0
+             */
+            code: string;
+            /**
+             * Msg
+             * @default success
+             */
+            msg: string;
+            data: components["schemas"]["TenantResponse"];
+        };
+        /** ResponseModel[UserResponse] */
+        ResponseModel_UserResponse_: {
+            /**
+             * Code
+             * @default 0
+             */
+            code: string;
+            /**
+             * Msg
+             * @default success
+             */
+            msg: string;
+            data: components["schemas"]["UserResponse"];
+        };
+        /** ResponseModel[list[TenantResponse]] */
+        ResponseModel_list_TenantResponse__: {
+            /**
+             * Code
+             * @default 0
+             */
+            code: string;
+            /**
+             * Msg
+             * @default success
+             */
+            msg: string;
+            /** Data */
+            data: components["schemas"]["TenantResponse"][];
+        };
         /** SignupRequest */
         SignupRequest: {
             /** Name */
@@ -459,6 +589,52 @@ export interface components {
              * @default bearer
              */
             token_type: string;
+        };
+        /** TenantCreateRequest */
+        TenantCreateRequest: {
+            /** Name */
+            name: string;
+        };
+        /** TenantResponse */
+        TenantResponse: {
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+        };
+        /** TenantUpdateRequest */
+        TenantUpdateRequest: {
+            /** Name */
+            name: string;
+        };
+        /**
+         * TenantUserRole
+         * @enum {string}
+         */
+        TenantUserRole: "owner" | "admin" | "member" | "guest";
+        /** UserAddRequest */
+        UserAddRequest: {
+            /**
+             * Email
+             * Format: email
+             */
+            email: string;
+            /** @default member */
+            role: components["schemas"]["TenantUserRole"];
+        };
+        /** UserResponse */
+        UserResponse: {
+            /** Id */
+            id: string;
+            /** Account Id */
+            account_id: string;
+            /** Tenant Id */
+            tenant_id: string;
+            role: components["schemas"]["TenantUserRole"];
+        };
+        /** UserRoleUpdateRequest */
+        UserRoleUpdateRequest: {
+            role: components["schemas"]["TenantUserRole"];
         };
         /** ValidationError */
         ValidationError: {
@@ -742,7 +918,7 @@ export interface operations {
             };
         };
     };
-    account_info_auth_account_info_get: {
+    get_account_info_account_me_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -757,7 +933,229 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ResponseModel_AccountInfoResponse_"];
+                    "application/json": components["schemas"]["ResponseModel_AccountResponse_"];
+                };
+            };
+        };
+    };
+    get_account_tenants_account_tenants_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_list_TenantResponse__"];
+                };
+            };
+        };
+    };
+    create_tenant_account_tenants_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TenantCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_TenantResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_tenant_account_tenants__tenant_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TenantUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_TenantResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_tenant_account_tenants__tenant_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_tenant_user_account_tenants__tenant_id__users_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserAddRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_UserResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_user_role_account_tenants__tenant_id__users__user_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UserRoleUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_UserResponse_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_tenant_user_account_tenants__tenant_id__users__user_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

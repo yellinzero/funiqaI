@@ -45,5 +45,12 @@
   "account_activated": "Account activated successfully",
   "invalid_activation_link": "Invalid activation link",
   "send_activation_code": "Send Activation Code",
-  "activation_code_description": "Please click the button below to send an activation code to your email {{email}}. Once received, enter the 6-digit activation code below to activate your account."
+  "activation_code_description": "Please click the button below to send an activation code to your email {{email}}. Once received, enter the 6-digit activation code below to activate your account.",
+  "create_tenant": "Create Tenant",
+  "create_tenant_description": "Create a new tenant for your organization",
+  "tenant_name": "Tenant Name",
+  "enter_tenant_name": "Enter tenant name",
+  "tenant_name_required": "Tenant name is required",
+  "tenant_created_success": "Tenant created successfully",
+  "tenant_creation_failed": "Failed to create tenant"
 }
