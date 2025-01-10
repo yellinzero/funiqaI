@@ -1,7 +1,7 @@
 'use client'
 import { resendVerificationCodeApi, signupVerifyApi } from '@/apis'
 import LangSelect from '@/components/LangSelect'
-import { SiteLogo } from '@/components/SiteLogo'
+import { LogoWithName } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
 import VerificationCodeForm from '@/components/VerificationCodeForm'
 import { useCountdown } from '@/hooks/useCountdown'
@@ -93,7 +93,7 @@ export default function SignUp() {
         padding: '12px',
       }}
       >
-        <SiteLogo />
+        <LogoWithName />
         <LangSelect />
       </Box>
 

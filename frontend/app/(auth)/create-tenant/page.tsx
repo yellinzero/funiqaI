@@ -1,7 +1,7 @@
 'use client'
 import { createTenantApi, tenantsOptions } from '@/apis'
 import LangSelect from '@/components/LangSelect'
-import { SiteLogo } from '@/components/SiteLogo'
+import { LogoWithName } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Box from '@mui/material/Box'
@@ -86,7 +86,7 @@ export default function CreateTenant() {
         padding: '12px',
       }}
       >
-        <SiteLogo />
+        <LogoWithName />
         <LangSelect />
       </Box>
 

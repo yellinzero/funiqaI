@@ -1,7 +1,7 @@
 'use client'
 import { forgotPasswordApi, resendVerificationCodeApi, resetPasswordApi } from '@/apis'
 import LangSelect from '@/components/LangSelect'
-import { SiteLogo } from '@/components/SiteLogo'
+import { LogoWithName } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
 import { useCountdown } from '@/hooks/useCountdown'
 import Box from '@mui/material/Box'
@@ -92,7 +92,7 @@ export default function ForgotPassword() {
         padding: '12px',
       }}
       >
-        <SiteLogo />
+        <LogoWithName />
         <LangSelect />
       </Box>
 

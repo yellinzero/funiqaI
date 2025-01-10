@@ -29,7 +29,8 @@
   },
   "lint-staged": {
     "frontend/**/*.{js,jsx,ts,tsx}": [
-      "cd frontend && eslint --fix"
+      "cd frontend && eslint --fix",
+      "cd frontend && vitest related --run"
     ]
   }
 }

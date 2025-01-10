@@ -93,7 +93,8 @@ const responseMiddleware: Middleware = {
       switch (status) {
         case 401: {
           Cookies.remove('session')
-          window.location.href = '/sign-in'
+          if (typeof window !== 'undefined')
+            window.location.href = '/sign-in'
           break
         }
       }
@@ -122,12 +123,14 @@ export function createFetchApi(client: Client<paths>) {
     const { t } = await initTranslations(locale || 'en', namespaces)
     const errorCode = data?.code || error?.code
     if (errorCode && errorCode !== '0') {
-      Toast.error({ message: t(errorCode) || t('undefined_error') })
+      if (typeof window !== 'undefined')
+        Toast.error({ message: t(errorCode) || t('undefined_error') })
       throw new HttpError(data?.message || error?.message, response, data)
     }
     else if (response.status >= 400 && response.status < 600) {
       const httpErrorMsg = t(`HCODE${response.status}`)
-      Toast.error({ message: httpErrorMsg })
+      if (typeof window !== 'undefined')
+        Toast.error({ message: httpErrorMsg })
       throw new HttpError(httpErrorMsg, response, data)
     }
 

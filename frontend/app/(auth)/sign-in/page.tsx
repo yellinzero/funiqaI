@@ -2,7 +2,7 @@
 import { loginApi } from '@/apis'
 import { HttpError } from '@/apis/core'
 import LangSelect from '@/components/LangSelect'
-import { SiteLogo } from '@/components/SiteLogo'
+import { LogoWithName } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
 import { useSession } from '@/plugins/session'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -94,7 +94,7 @@ export default function Login() {
         padding: '12px',
       }}
       >
-        <SiteLogo />
+        <LogoWithName />
         <LangSelect />
       </Box>
 

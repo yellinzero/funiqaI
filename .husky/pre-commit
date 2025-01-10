@@ -29,7 +29,7 @@ if $backend_modified; then
     # python style checks rely on `ruff` in path
     if ! command -v ruff &> /dev/null; then
         echo "Installing linting tools (Ruff, dotenv-linter ...) ..."
-        poetry install -C backend --only lint
+        poetry install -C backend
     fi
 
     echo "Run fuff linter auto-fixing"
