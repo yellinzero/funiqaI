@@ -53,7 +53,7 @@ def register_routes(app: FastAPI):
     Register API routes.
     """
 
-    @app.get("/api/health", tags=["Health Check"])
+    @app.get("/health", tags=["Health Check"])
     def health_check():
         return {"status": "healthy"}
 

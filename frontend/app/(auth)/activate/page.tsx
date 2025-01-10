@@ -1,7 +1,7 @@
 'use client'
 import { activateAccountApi, activateAccountVerifyApi, resendVerificationCodeApi } from '@/apis'
 import LangSelect from '@/components/LangSelect'
-import { SiteLogo } from '@/components/SiteLogo'
+import { LogoWithName } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
 import VerificationCodeForm from '@/components/VerificationCodeForm'
 import { useCountdown } from '@/hooks/useCountdown'
@@ -111,7 +111,7 @@ export default function Activate() {
         padding: '12px',
       }}
       >
-        <SiteLogo />
+        <LogoWithName />
         <LangSelect />
       </Box>
 
