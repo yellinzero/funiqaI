@@ -34,7 +34,7 @@ class TokenManager:
 
         :param token: Token to be revoked
         """
-        token_key = self._get_token_key(namespace, token)
+        token_key = self._get_token_key(token, namespace)
         await redis.delete(token_key)
 
     async def get_token_data(self, token: str, namespace: str = 'funiq_ai') -> Optional[dict]:
@@ -193,5 +193,5 @@ class AccountTokenManager(TokenManager):
         old_token = await redis.get(key)
 
         if old_token:
-            super().revoke_token(old_token.decode("utf-8"), token_type)  # Remove token from storage
+            await super().revoke_token(old_token.decode("utf-8"), token_type)  # Remove token from storage
             await redis.delete(key)  # Remove reference to the token
