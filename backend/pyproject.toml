@@ -58,6 +58,7 @@ ignore = [
     "SIM117", # Allow multiple with statements for better readability
     "B006", # Ignore mutable argument defaults in certain cases
     "PT011", # Allow broad exception handling in pytest raises
+    "S101", # Use assert instead of raise
 ]
 
 # Per-file specific ignores for project-specific exceptions

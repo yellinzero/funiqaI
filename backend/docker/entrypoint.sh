@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e  # 如果任何命令失败，则退出
+set -e  # if any command fails, exit
 
 case "${MODE}" in
   worker)
