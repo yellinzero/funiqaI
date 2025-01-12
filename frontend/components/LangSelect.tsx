@@ -50,11 +50,12 @@ export default function LangSelect() {
         }}
         onClick={handleClick}
       >
-        <TranslateIcon sx={{ fontSize: '16px' }} />
+        <TranslateIcon sx={{ fontSize: '16px', color: 'text.secondary' }} />
         <Box
           component="span"
           sx={{
             padding: '8px 0px',
+            color: 'text.secondary',
           }}
         >
           {currLangLabel}

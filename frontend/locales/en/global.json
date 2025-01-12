@@ -1,6 +1,7 @@
 {
   "product_name": "Funiq AI",
   "welcome": "Welcome to {{name}}",
+  "home_description": "A simple and user-friendly AI workflow management platform, making AI technology more accessible",
   "chats": "Chats",
   "workflows": "Workflows",
   "store": "Store",

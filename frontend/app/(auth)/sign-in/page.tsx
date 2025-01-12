@@ -1,8 +1,6 @@
 'use client'
 import { loginApi } from '@/apis'
 import { HttpError } from '@/apis/core'
-import LangSelect from '@/components/LangSelect'
-import { LogoWithName } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
 import { useSession } from '@/plugins/session'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -58,7 +56,7 @@ export default function Login() {
       if (res.data) {
         setSession(res.data.access_token)
 
-        router.push('/')
+        router.push('/chat')
 
         Toast.success({ message: t('login_success') })
       }
@@ -72,134 +70,95 @@ export default function Login() {
   }
 
   return (
-    <Box
-      component="main"
-      sx={{
-        display: 'flex',
-        backgroundColor: 'background.default',
-        overflow: 'auto',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
-      }}
-    >
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'fixed',
-        width: '100%',
-        top: '0',
-        padding: '12px',
-      }}
-      >
-        <LogoWithName />
-        <LangSelect />
-      </Box>
+    <>
+      <Card sx={{ height: '70%' }}>
+        <Typography
+          component="h1"
+          variant="h4"
+          sx={{ width: '100%', fontSize: '1.5rem' }}
+        >
+          {t('welcome', {
+            name: t('product_name'),
+          })}
+        </Typography>
+        <Box
+          component="form"
+          onSubmit={handleSubmit(onSubmit)}
+          noValidate
+          sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
+        >
+          <FormControl>
+            <FormLabel htmlFor="email">{t('email')}</FormLabel>
+            <Controller
+              name="email"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  id="email"
+                  type="email"
+                  placeholder="your@email.com"
+                  autoComplete="email"
+                  fullWidth
+                  variant="outlined"
+                  error={!!errors.email}
+                  helperText={errors.email ? t('enter_valid_email') : undefined}
+                />
+              )}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="password">{t('password')}</FormLabel>
+            <Controller
+              name="password"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  id="password"
+                  type="password"
+                  placeholder="••••••"
+                  autoComplete="current-password"
+                  fullWidth
+                  variant="outlined"
+                  error={!!errors.password}
+                  helperText={errors.password ? t('enter_valid_password') : undefined}
+                />
+              )}
+            />
+          </FormControl>
+          <Button type="submit" fullWidth variant="contained">
+            {t('sign_in')}
+          </Button>
+          <Box sx={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'end',
+          }}
+          >
+            <Link href="/forgot-password" underline="hover">
+              {t('forgot_password')}
+            </Link>
+          </Box>
 
+        </Box>
+      </Card>
       <Box
-        component="div"
+        component="span"
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 2,
-          height: '100%',
-          width: '100%',
+          gap: 1,
         }}
       >
-        <Card sx={{ height: '70%' }}>
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: '1.5rem' }}
-          >
-            {t('welcome', {
-              name: t('product_name'),
-            })}
-          </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-            sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
-          >
-            <FormControl>
-              <FormLabel htmlFor="email">{t('email')}</FormLabel>
-              <Controller
-                name="email"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    id="email"
-                    type="email"
-                    placeholder="your@email.com"
-                    autoComplete="email"
-                    fullWidth
-                    variant="outlined"
-                    error={!!errors.email}
-                    helperText={errors.email ? t('enter_valid_email') : undefined}
-                  />
-                )}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel htmlFor="password">{t('password')}</FormLabel>
-              <Controller
-                name="password"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    id="password"
-                    type="password"
-                    placeholder="••••••"
-                    autoComplete="current-password"
-                    fullWidth
-                    variant="outlined"
-                    error={!!errors.password}
-                    helperText={errors.password ? t('enter_valid_password') : undefined}
-                  />
-                )}
-              />
-            </FormControl>
-            <Button type="submit" fullWidth variant="contained">
-              {t('sign_in')}
-            </Button>
-            <Box sx={{
-              width: '100%',
-              display: 'flex',
-              justifyContent: 'end',
-            }}
-            >
-              <Link href="/forgot-password" underline="hover">
-                {t('forgot_password')}
-              </Link>
-            </Box>
-
-          </Box>
-        </Card>
-        <Box
-          component="span"
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1,
-          }}
-        >
-          <Box component="span">
-            {t('no_account')}
-          </Box>
-
-          <Link href="/sign-up" underline="hover">
-            {t('sign_up_now')}
-          </Link>
+        <Box component="span" sx={{ color: 'text.secondary' }}>
+          {t('no_account')}
         </Box>
-      </Box>
 
-    </Box>
+        <Link href="/sign-up" underline="hover">
+          {t('sign_up_now')}
+        </Link>
+      </Box>
+    </>
   )
 }
