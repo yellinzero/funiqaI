@@ -1,56 +1,72 @@
-import { tenantsOptions } from '@/apis/queries/account'
-import Header from '@/components/Header'
-import MobileNavbar from '@/components/MobileNavbar'
-import SideMenu from '@/components/SideMenu'
-import TenantsCheck from '@/components/TenantsCheck'
+import HomePageHeader from '@/components/HomePageHeader'
+import { LogoWithName } from '@/components/SiteLogo'
 import { initTranslations } from '@/plugins/i18n'
 import { getLocaleFromServer } from '@/plugins/i18n/server'
-import { getQueryClient } from '@/utils/get-query-client'
-import Box from '@mui/material/Box'
-import Stack from '@mui/material/Stack'
-import { dehydrate, HydrationBoundary } from '@tanstack/react-query'
-
-const namespaces = ['global']
+import { Box, Button, Link, Typography } from '@mui/material'
 
 export default async function Home() {
   const locale = await getLocaleFromServer()
-  const { i18n: { t } } = await initTranslations(locale, namespaces)
-
-  const queryClient = getQueryClient()
-
-  await queryClient.prefetchQuery(tenantsOptions)
-
+  const { t } = await initTranslations(locale, ['global'])
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <Box sx={{ display: 'flex', height: '100vh', width: '100vw' }}>
-        <TenantsCheck />
-        <SideMenu />
-        <MobileNavbar />
-        {/* Main content */}
-        <Box
-          component="main"
+    <Box sx={{
+      width: '100vw',
+      height: '100vh',
+      backgroundColor: 'background.default',
+      display: 'flex',
+      flexDirection: 'column',
+    }}
+    >
+      <HomePageHeader />
+      <Box sx={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: 4,
+        px: 2,
+      }}
+      >
+        <LogoWithName height={120} />
+        <Typography
+          variant="h5"
+          color="text.secondary"
+          align="center"
           sx={{
-            flexGrow: 1,
-            backgroundColor: 'background.default',
-            overflow: 'auto',
+            maxWidth: '600px',
+            fontSize: {
+              xs: '1.1rem',
+              sm: '1.3rem',
+            },
           }}
         >
-          <Stack
-            spacing={2}
-            sx={{
-              alignItems: 'center',
-              mx: 3,
-              pb: 5,
-              mt: { xs: 8, md: 0 },
-
-            }}
-          >
-            <Header />
-            <div>Hello world </div>
-            <div>{t('welcome')}</div>
-          </Stack>
+          {t('home_description')}
+        </Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
+          <Link href="/sign-in" underline="hover">
+            <Button
+              variant="contained"
+              color="primary"
+              size="large"
+              sx={{
+                px: 4,
+                py: 1,
+                borderRadius: 2,
+                fontSize: '1.1rem',
+              }}
+            >
+              {t('sign_in')}
+            </Button>
+          </Link>
+          <Link href="/sign-up" underline="hover">
+            <Button
+              variant="text"
+            >
+              {t('sign_up')}
+            </Button>
+          </Link>
         </Box>
       </Box>
-    </HydrationBoundary>
+    </Box>
   )
 }

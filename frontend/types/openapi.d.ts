@@ -230,7 +230,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/health": {
+    "/health": {
         parameters: {
             query?: never;
             header?: never;
@@ -238,7 +238,7 @@ export interface paths {
             cookie?: never;
         };
         /** Health Check */
-        get: operations["health_check_api_health_get"];
+        get: operations["health_check_health_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1160,7 +1160,7 @@ export interface operations {
             };
         };
     };
-    health_check_api_health_get: {
+    health_check_health_get: {
         parameters: {
             query?: never;
             header?: never;

@@ -1,12 +1,24 @@
-# FuniqAI
-FuniqAI is a personal, experimental project designed to simplify the process of creating and managing agent-based workflows. Whether you're building complex AI pipelines or just exploring intelligent automation for fun, FuniqAI offers:
+# Funiq AI
 
-- Dynamic Agent Flows: Easily create, connect, and manage intelligent agents.
+Funiq AI is a personal research and learning project aimed at exploring the design and implementation of a modern AI workflow management platform. It strives to create a simplified and user-friendly ecosystem for creating, using, sharing, and managing AI agents, offering a flexible, powerful, and easily maintainable platform for AI applications.
 
-- Customizable Pipelines: Tailor agent behaviors and interactions to fit your use case.
+## 🌟 Core Features (Expected Features - Work in Progress)
 
-- For Learning and Fun: A lightweight and accessible platform to experiment with AI concepts.
+- [ ] **Intuitive Agent Creation**: Design and customize AI agents through a user-friendly interface
+- [ ] **Streamlined Usage**: Simplified workflows for quick deployment and operation
+- [ ] **Open Sharing System**: Import/export capabilities to foster community collaboration
+- [ ] **Comprehensive Management**: Centralized control panel for monitoring and managing AI agents
+- [ ] **Multi-language Support**: Interface available in multiple languages
 
-- Modular and Flexible: Designed with scalability and creativity in mind, making it perfect for both prototyping and casual development.
+## 🎯 Vision
 
-Ideal for AI enthusiasts, hobbyists, and developers looking for a playful and innovative way to dive into agent-driven workflows.
+Dedicated to lowering the barriers to AI application development, making AI technology more accessible to everyone. Through standardized development frameworks and intuitive interfaces, we aim to democratize AI technology and make it more practical for everyday use.
+
+## 🚀 Quick Links
+
+- [Frontend Documentation](./frontend/README.md)
+- [Backend Documentation](./backend/README.md)
+
+## 📄 License
+
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.

@@ -1,7 +1,5 @@
 'use client'
 import { createTenantApi, tenantsOptions } from '@/apis'
-import LangSelect from '@/components/LangSelect'
-import { LogoWithName } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Box from '@mui/material/Box'
@@ -55,7 +53,7 @@ export default function CreateTenant() {
       await createTenantApi(data)
       await refetch()
       Toast.success({ message: t('tenant_created_success') })
-      router.push('/')
+      router.push('/chat')
     }
     catch (e) {
       console.error('Create tenant error:', e)
@@ -64,86 +62,46 @@ export default function CreateTenant() {
   }
 
   return (
-    <Box
-      component="main"
-      sx={{
-        display: 'flex',
-        backgroundColor: 'background.default',
-        overflow: 'auto',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
-      }}
-    >
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'fixed',
-        width: '100%',
-        top: '0',
-        padding: '12px',
-      }}
+    <Card>
+      <Typography
+        component="h1"
+        variant="h4"
+        sx={{ width: '100%', fontSize: '1.5rem' }}
       >
-        <LogoWithName />
-        <LangSelect />
-      </Box>
+        {t('create_tenant')}
+      </Typography>
+      <Typography variant="body1" color="text.secondary">
+        {t('create_tenant_description')}
+      </Typography>
 
       <Box
-        component="div"
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 2,
-          height: '100%',
-          width: '100%',
-        }}
+        component="form"
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
       >
-        <Card>
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: '1.5rem' }}
-          >
-            {t('create_tenant')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('create_tenant_description')}
-          </Typography>
-
-          <Box
-            component="form"
-            onSubmit={handleSubmit(onSubmit)}
-            noValidate
-            sx={{ display: 'flex', flexDirection: 'column', width: '100%', gap: 2 }}
-          >
-            <FormControl>
-              <FormLabel htmlFor="name">{t('tenant_name')}</FormLabel>
-              <Controller
-                name="name"
-                control={control}
-                render={({ field }) => (
-                  <TextField
-                    {...field}
-                    id="name"
-                    placeholder={t('enter_tenant_name')}
-                    fullWidth
-                    variant="outlined"
-                    error={!!errors.name}
-                    helperText={errors.name ? t('tenant_name_required') : undefined}
-                  />
-                )}
+        <FormControl>
+          <FormLabel htmlFor="name">{t('tenant_name')}</FormLabel>
+          <Controller
+            name="name"
+            control={control}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                id="name"
+                placeholder={t('enter_tenant_name')}
+                fullWidth
+                variant="outlined"
+                error={!!errors.name}
+                helperText={errors.name ? t('tenant_name_required') : undefined}
               />
-            </FormControl>
-            <Button type="submit" fullWidth variant="contained">
-              {t('create_tenant')}
-            </Button>
-          </Box>
-        </Card>
+            )}
+          />
+        </FormControl>
+        <Button type="submit" fullWidth variant="contained">
+          {t('create_tenant')}
+        </Button>
       </Box>
-    </Box>
+    </Card>
   )
 }

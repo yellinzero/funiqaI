@@ -1,13 +1,10 @@
 'use client'
 import { resendVerificationCodeApi, signupVerifyApi } from '@/apis'
-import LangSelect from '@/components/LangSelect'
-import { LogoWithName } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
 import VerificationCodeForm from '@/components/VerificationCodeForm'
 import { useCountdown } from '@/hooks/useCountdown'
 import { useSession } from '@/plugins/session'
 import { styled } from '@mui/material'
-import Box from '@mui/material/Box'
 import MuiCard from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
@@ -71,76 +68,36 @@ export default function SignUp() {
   }
 
   return (
-    <Box
-      component="main"
-      sx={{
-        display: 'flex',
-        backgroundColor: 'background.default',
-        overflow: 'auto',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
-      }}
-    >
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'fixed',
-        width: '100%',
-        top: '0',
-        padding: '12px',
-      }}
+    <Card sx={{ height: '70%' }}>
+      <Typography
+        component="h1"
+        variant="h4"
+        sx={{ width: '100%', fontSize: '1.5rem' }}
       >
-        <LogoWithName />
-        <LangSelect />
-      </Box>
-
-      <Box
-        component="div"
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 2,
-          height: '100%',
-          width: '100%',
-        }}
+        {t('welcome', {
+          name: t('product_name'),
+        })}
+      </Typography>
+      <Typography
+        component="h1"
+        variant="h4"
+        sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
       >
-        <Card sx={{ height: '70%' }}>
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: '1.5rem' }}
-          >
-            {t('welcome', {
-              name: t('product_name'),
-            })}
-          </Typography>
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
-          >
-            {showVerifyEmail ? t('verify_email') : t('sign_up')}
-          </Typography>
-          {showVerifyEmail
-            ? (
-                <VerificationCodeForm
-                  onSubmit={handleVerificationSubmit}
-                  submitButtonText="verify"
-                  countdown={countdown}
-                  onResend={handleResendCode}
-                  errorMessage="verification_failed"
-                />
-              )
-            : (
-                <SignUpForm onSuccess={handleSignUpSuccess} />
-              )}
-        </Card>
-      </Box>
-    </Box>
+        {showVerifyEmail ? t('verify_email') : t('sign_up')}
+      </Typography>
+      {showVerifyEmail
+        ? (
+            <VerificationCodeForm
+              onSubmit={handleVerificationSubmit}
+              submitButtonText="verify"
+              countdown={countdown}
+              onResend={handleResendCode}
+              errorMessage="verification_failed"
+            />
+          )
+        : (
+            <SignUpForm onSuccess={handleSignUpSuccess} />
+          )}
+    </Card>
   )
 }

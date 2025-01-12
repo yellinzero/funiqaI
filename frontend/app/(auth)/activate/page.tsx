@@ -1,11 +1,8 @@
 'use client'
 import { activateAccountApi, activateAccountVerifyApi, resendVerificationCodeApi } from '@/apis'
-import LangSelect from '@/components/LangSelect'
-import { LogoWithName } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
 import VerificationCodeForm from '@/components/VerificationCodeForm'
 import { useCountdown } from '@/hooks/useCountdown'
-import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
 import { styled } from '@mui/material/styles'
@@ -89,75 +86,35 @@ export default function Activate() {
   }
 
   return (
-    <Box
-      component="main"
-      sx={{
-        display: 'flex',
-        backgroundColor: 'background.default',
-        overflow: 'auto',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
-      }}
-    >
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'fixed',
-        width: '100%',
-        top: '0',
-        padding: '12px',
-      }}
+    <Card>
+      <Typography
+        component="h1"
+        variant="h4"
+        sx={{ width: '100%', fontSize: '1.5rem' }}
       >
-        <LogoWithName />
-        <LangSelect />
-      </Box>
-
-      <Box
-        component="div"
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 2,
-          height: '100%',
-          width: '100%',
-        }}
-      >
-        <Card>
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: '1.5rem' }}
-          >
-            {t('activate_account')}
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {t('activation_code_description', { email })}
-          </Typography>
-          {!token && (
-            <Button
-              variant="contained"
-              onClick={sendActivationEmail}
-              fullWidth
-            >
-              {t('send_activation_code')}
-            </Button>
-          )}
-          {token && (
-            <VerificationCodeForm
-              onSubmit={handleVerificationSubmit}
-              submitButtonText="activate"
-              countdown={countdown}
-              onResend={handleResendCode}
-              errorMessage="activation_failed"
-            />
-          )}
-        </Card>
-      </Box>
-    </Box>
+        {t('activate_account')}
+      </Typography>
+      <Typography variant="body1" color="text.secondary">
+        {t('activation_code_description', { email })}
+      </Typography>
+      {!token && (
+        <Button
+          variant="contained"
+          onClick={sendActivationEmail}
+          fullWidth
+        >
+          {t('send_activation_code')}
+        </Button>
+      )}
+      {token && (
+        <VerificationCodeForm
+          onSubmit={handleVerificationSubmit}
+          submitButtonText="activate"
+          countdown={countdown}
+          onResend={handleResendCode}
+          errorMessage="activation_failed"
+        />
+      )}
+    </Card>
   )
 }

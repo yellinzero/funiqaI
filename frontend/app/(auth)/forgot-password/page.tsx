@@ -1,10 +1,7 @@
 'use client'
 import { forgotPasswordApi, resendVerificationCodeApi, resetPasswordApi } from '@/apis'
-import LangSelect from '@/components/LangSelect'
-import { LogoWithName } from '@/components/SiteLogo'
 import Toast from '@/components/Toast'
 import { useCountdown } from '@/hooks/useCountdown'
-import Box from '@mui/material/Box'
 import MuiCard from '@mui/material/Card'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
@@ -70,67 +67,27 @@ export default function ForgotPassword() {
   }
 
   return (
-    <Box
-      component="main"
-      sx={{
-        display: 'flex',
-        backgroundColor: 'background.default',
-        overflow: 'auto',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
-      }}
-    >
-      <Box sx={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'fixed',
-        width: '100%',
-        top: '0',
-        padding: '12px',
-      }}
+    <Card sx={{ height: '70%' }}>
+      <Typography
+        component="h1"
+        variant="h4"
+        sx={{ width: '100%', fontSize: '1.5rem' }}
       >
-        <LogoWithName />
-        <LangSelect />
-      </Box>
+        {t('forgot_password')}
+      </Typography>
 
-      <Box
-        component="div"
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 2,
-          height: '100%',
-          width: '100%',
-        }}
-      >
-        <Card sx={{ height: '70%' }}>
-          <Typography
-            component="h1"
-            variant="h4"
-            sx={{ width: '100%', fontSize: '1.5rem' }}
-          >
-            {t('forgot_password')}
-          </Typography>
-
-          {step === 1
-            ? <EmailForm onSubmit={onSubmitEmail} />
-            : (
-                <ResetForm
-                  onSubmit={onSubmitReset}
-                  countdown={countdown}
-                  onResend={async () => {
-                    await resendVerificationCodeApi({ email, code_type: 'reset_password_email' })
-                    startCountdown()
-                  }}
-                />
-              )}
-        </Card>
-      </Box>
-    </Box>
+      {step === 1
+        ? <EmailForm onSubmit={onSubmitEmail} />
+        : (
+            <ResetForm
+              onSubmit={onSubmitReset}
+              countdown={countdown}
+              onResend={async () => {
+                await resendVerificationCodeApi({ email, code_type: 'reset_password_email' })
+                startCountdown()
+              }}
+            />
+          )}
+    </Card>
   )
 }

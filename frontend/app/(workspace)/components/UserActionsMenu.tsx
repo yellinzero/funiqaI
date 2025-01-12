@@ -22,50 +22,51 @@ const MenuItem = styled(MuiMenuItem)({
 
 export default function UserActionsMenu() {
   const { i18n } = useTranslation()
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-  const [langsMenuAnchorEl, setLangsMessnuAnchorEl] = React.useState<null | HTMLElement>(null)
-  const open = Boolean(anchorEl)
-  const langsMenuOpen = Boolean(langsMenuAnchorEl)
+  const [mainAnchorEl, setMainAnchorEl] = React.useState<null | HTMLElement>(null)
+  const [langAnchorEl, setLangAnchorEl] = React.useState<null | HTMLElement>(null)
+  const mainMenuOpen = Boolean(mainAnchorEl)
+  const langMenuOpen = Boolean(langAnchorEl)
   const [_cookie, setCookie] = useCookies()
   const router = useRouter()
 
-  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
-  }
-  const handleClose = () => {
-    setAnchorEl(null)
+  const handleMainMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setMainAnchorEl(event.currentTarget)
   }
 
-  const handleLangsMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
-    setLangsMessnuAnchorEl(event.currentTarget)
+  const handleMainMenuClose = () => {
+    setMainAnchorEl(null)
   }
 
-  const handleLangsMenuClose = () => {
-    setLangsMessnuAnchorEl(null)
+  const handleLangMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setLangAnchorEl(event.currentTarget)
   }
 
-  const handleChangeLangs = (lang: string) => {
+  const handleLangMenuClose = () => {
+    setLangAnchorEl(null)
+  }
+
+  const handleChangeLang = (lang: string) => {
     i18n.changeLanguage(lang)
     setCookie(i18nCookieName, lang, { path: '/' })
-    handleLangsMenuClose()
-    handleClose()
+    handleLangMenuClose()
+    handleMainMenuClose()
     router.refresh()
   }
+
   return (
     <>
       <MenuButton
         aria-label="Open menu"
-        onClick={handleClick}
+        onClick={handleMainMenuClick}
         sx={{ borderColor: 'transparent' }}
       >
         <MoreVertRoundedIcon />
       </MenuButton>
       <Menu
-        anchorEl={anchorEl}
-        id="menu"
-        open={open}
-        onClose={handleClose}
-        onClick={handleClose}
+        anchorEl={mainAnchorEl}
+        id="main-menu"
+        open={mainMenuOpen}
+        onClose={handleMainMenuClose}
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
         sx={{
@@ -80,17 +81,22 @@ export default function UserActionsMenu() {
           },
         }}
       >
-        <MenuItem onClick={handleClose}>My account</MenuItem>
-        <Divider />
-        <MenuItem onClick={handleClose}>Settings</MenuItem>
+        <MenuItem onClick={handleMainMenuClose}>My account</MenuItem>
+        <MenuItem onClick={handleMainMenuClose}>Settings</MenuItem>
         <MenuItem
-          onMouseEnter={handleLangsMenuOpen}
+          onClick={handleLangMenuOpen}
+          sx={{
+            minHeight: 36,
+            [`& .${listItemIconClasses.root}`]: {
+              minWidth: 36,
+            },
+          }}
         >
-          Switch language
+          <ListItemText>Language</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem
-          onClick={handleClose}
+          onClick={handleMainMenuClose}
           sx={{
             [`& .${listItemIconClasses.root}`]: {
               ml: 'auto',
@@ -106,17 +112,36 @@ export default function UserActionsMenu() {
       </Menu>
 
       <Menu
-        anchorEl={langsMenuAnchorEl}
-        open={langsMenuOpen}
-        onClose={handleLangsMenuClose}
-        onClick={handleLangsMenuClose}
-        transformOrigin={{ horizontal: 'left', vertical: 'center' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        anchorEl={langAnchorEl}
+        id="language-menu"
+        open={langMenuOpen}
+        onClose={handleLangMenuClose}
+        transformOrigin={{ horizontal: 'left', vertical: 'top' }}
+        anchorOrigin={{ horizontal: 'right', vertical: 'top' }}
+        sx={{
+          [`& .${listClasses.root}`]: {
+            padding: '4px',
+          },
+          [`& .${paperClasses.root}`]: {
+            padding: 0,
+          },
+        }}
       >
         {languagesOptions.map(item => (
-          <MenuItem key={item.value} onClick={() => handleChangeLangs(item.value)} selected={item.value === i18n.language}>{item.label}</MenuItem>
+          <MenuItem
+            key={item.value}
+            onClick={() => handleChangeLang(item.value)}
+            selected={item.value === i18n.language}
+            sx={{
+              minHeight: 36,
+              [`& .${listItemIconClasses.root}`]: {
+                minWidth: 36,
+              },
+            }}
+          >
+            <ListItemText>{item.label}</ListItemText>
+          </MenuItem>
         ))}
-
       </Menu>
     </>
   )

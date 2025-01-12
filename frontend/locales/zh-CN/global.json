@@ -1,6 +1,7 @@
 {
   "product_name": "Funiq AI",
   "welcome": "欢迎使用{{name}}",
+  "home_description": "简单易用的人工智能工作流程管理平台，让人工智能技术更易于使用",
   "chats": "对话",
   "workflows": "工作流",
   "store": "商店",

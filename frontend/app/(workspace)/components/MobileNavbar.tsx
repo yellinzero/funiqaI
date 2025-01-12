@@ -1,4 +1,6 @@
 'use client'
+import MenuButton from '@/app/(workspace)/components/SideMenuButton'
+import ColorModeIconDropdown from '@/theme/ColorModeIconDropdown'
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded'
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded'
 import AppBar from '@mui/material/AppBar'
@@ -9,9 +11,7 @@ import { tabsClasses } from '@mui/material/Tabs'
 import MuiToolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import * as React from 'react'
-import ColorModeIconDropdown from '../theme/ColorModeIconDropdown'
 import MobileSideMenu from './MobileSideMenu'
-import MenuButton from './SideMenuButton'
 
 const Toolbar = styled(MuiToolbar)({
   width: '100%',

@@ -1,7 +1,7 @@
 'use client'
+import ColorModeIconDropdown from '@/theme/ColorModeIconDropdown'
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded'
 import Stack from '@mui/material/Stack'
-import ColorModeIconDropdown from '../theme/ColorModeIconDropdown'
 import MenuButton from './SideMenuButton'
 
 export default function Header() {
