@@ -23,7 +23,7 @@ interface SignUpFormProps {
 }
 
 export default function SignUpForm({ onSuccess }: SignUpFormProps) {
-  const { t, i18n } = useTranslation()
+  const { t, i18n } = useTranslation(['auth'])
 
   const {
     control,

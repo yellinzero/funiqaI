@@ -25,7 +25,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }))
 
 export default function SignUp() {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['auth', 'global'])
   const { setSession } = useSession()
   const router = useRouter()
   const [showVerifyEmail, setShowVerifyEmail] = useState(false)

@@ -19,7 +19,7 @@ interface EmailFormProps {
 }
 
 export default function EmailForm({ onSubmit }: EmailFormProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['auth'])
   const {
     control,
     handleSubmit,

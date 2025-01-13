@@ -24,7 +24,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }))
 
 export default function Activate() {
-  const { t, i18n } = useTranslation()
+  const { t, i18n } = useTranslation(['auth', 'global'])
   const router = useRouter()
   const searchParams = useSearchParams()
   const [token, setToken] = useState('')

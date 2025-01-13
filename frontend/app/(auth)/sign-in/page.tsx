@@ -37,7 +37,7 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>
 
 export default function Login() {
-  const { t, i18n } = useTranslation()
+  const { t, i18n } = useTranslation(['auth', 'global'])
   const { setSession } = useSession()
   const router = useRouter()
 
