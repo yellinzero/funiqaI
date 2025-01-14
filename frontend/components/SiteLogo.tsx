@@ -15,8 +15,8 @@ export function LogoWithName(props: {
 
   const theme = _cookie.theme
   return theme === 'dark'
-    ? <Image src={LogoWhiteSvg} height={height} width={width} style={{ objectFit: 'contain' }} alt="Logo" />
-    : <Image src={LogoGraySvg} height={height} width={width} style={{ objectFit: 'contain' }} alt="Logo" />
+    ? <Image src={LogoWhiteSvg} height={height} width={width} style={{ objectFit: 'contain' }} alt="Logo" priority />
+    : <Image src={LogoGraySvg} height={height} width={width} style={{ objectFit: 'contain' }} alt="Logo" priority />
 }
 
 export { Logo }

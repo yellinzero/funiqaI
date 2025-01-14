@@ -35,7 +35,7 @@ const tenantSchema = z.object({
 type TenantFormInputs = z.infer<typeof tenantSchema>
 
 export default function CreateTenant() {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['auth', 'global'])
   const router = useRouter()
   const { refetch } = useSuspenseQuery(tenantsOptions)
 

@@ -15,7 +15,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Signup */
+        /**
+         * Signup
+         * @description Register a new account
+         */
         post: operations["signup_auth_signup_post"];
         delete?: never;
         options?: never;
@@ -32,7 +35,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Login */
+        /**
+         * Login
+         * @description Login with email and password
+         */
         post: operations["login_auth_login_post"];
         delete?: never;
         options?: never;
@@ -49,7 +55,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Signup Verify */
+        /**
+         * Signup Verify
+         * @description Verify signup email with verification code
+         */
         post: operations["signup_verify_auth_signup_verify_post"];
         delete?: never;
         options?: never;
@@ -66,7 +75,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Activate Account */
+        /**
+         * Activate Account
+         * @description Send activation email for inactive account
+         */
         post: operations["activate_account_auth_activate_account_post"];
         delete?: never;
         options?: never;
@@ -83,7 +95,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Forgot Password */
+        /**
+         * Forgot Password
+         * @description Send password reset email
+         */
         post: operations["forgot_password_auth_forgot_password_post"];
         delete?: never;
         options?: never;
@@ -100,7 +115,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Reset Password */
+        /**
+         * Reset Password
+         * @description Reset password with verification code
+         */
         post: operations["reset_password_auth_reset_password_post"];
         delete?: never;
         options?: never;
@@ -117,7 +135,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Resend Verification Code */
+        /**
+         * Resend Verification Code
+         * @description Resend verification code for signup/activation/password reset
+         */
         post: operations["resend_verification_code_auth_resend_verification_code_post"];
         delete?: never;
         options?: never;
@@ -134,7 +155,10 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Activate Account Verify */
+        /**
+         * Activate Account Verify
+         * @description Verify account activation with verification code
+         */
         post: operations["activate_account_verify_auth_activate_account_verify_post"];
         delete?: never;
         options?: never;
@@ -255,22 +279,26 @@ export interface components {
         AccountResponse: {
             /** Id */
             id: string;
-            /**
-             * Email
-             * Format: email
-             */
+            /** Email */
             email: string;
             /** Name */
             name: string;
             /** Language */
-            language: string;
-            /** Status */
-            status: string;
+            language: string | null;
+            status: components["schemas"]["AccountStatus"];
             /** Last Login At */
-            last_login_at?: string | null;
+            last_login_at: string | null;
             /** Last Login Ip */
-            last_login_ip?: string | null;
+            last_login_ip: string | null;
+            role: components["schemas"]["TenantUserRole"] | null;
+            /** Avatar */
+            avatar: string | null;
         };
+        /**
+         * AccountStatus
+         * @enum {string}
+         */
+        AccountStatus: "pending" | "active" | "inactive" | "disabled";
         /**
          * AccountTokenType
          * @enum {string}
@@ -299,6 +327,15 @@ export interface components {
         ActivateAccountVerifyResponse: {
             /** Access Token */
             access_token: string;
+            /** Refresh Token */
+            refresh_token: string;
+            /** Tenant Id */
+            tenant_id: string | null;
+            /**
+             * Token Type
+             * @default bearer
+             */
+            token_type: string;
         };
         /** ForgotPasswordRequest */
         ForgotPasswordRequest: {
@@ -334,6 +371,10 @@ export interface components {
         LoginResponse: {
             /** Access Token */
             access_token: string;
+            /** Refresh Token */
+            refresh_token: string;
+            /** Tenant Id */
+            tenant_id: string | null;
             /**
              * Token Type
              * @default bearer
@@ -362,11 +403,6 @@ export interface components {
             code: string;
             /** New Password */
             new_password: string;
-        };
-        /** ResetPasswordResponse */
-        ResetPasswordResponse: {
-            /** Access Token */
-            access_token: string;
         };
         /** ResponseModel */
         ResponseModel: {
@@ -453,6 +489,21 @@ export interface components {
             msg: string;
             data: components["schemas"]["LoginResponse"];
         };
+        /** ResponseModel[NoneType] */
+        ResponseModel_NoneType_: {
+            /**
+             * Code
+             * @default 0
+             */
+            code: string;
+            /**
+             * Msg
+             * @default success
+             */
+            msg: string;
+            /** Data */
+            data: null;
+        };
         /** ResponseModel[ResendVerificationCodeResponse] */
         ResponseModel_ResendVerificationCodeResponse_: {
             /**
@@ -466,20 +517,6 @@ export interface components {
              */
             msg: string;
             data: components["schemas"]["ResendVerificationCodeResponse"];
-        };
-        /** ResponseModel[ResetPasswordResponse] */
-        ResponseModel_ResetPasswordResponse_: {
-            /**
-             * Code
-             * @default 0
-             */
-            code: string;
-            /**
-             * Msg
-             * @default success
-             */
-            msg: string;
-            data: components["schemas"]["ResetPasswordResponse"];
         };
         /** ResponseModel[SignupResponse] */
         ResponseModel_SignupResponse_: {
@@ -584,6 +621,10 @@ export interface components {
         SignupVerifyResponse: {
             /** Access Token */
             access_token: string;
+            /** Refresh Token */
+            refresh_token: string;
+            /** Tenant Id */
+            tenant_id: string | null;
             /**
              * Token Type
              * @default bearer
@@ -838,7 +879,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["ResponseModel_ResetPasswordResponse_"];
+                    "application/json": components["schemas"]["ResponseModel_NoneType_"];
                 };
             };
             /** @description Validation Error */

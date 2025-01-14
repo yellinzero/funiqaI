@@ -2,7 +2,7 @@
 import { loginApi } from '@/apis'
 import { HttpError } from '@/apis/core'
 import Toast from '@/components/Toast'
-import { useSession } from '@/plugins/session'
+import { useSessionCookie } from '@/hooks/useSessionCookie'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link } from '@mui/material'
 import Box from '@mui/material/Box'
@@ -37,8 +37,8 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>
 
 export default function Login() {
-  const { t, i18n } = useTranslation()
-  const { setSession } = useSession()
+  const { t, i18n } = useTranslation(['auth', 'global'])
+  const { setAuth } = useSessionCookie()
   const router = useRouter()
 
   const {
@@ -54,7 +54,7 @@ export default function Login() {
     try {
       const res = await loginApi({ ...data, language: i18n.language })
       if (res.data) {
-        setSession(res.data.access_token)
+        setAuth(res.data.access_token, res.data.refresh_token, res.data.tenant_id ?? undefined)
 
         router.push('/chat')
 

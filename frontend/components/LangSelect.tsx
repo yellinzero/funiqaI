@@ -1,4 +1,4 @@
-import { i18nCookieName, languagesOptions } from '@/plugins/i18n/settings'
+import { I18N_COOKIE_NAME, languagesOptions } from '@/plugins/i18n/settings'
 import TranslateIcon from '@mui/icons-material/Translate'
 import { Box, List, ListItemButton, ListItemText, Popover, Stack } from '@mui/material'
 import { useRouter } from 'next/navigation'
@@ -35,7 +35,7 @@ export default function LangSelect() {
 
   function changeLanguage(lang: string) {
     i18n.changeLanguage(lang)
-    setCookie(i18nCookieName, lang, { path: '/' })
+    setCookie(I18N_COOKIE_NAME, lang, { path: '/' })
     router.refresh()
   }
 

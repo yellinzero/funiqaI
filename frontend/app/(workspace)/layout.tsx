@@ -1,10 +1,15 @@
+import { meOptions } from '@/apis'
 import MobileNavbar from '@/app/(workspace)/components/MobileNavbar'
 import SideMenu from '@/app/(workspace)/components/SideMenu'
 import Header from '@/app/(workspace)/components/WorkspaceHeader'
+import { getQueryClient } from '@/utils/get-query-client'
 import Box from '@mui/material/Box'
 import Stack from '@mui/material/Stack'
 
 export default function WorkspaceLayout({ children }: { children: React.ReactNode }) {
+  const queryClient = getQueryClient()
+
+  void queryClient.prefetchQuery(meOptions)
   return (
     <Box sx={{ display: 'flex', height: '100vh', width: '100vw' }}>
       <SideMenu />

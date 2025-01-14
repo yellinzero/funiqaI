@@ -2,7 +2,8 @@ import type { paths } from '@/types/openapi'
 import type { Client, ClientMethod, FetchResponse, InitParam, MaybeOptionalInit, Middleware } from 'openapi-fetch'
 import Toast from '@/components/Toast'
 import { initTranslations } from '@/plugins/i18n'
-import { i18nCookieName } from '@/plugins/i18n/settings'
+import { I18N_COOKIE_NAME } from '@/plugins/i18n/settings'
+import { SESSION_COOKIE_NAME } from '@/utils/constants'
 import Cookies from 'js-cookie'
 import createClient from 'openapi-fetch'
 
@@ -78,9 +79,26 @@ export class HttpError extends Error {
 // Middlewares
 const authMiddleware: Middleware = {
   async onRequest({ request }) {
-    const accessToken = Cookies.get('session')
-    if (accessToken) {
-      request.headers.set('Authorization', `Bearer ${accessToken}`)
+    const session = JSON.parse(Cookies.get(SESSION_COOKIE_NAME) ?? '{}')
+
+    if (session.accessToken) {
+      request.headers.set('Authorization', `Bearer ${session.accessToken}`)
+    }
+    if (session.refreshToken) {
+      request.headers.set('X-Refresh-Token', session.refreshToken)
+    }
+    return request
+  },
+}
+
+const requestContextMiddleware: Middleware = {
+  async onRequest({ request }) {
+    const language = Cookies.get(I18N_COOKIE_NAME) ?? 'en'
+    const session = JSON.parse(Cookies.get(SESSION_COOKIE_NAME) ?? '{}')
+    request.headers.set('X-LANGUAGE', language)
+    request.headers.set('X-Tenant-ID', session.tenantId)
+    if (session.accessToken) {
+      request.headers.set('Authorization', `Bearer ${session.accessToken}`)
     }
     return request
   },
@@ -88,6 +106,11 @@ const authMiddleware: Middleware = {
 
 const responseMiddleware: Middleware = {
   async onResponse({ response }) {
+    const newAccessToken = response.headers.get('X-New-Access-Token')
+    if (newAccessToken) {
+      const session = JSON.parse(Cookies.get(SESSION_COOKIE_NAME) ?? '{}')
+      Cookies.set('session', JSON.stringify({ ...session, accessToken: newAccessToken }))
+    }
     const status = response.status
     if (status >= 400 && status < 600) {
       switch (status) {
@@ -108,6 +131,7 @@ const responseMiddleware: Middleware = {
 
 // Apply middlewares
 apiFetch.use(authMiddleware)
+apiFetch.use(requestContextMiddleware)
 apiFetch.use(responseMiddleware)
 publicApiFetch.use(responseMiddleware)
 
@@ -119,7 +143,7 @@ export function createFetchApi(client: Client<paths>) {
   ): Promise<CustomFetchResponse<Path, Method>> => {
     const { data, response, error } = await promise
 
-    const locale = Cookies.get(i18nCookieName)
+    const locale = Cookies.get(I18N_COOKIE_NAME)
     const { t } = await initTranslations(locale || 'en', namespaces)
     const errorCode = data?.code || error?.code
     if (errorCode && errorCode !== '0') {

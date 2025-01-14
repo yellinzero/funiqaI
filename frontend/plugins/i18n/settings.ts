@@ -1,6 +1,6 @@
 export const fallbackLang = 'en'
 export const languages = [fallbackLang, 'zh-CN']
-export const i18nCookieName = 'i18next'
+export const I18N_COOKIE_NAME = 'i18next'
 export const defaultNS = 'global'
 
 export function getOptions(lang = fallbackLang, ns = defaultNS) {

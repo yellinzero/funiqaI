@@ -25,7 +25,7 @@ interface ResetFormProps {
 }
 
 export default function ResetForm({ onSubmit, countdown, onResend }: ResetFormProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['auth'])
   const {
     control,
     handleSubmit,
@@ -51,7 +51,7 @@ export default function ResetForm({ onSubmit, countdown, onResend }: ResetFormPr
               fullWidth
               variant="outlined"
               error={!!errors.code}
-              helperText={errors.code ? t('invalid_verification_code', 'Invalid verification code') : undefined}
+              helperText={errors.code ? t('invalid_verification_code') : undefined}
             />
           )}
         />
@@ -89,7 +89,7 @@ export default function ResetForm({ onSubmit, countdown, onResend }: ResetFormPr
               fullWidth
               variant="outlined"
               error={!!errors.confirmPassword}
-              helperText={errors.confirmPassword ? t('passwords_dont_match', 'Passwords don\'t match') : undefined}
+              helperText={errors.confirmPassword ? t('passwords_dont_match') : undefined}
             />
           )}
         />

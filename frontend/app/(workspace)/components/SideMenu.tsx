@@ -1,3 +1,5 @@
+'use client'
+import { useUserInfo } from '@/hooks/useUserInfo'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
 import Drawer, { drawerClasses } from '@mui/material/Drawer'
@@ -7,7 +9,8 @@ import SideMenuContent from './SideMenuContent'
 import UserActionsMenu from './UserActionsMenu'
 
 const drawerWidth = 240
-export default async function SideMenu() {
+export default function SideMenu() {
+  const userInfo = useUserInfo()
   return (
     <Drawer
       variant="permanent"
@@ -35,16 +38,16 @@ export default async function SideMenu() {
       >
         <Avatar
           sizes="small"
-          alt="Riley Carter"
-          src="/static/images/avatar/7.jpg"
+          alt={userInfo?.name ?? ''}
+          src={userInfo?.avatar ?? ''}
           sx={{ width: 36, height: 36 }}
         />
         <Box sx={{ mr: 'auto' }}>
           <Typography variant="body2" sx={{ fontWeight: 500, lineHeight: '16px' }}>
-            Riley Carter
+            {userInfo?.name}
           </Typography>
           <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-            riley@email.com
+            {userInfo?.email}
           </Typography>
         </Box>
         <UserActionsMenu />

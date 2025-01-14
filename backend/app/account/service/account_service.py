@@ -10,13 +10,23 @@ from app.auth.schemas import (
     ActivateAccountVerifyRequest,
     ForgotPasswordRequest,
     LoginRequest,
+    OAuthLoginRequest,
     ResetPasswordRequest,
     SignupRequest,
     SignupVerifyRequest,
 )
 from app.errors.account import AccountErrorCode
 from app.errors.common import CommonErrorCode
-from app.models.account import Account, AccountStatus, Tenant, User
+from app.models.account import (
+    Account,
+    AccountStatus,
+    OAuthProvider,
+    Tenant,
+    TenantInvite,
+    TenantInviteStatus,
+    TenantUserRole,
+    User,
+)
 from database import RedisRateLimiter
 from tasks.email_tasks import (
     send_activate_account_email_task,
@@ -24,7 +34,7 @@ from tasks.email_tasks import (
     send_signup_verification_email_task,
 )
 from utils.datatime import utcnow
-from utils.security import create_access_token, get_account_id_from_request
+from utils.security import create_token_pair, get_account_id_from_request
 from utils.token_manager import AccountTokenManager, AccountTokenType
 
 token_manager = AccountTokenManager()
@@ -64,44 +74,72 @@ class AccountService:
                     data={"name": payload.name}, status_code=status.HTTP_400_BAD_REQUEST
                 )
 
-        # Create new account
+        # Check invite code if provided
+        invite = None
+        if payload.invite_code:
+            result = await session.execute(
+                select(TenantInvite).where(
+                    TenantInvite.code == payload.invite_code, TenantInvite.status == TenantInviteStatus.PENDING
+                )
+            )
+            invite = result.scalars().one_or_none()
+            if not invite or (invite.expires_at and invite.expires_at < utcnow().replace(tzinfo=None)):
+                raise AccountErrorCode.INVALID_INVITE_CODE.exception(
+                    data={"invite_code": payload.invite_code}, status_code=status.HTTP_400_BAD_REQUEST
+                )
+
+        # Create new account with appropriate status
         account = Account(
             name=payload.name,
             email=payload.email,
-            language=payload.language or "en",
+            language=request.state.language,
             status=AccountStatus.PENDING,
             last_login_ip=request.client.host,
+            last_login_tenant_id=invite.tenant_id if invite else None,
         )
 
         account.set_password(payload.password)
-        await account.save(session)
+        session.add(account)
 
+        # If invite exists, create user in tenant and mark invite as used
+        if invite:
+            user = User(
+                account_id=account.id, tenant_id=invite.tenant_id, role=TenantUserRole.MEMBER, invite_code=invite.code
+            )
+            session.add(user)
+
+            invite.status = TenantInviteStatus.USED
+            invite.used_at = utcnow().replace(tzinfo=None)
+            session.add(invite)
+
+            # Set last login tenant
+            account.last_login_tenant_id = invite.tenant_id
+            session.add(account)
+
+        # Commit account creation
+        await session.commit()
+
+        # For normal signup, send verification email
         token = await AccountService.send_sign_up_verification_email(account)
         return token
 
     @staticmethod
-    async def sign_up_email_verify(session: AsyncSession, payload: SignupVerifyRequest, request: Request) -> str:
-        """
-        Verify the email using the provided verification code.
-        :param session: Database session
-        :param token:
-        :param code: Verification code provided by the user
-        :return: Whether the verification was successful
-        """
-        # Retrieve the token data
+    async def sign_up_email_verify(
+        session: AsyncSession, payload: SignupVerifyRequest, request: Request
+    ) -> tuple[str, str, str]:
+        """Verify the email using the provided verification code."""
+        # Verify token and code
         token_data = await token_manager.get_signup_email_verification_data(payload.token)
         if not token_data:
             raise CommonErrorCode.EMAIL_VERIFICATION_CODE_EXPIRED.exception(status_code=status.HTTP_400_BAD_REQUEST)
 
         email = token_data.get("email")
-
-        # Check the provided code against the token data
         if token_data.get("code") != payload.code:
             raise CommonErrorCode.INVALID_VERIFICATION_CODE.exception(
                 data={"email": email}, status_code=status.HTTP_400_BAD_REQUEST
             )
 
-        # Mark the account as active if the verification succeeds
+        # Find account
         result = await session.execute(Account.select().where(Account.email == email))
         account: Account | None = result.scalars().one_or_none()
 
@@ -110,16 +148,15 @@ class AccountService:
                 data={"email": email}, status_code=status.HTTP_404_NOT_FOUND
             )
 
-        # Update account status to active
+        # Update account status
         account.status = AccountStatus.ACTIVE
-        account.last_login_at = utcnow().replace(tzinfo=None)
-        account.last_login_ip = request.client.host
         await account.save(session)
 
         # Remove the token after successful verification
         await token_manager.revoke_signup_email_verification_token(email)
-        access_token = create_access_token({"aid": str(account.id)})
-        return access_token
+
+        # Handle authentication
+        return await AccountService._handle_successful_auth(session, account, request)
 
     @staticmethod
     async def send_sign_up_verification_email(account: Account) -> str:
@@ -147,25 +184,76 @@ class AccountService:
 
     # region Authentication
     @staticmethod
-    async def login(session: AsyncSession, payload: LoginRequest, request: Request) -> str:
-        """Authenticate an account and return a JWT token."""
-        # Find the account
-        result = await session.execute(Account.select().where(Account.email == payload.email))
+    async def _verify_login_account(session: AsyncSession, email: str, password: str | None = None) -> Account:
+        """
+        Verify account exists and credentials are valid.
 
+        Args:
+            session: Database session
+            email: Account email
+            password: Optional password (None for OAuth/email verification flows)
+
+        Returns:
+            Account: Verified account object
+        """
+        result = await session.execute(Account.select().where(Account.email == email))
         account: Account | None = result.scalars().one_or_none()
 
-        if not account or not account.verify_password(payload.password):
+        if not account or (password and not account.verify_password(password)):
             raise AccountErrorCode.INVALID_EMAIL_PASSWORD.exception(status_code=status.HTTP_401_UNAUTHORIZED)
 
         if account.status != AccountStatus.ACTIVE:
             raise AccountErrorCode.ACCOUNT_NOT_ACTIVE.exception(status_code=status.HTTP_403_FORBIDDEN)
 
-        # Generate JWT token
+        return account
+
+    @staticmethod
+    async def _handle_successful_auth(
+        session: AsyncSession, account: Account, request: Request
+    ) -> tuple[str, str, str]:
+        """
+        Handle successful authentication by updating account info and generating tokens.
+        """
+        # Check if user belongs to any tenant
+        result = await session.execute(select(User).where(User.account_id == account.id))
+        user_tenants = result.scalars().all()
+
+        if not user_tenants:
+            raise AccountErrorCode.NO_TENANT_ASSOCIATED.exception(status_code=status.HTTP_403_FORBIDDEN)
+
+        # Set last login tenant based on X-Tenant-ID header if present
+        requested_tenant_id = request.state.tenant_id
+        if requested_tenant_id:
+            # Verify the requested tenant is valid for this user
+            if any(str(user.tenant_id) == requested_tenant_id for user in user_tenants):
+                current_tenant_id = requested_tenant_id
+            else:
+                raise AccountErrorCode.INVALID_TENANT.exception(status_code=status.HTTP_403_FORBIDDEN)
+        else:
+            # Fall back to last login tenant or first available tenant
+            if account.last_login_tenant_id and any(
+                user.tenant_id == account.last_login_tenant_id for user in user_tenants
+            ):
+                current_tenant_id = account.last_login_tenant_id
+            else:
+                current_tenant_id = user_tenants[0].tenant_id
+
+        # Update account info
         account.last_login_at = utcnow().replace(tzinfo=None)
         account.last_login_ip = request.client.host
+        account.last_login_tenant_id = current_tenant_id
+        account.language = request.state.language or account.language
         await account.save(session)
-        token = create_access_token({"aid": str(account.id)})
-        return token
+
+        # Generate tokens
+        access_token, refresh_token = create_token_pair({"aid": str(account.id)})
+        return access_token, refresh_token, str(current_tenant_id)
+
+    @staticmethod
+    async def login(session: AsyncSession, payload: LoginRequest, request: Request) -> tuple[str, str, str]:
+        """Authenticate an account and return JWT tokens."""
+        account = await AccountService._verify_login_account(session, payload.email, payload.password)
+        return await AccountService._handle_successful_auth(session, account, request)
 
     # endregion
 
@@ -259,7 +347,7 @@ class AccountService:
         return token
 
     @staticmethod
-    async def reset_password(session: AsyncSession, payload: ResetPasswordRequest) -> str:
+    async def reset_password(session: AsyncSession, payload: ResetPasswordRequest) -> None:
         """Reset password using verification code."""
         # Verify token and code
         token_data = await token_manager.get_reset_password_verification_data(payload.token)
@@ -287,7 +375,6 @@ class AccountService:
 
         # Revoke token and return new access token
         await token_manager.revoke_reset_password_token(email)
-        return create_access_token({"aid": str(account.id)})
 
     # endregion
 
@@ -322,10 +409,8 @@ class AccountService:
     @staticmethod
     async def activate_account_verify(
         session: AsyncSession, payload: ActivateAccountVerifyRequest, request: Request
-    ) -> str:
-        """
-        Verify account activation using the provided verification code.
-        """
+    ) -> tuple[str, str, str]:
+        """Verify account activation using the provided verification code."""
         # Verify token and code
         token_data = await token_manager.get_activate_account_verification_data(payload.token)
         if not token_data:
@@ -337,7 +422,7 @@ class AccountService:
                 data={"email": email}, status_code=status.HTTP_400_BAD_REQUEST
             )
 
-        # Find and update account
+        # Find account
         result = await session.execute(Account.select().where(Account.email == email))
         account: Account | None = result.scalars().one_or_none()
 
@@ -348,13 +433,13 @@ class AccountService:
 
         # Update account status
         account.status = AccountStatus.ACTIVE
-        account.last_login_at = utcnow().replace(tzinfo=None)
-        account.last_login_ip = request.client.host
         await account.save(session)
 
-        # Revoke token and return new access token
-        await token_manager.revoke_signup_email_verification_token(email)
-        return create_access_token({"aid": str(account.id)})
+        # Revoke token
+        await token_manager.revoke_activate_account_verification_token(email)
+
+        # Handle authentication
+        return await AccountService._handle_successful_auth(session, account, request)
 
     @staticmethod
     async def get_account_info(session: AsyncSession, request: Request) -> Account:
@@ -378,11 +463,107 @@ class AccountService:
         :param account_id: Account ID
         :return: List of tenant responses
         """
-        result = await session.execute(
-            select(Tenant.id, Tenant.name).join(User).where(User.account_id == account_id)
-        )
+        result = await session.execute(select(Tenant.id, Tenant.name).join(User).where(User.account_id == account_id))
 
-        return [
-            TenantResponse(id=str(tenant_id), name=tenant_name)
-            for tenant_id, tenant_name in result
-        ]
+        return [TenantResponse(id=str(tenant_id), name=tenant_name) for tenant_id, tenant_name in result]
+
+    # TODO
+    @staticmethod
+    async def oauth_login(session: AsyncSession, payload: OAuthLoginRequest, request: Request) -> tuple[str, str, str]:
+        """
+        Handle OAuth login/registration flow
+        """
+        # Find existing OAuth provider link
+        result = await session.execute(
+            select(OAuthProvider).where(
+                OAuthProvider.provider_name == payload.provider, OAuthProvider.provider_id == payload.provider_user_id
+            )
+        )
+        oauth_provider = result.scalars().one_or_none()
+
+        invite = None
+
+        if payload.invite_code:
+            result = await session.execute(
+                select(TenantInvite).where(
+                    TenantInvite.code == payload.invite_code, TenantInvite.status == TenantInviteStatus.PENDING
+                )
+            )
+            invite = result.scalars().one_or_none()
+            if not invite or (invite.expires_at and invite.expires_at < utcnow().replace(tzinfo=None)):
+                raise AccountErrorCode.INVALID_INVITE_CODE.exception(
+                    data={"invite_code": payload.invite_code}, status_code=status.HTTP_400_BAD_REQUEST
+                )
+
+        if oauth_provider:
+            oauth_provider.access_token = payload.access_token
+            oauth_provider.refresh_token = payload.refresh_token
+            oauth_provider.profile_data = payload.profile_data
+            await oauth_provider.save(session)
+
+            account = oauth_provider.account
+            account.last_login_at = utcnow().replace(tzinfo=None)
+            account.last_login_ip = request.client.host
+
+            if invite:
+                result = await session.execute(
+                    select(User).where(User.account_id == account.id, User.tenant_id == invite.tenant_id)
+                )
+                existing_user = result.scalars().one_or_none()
+
+                if not existing_user:
+                    user = User(
+                        account_id=account.id,
+                        tenant_id=invite.tenant_id,
+                        role=TenantUserRole.MEMBER,
+                        invite_code=invite.code,
+                    )
+                    session.add(user)
+
+                    invite.status = TenantInviteStatus.USED
+                    invite.used_at = utcnow().replace(tzinfo=None)
+                    session.add(invite)
+
+                    account.last_login_tenant_id = invite.tenant_id
+
+            await account.save(session)
+
+        else:
+            result = await session.execute(select(Account).where(Account.email == payload.email))
+            account = result.scalars().one_or_none()
+
+            if not account:
+                account = Account(
+                    email=payload.email,
+                    name=payload.name,
+                    status=AccountStatus.ACTIVE,
+                    last_login_ip=request.client.host,
+                    language=payload.language or "en",
+                    last_login_tenant_id=invite.tenant_id if invite else None,
+                )
+                await account.save(session)
+
+                if invite:
+                    user = User(
+                        account_id=account.id,
+                        tenant_id=invite.tenant_id,
+                        role=TenantUserRole.MEMBER,
+                        invite_code=invite.code,
+                    )
+                    session.add(user)
+
+                    invite.status = TenantInviteStatus.USED
+                    invite.used_at = utcnow().replace(tzinfo=None)
+                    session.add(invite)
+
+            oauth_provider = OAuthProvider(
+                provider_name=payload.provider,
+                provider_id=payload.provider_user_id,
+                access_token=payload.access_token,
+                refresh_token=payload.refresh_token,
+                profile_data=payload.profile_data,
+                account_id=account.id,
+            )
+            await oauth_provider.save(session)
+
+        return await AccountService._handle_successful_auth(session, account, request)

@@ -1,8 +1,7 @@
-from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
-from app.models.account import TenantUserRole
+from app.models.account import AccountStatus, TenantUserRole
 
 
 class TenantCreateRequest(BaseModel):
@@ -36,9 +35,11 @@ class UserResponse(BaseModel):
 
 class AccountResponse(BaseModel):
     id: str
-    email: EmailStr
+    email: str
     name: str
-    language: str
-    status: str
-    last_login_at: Optional[str] = None
-    last_login_ip: Optional[str] = None
+    language: str | None
+    status: AccountStatus
+    last_login_at: str | None
+    last_login_ip: str | None
+    role: TenantUserRole | None
+    avatar: str | None
