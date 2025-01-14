@@ -5,5 +5,7 @@
   "chats": "对话",
   "workflows": "工作流",
   "store": "商店",
-  "integrationHub": "集成中心"
+  "integrationHub": "集成中心",
+  "sign_in": "登录",
+  "sign_up": "注册"
 }

@@ -3,7 +3,7 @@ import { resendVerificationCodeApi, signupVerifyApi } from '@/apis'
 import Toast from '@/components/Toast'
 import VerificationCodeForm from '@/components/VerificationCodeForm'
 import { useCountdown } from '@/hooks/useCountdown'
-import { useSession } from '@/plugins/session'
+import { useSessionCookie } from '@/hooks/useSessionCookie'
 import { styled } from '@mui/material'
 import MuiCard from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
@@ -26,7 +26,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 
 export default function SignUp() {
   const { t } = useTranslation(['auth', 'global'])
-  const { setSession } = useSession()
+  const { setAuth } = useSessionCookie()
   const router = useRouter()
   const [showVerifyEmail, setShowVerifyEmail] = useState(false)
   const [token, setToken] = useState('')
@@ -40,9 +40,9 @@ export default function SignUp() {
     startCountdown()
   }
 
-  const handleVerifyEmailSuccess = (accessToken: string) => {
-    if (accessToken) {
-      setSession(accessToken)
+  const handleVerifyEmailSuccess = (data: { access_token: string, refresh_token: string, tenant_id?: string }) => {
+    if (data) {
+      setAuth(data.access_token, data.refresh_token, data.tenant_id)
       router.push('/create-tenant')
     }
   }
@@ -63,7 +63,11 @@ export default function SignUp() {
     const res = await signupVerifyApi({ code, token })
     if (res.data) {
       Toast.success({ message: t('email_verified_success') })
-      handleVerifyEmailSuccess(res.data.access_token)
+      handleVerifyEmailSuccess({
+        access_token: res.data.access_token,
+        refresh_token: res.data.refresh_token,
+        tenant_id: res.data.tenant_id ?? undefined,
+      })
     }
   }
 

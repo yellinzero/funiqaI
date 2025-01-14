@@ -1,3 +1,6 @@
+import secrets
+from datetime import timedelta
+
 from fastapi import status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -5,7 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.account.schemas import TenantResponse, UserResponse
 from app.errors.account import AccountErrorCode
 from app.errors.common import CommonErrorCode
-from app.models.account import Account, Tenant, TenantUserRole, User
+from app.models.account import Account, Tenant, TenantInvite, TenantInviteStatus, TenantUserRole, User
+from utils.datatime import utcnow
 
 
 class TenantService:
@@ -27,10 +31,7 @@ class TenantService:
         user = User(account_id=account_id, tenant_id=tenant.id, role=TenantUserRole.OWNER)
         await user.save(session)
 
-        return TenantResponse(
-            id=str(tenant.id),
-            name=tenant.name
-        )
+        return TenantResponse(id=str(tenant.id), name=tenant.name)
 
     @staticmethod
     async def get_tenant(session: AsyncSession, tenant_id: str) -> Tenant:
@@ -55,10 +56,7 @@ class TenantService:
         tenant = await TenantService.get_tenant(session, tenant_id)
         tenant.name = name
         await tenant.save(session)
-        return TenantResponse(
-            id=str(tenant.id),
-            name=tenant.name
-        )
+        return TenantResponse(id=str(tenant.id), name=tenant.name)
 
     @staticmethod
     async def delete_tenant(session: AsyncSession, tenant_id: str, account_id: str) -> None:
@@ -79,6 +77,54 @@ class TenantService:
     @staticmethod
     async def get_user_role(session: AsyncSession, tenant_id: str, account_id: str) -> User:
         """Get user's role in tenant."""
+        result = await session.execute(select(User).where(User.tenant_id == tenant_id, User.account_id == account_id))
+        user = result.scalars().one_or_none()
+        if not user:
+            raise AccountErrorCode.USER_NOT_IN_TENANT.exception(
+                data={"tenant_id": tenant_id}, status_code=status.HTTP_404_NOT_FOUND
+            )
+        return user
+
+    @staticmethod
+    async def generate_invite_code(
+        session: AsyncSession, tenant_id: str, account_id: str, role: TenantUserRole = TenantUserRole.MEMBER
+    ) -> str:
+        """Generate an invite code for the tenant."""
+        # Check if user has permission to generate invite code
+        user = await TenantService.get_user_role(session, tenant_id, account_id)
+        if user.role not in [TenantUserRole.OWNER, TenantUserRole.ADMIN]:
+            raise CommonErrorCode.PERMISSION_DENIED.exception(status_code=status.HTTP_403_FORBIDDEN)
+
+        # Only owner can generate admin invite codes
+        if role == TenantUserRole.ADMIN and user.role != TenantUserRole.OWNER:
+            raise CommonErrorCode.PERMISSION_DENIED.exception(status_code=status.HTTP_403_FORBIDDEN)
+
+        # Generate unique invite code
+        while True:
+            code = secrets.token_urlsafe(16)
+            exists = await session.execute(select(TenantInvite).where(TenantInvite.code == code))
+            if not exists.scalars().one_or_none():
+                break
+
+        # Create invite record
+        invite = TenantInvite(
+            tenant_id=tenant_id,
+            code=code,
+            role=role,
+            created_by=account_id,
+            status=TenantInviteStatus.PENDING,
+            expires_at=utcnow().replace(tzinfo=None) + timedelta(days=7),  # Expires in 7 days
+        )
+        await invite.save(session)
+
+        return code
+
+    @staticmethod
+    async def get_user_by_account_id(
+        session: AsyncSession,
+        tenant_id: str,
+        account_id: str,
+    ) -> User:
         result = await session.execute(select(User).where(User.tenant_id == tenant_id, User.account_id == account_id))
         user = result.scalars().one_or_none()
         if not user:
@@ -127,7 +173,7 @@ class TenantService:
             id=str(new_user.id),
             account_id=str(new_user.account_id),
             tenant_id=str(new_user.tenant_id),
-            role=new_user.role
+            role=new_user.role,
         )
 
     @staticmethod
@@ -163,7 +209,7 @@ class TenantService:
             id=str(target_user.id),
             account_id=str(target_user.account_id),
             tenant_id=str(target_user.tenant_id),
-            role=target_user.role
+            role=target_user.role,
         )
 
     @staticmethod

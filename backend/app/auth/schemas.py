@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr
 
+from app.models.account import OAuthProviderName
 from utils.token_manager import AccountTokenType
 
 
@@ -37,11 +38,15 @@ class ActivateAccountResponse(BaseModel):
 
 class LoginResponse(BaseModel):
     access_token: str
+    refresh_token: str
+    tenant_id: str | None
     token_type: str = "bearer"
 
 
 class SignupVerifyResponse(BaseModel):
     access_token: str
+    refresh_token: str
+    tenant_id: str | None
     token_type: str = "bearer"
 
 
@@ -57,10 +62,6 @@ class ResetPasswordRequest(BaseModel):
     token: str
     code: str
     new_password: str
-
-
-class ResetPasswordResponse(BaseModel):
-    access_token: str
 
 
 class ResendVerificationCodeRequest(BaseModel):
@@ -79,3 +80,25 @@ class ActivateAccountVerifyRequest(BaseModel):
 
 class ActivateAccountVerifyResponse(BaseModel):
     access_token: str
+    refresh_token: str
+    tenant_id: str | None
+    token_type: str = "bearer"
+
+
+class OAuthLoginRequest(BaseModel):
+    provider: OAuthProviderName
+    provider_user_id: str
+    email: EmailStr
+    name: str
+    access_token: str
+    refresh_token: str | None = None
+    profile_data: dict | None = None
+    language: str | None = None
+    invite_code: str | None = None
+    
+
+class OAuthLoginResponse(BaseModel):
+    access_token: str
+    refresh_token: str | None = None
+    tenant_id: str | None = None
+    token_type: str = "bearer"

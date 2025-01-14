@@ -1,5 +1,6 @@
 'use client'
-import { i18nCookieName, languagesOptions } from '@/plugins/i18n/settings'
+import { useSessionCookie } from '@/hooks/useSessionCookie'
+import { I18N_COOKIE_NAME, languagesOptions } from '@/plugins/i18n/settings'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded'
 import Divider, { dividerClasses } from '@mui/material/Divider'
@@ -27,6 +28,7 @@ export default function UserActionsMenu() {
   const mainMenuOpen = Boolean(mainAnchorEl)
   const langMenuOpen = Boolean(langAnchorEl)
   const [_cookie, setCookie] = useCookies()
+  const sessionCookie = useSessionCookie()
   const router = useRouter()
 
   const handleMainMenuClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -47,12 +49,16 @@ export default function UserActionsMenu() {
 
   const handleChangeLang = (lang: string) => {
     i18n.changeLanguage(lang)
-    setCookie(i18nCookieName, lang, { path: '/' })
+    setCookie(I18N_COOKIE_NAME, lang, { path: '/' })
     handleLangMenuClose()
     handleMainMenuClose()
     router.refresh()
   }
 
+  function handleLogout() {
+    sessionCookie.clearAuth()
+    router.push('/')
+  }
   return (
     <>
       <MenuButton
@@ -96,7 +102,7 @@ export default function UserActionsMenu() {
         </MenuItem>
         <Divider />
         <MenuItem
-          onClick={handleMainMenuClose}
+          onClick={handleLogout}
           sx={{
             [`& .${listItemIconClasses.root}`]: {
               ml: 'auto',

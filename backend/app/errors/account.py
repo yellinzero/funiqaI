@@ -37,3 +37,35 @@ class AccountErrorCode(BaseErrorCode):
         "B0011", 
         "The user is already in the tenant."
     )
+    NO_TENANT_ASSOCIATED = (
+        "B0012", 
+        "No tenant associated with the account."
+    )
+    INVALID_INVITE_CODE = (
+        "B0013", 
+        "The invite code is invalid or expired."
+    )
+    OAUTH_INVALID_PROVIDER = (
+        "B0014",
+        "Invalid OAuth provider"
+    )
+    OAUTH_INVALID_TOKEN = (
+        "B0015", 
+        "Invalid OAuth token"
+    )
+    OAUTH_EMAIL_REQUIRED = (
+        "B0016",
+        "Email is required for OAuth login"
+    )
+    TOKEN_EXPIRED = (
+        "B0017",
+        "Access token has expired"
+    )
+    REFRESH_TOKEN_EXPIRED = (
+        "B0020",
+        "Refresh token has expired"
+    )
+    INVALID_TENANT = (
+        "B0018",
+        "Invalid tenant"
+    )

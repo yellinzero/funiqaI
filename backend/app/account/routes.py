@@ -22,8 +22,21 @@ account_router = APIRouter(prefix="/account", tags=["Account"])
 # Account management routes
 @account_router.get("/me", response_model=ResponseModel[AccountResponse])
 async def get_account_info(request: Request):
+    tenant_id = request.state.tenant_id
     account = await AccountService.get_account_info(db.session, request)
-    return ResponseModel(data=account)
+    user = await TenantService.get_user_by_account_id(db.session, tenant_id, account.id)
+    
+    return ResponseModel(data={
+        "id": str(account.id),
+        "email": account.email,
+        "name": account.name,
+        "language": account.language,
+        "status": account.status,
+        "last_login_at": account.last_login_at.isoformat() if account.last_login_at else None,
+        "last_login_ip": account.last_login_ip,
+        "role": user.role,
+        "avatar": user.avatar,
+    })
 
 
 @account_router.get("/tenants", response_model=ResponseModel[list[TenantResponse]])
@@ -37,7 +50,6 @@ async def get_account_tenants(request: Request):
 @account_router.post("/tenants", response_model=ResponseModel[TenantResponse])
 async def create_tenant(payload: TenantCreateRequest, request: Request):
     account_id = get_account_id_from_request(request)
-    print('==========', account_id)
     tenant = await TenantService.create_tenant(session=db.session, name=payload.name, account_id=account_id)
     return ResponseModel(data=tenant)
 

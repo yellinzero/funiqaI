@@ -3,6 +3,7 @@ import { activateAccountApi, activateAccountVerifyApi, resendVerificationCodeApi
 import Toast from '@/components/Toast'
 import VerificationCodeForm from '@/components/VerificationCodeForm'
 import { useCountdown } from '@/hooks/useCountdown'
+import { useSessionCookie } from '@/hooks/useSessionCookie'
 import Button from '@mui/material/Button'
 import MuiCard from '@mui/material/Card'
 import { styled } from '@mui/material/styles'
@@ -30,12 +31,11 @@ export default function Activate() {
   const [token, setToken] = useState('')
   const [email, setEmail] = useState('')
   const { countdown, startCountdown } = useCountdown()
-
+  const { setAuth } = useSessionCookie()
   useEffect(() => {
     const email = searchParams.get('email')
     if (!email) {
       Toast.error({ message: t('invalid_activation_link') })
-      router.push('/sign-in')
       return
     }
     setEmail(email)
@@ -60,11 +60,6 @@ export default function Activate() {
     }
   }
 
-  const handleActivationSuccess = () => {
-    Toast.success({ message: t('account_activated') })
-    router.push('/sign-in')
-  }
-
   const handleResendCode = async () => {
     try {
       await resendVerificationCodeApi({
@@ -81,8 +76,12 @@ export default function Activate() {
   }
 
   const handleVerificationSubmit = async (code: string) => {
-    await activateAccountVerifyApi({ token, code })
-    handleActivationSuccess()
+    const res = await activateAccountVerifyApi({ token, code })
+    if (res.data) {
+      setAuth(res.data.access_token, res.data.refresh_token, res.data.tenant_id ?? undefined)
+      Toast.success({ message: t('account_activated') })
+      router.push('/chat')
+    }
   }
 
   return (

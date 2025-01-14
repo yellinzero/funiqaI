@@ -50,15 +50,13 @@ export default function ForgotPassword() {
 
   const onSubmitReset = async (data: { code: string, password: string, confirmPassword: string }) => {
     try {
-      const res = await resetPasswordApi({
+      await resetPasswordApi({
         token,
         code: data.code,
         new_password: data.password,
       })
-      if (res.data?.access_token) {
-        Toast.success({ message: t('password_reset_success') })
-        router.push('/sign-in')
-      }
+      Toast.success({ message: t('password_reset_success') })
+      router.push('/sign-in')
     }
     catch (e) {
       console.error('Reset password error:', e)
