@@ -22,7 +22,7 @@ from .schemas import (
     SignupVerifyResponse,
 )
 
-auth_router = APIRouter(prefix="/auth", tags=["Authentication", "Public"])
+auth_router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 @auth_router.post("/signup", response_model=ResponseModel[SignupResponse])
