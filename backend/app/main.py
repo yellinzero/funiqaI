@@ -23,6 +23,9 @@ def create_app() -> FastAPI:
         lifespan=lifespan,  # Register lifecycle hooks
     )
 
+    # Register exception handlers
+    register_exception_handlers(app)
+    
     # Install middleware
     install_global_middlewares(app)
 
@@ -30,9 +33,8 @@ def create_app() -> FastAPI:
     app_manager.install_apps(funiq_ai_config.INSTALLED_APPS)
     app_manager.apply_modules_to_fastapi(app)
 
-    # Register routes and exception handlers
+    # Register routes
     register_routes(app)
-    register_exception_handlers(app)
 
     # Initialize services
     init_email_service(app)  # Email service
