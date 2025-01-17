@@ -37,7 +37,7 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>
 
 export default function Login() {
-  const { t, i18n } = useTranslation(['auth', 'global'])
+  const { t } = useTranslation(['auth', 'global'])
   const { setAuth } = useSessionCookie()
   const router = useRouter()
 
@@ -52,9 +52,9 @@ export default function Login() {
 
   const onSubmit = async (data: LoginFormInputs) => {
     try {
-      const res = await loginApi({ ...data, language: i18n.language })
+      const res = await loginApi(data)
       if (res.data) {
-        setAuth(res.data.access_token, res.data.refresh_token, res.data.tenant_id ?? undefined)
+        setAuth(res.data.access_token, res.data.tenant_id ?? undefined)
 
         router.push('/chat')
 

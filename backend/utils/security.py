@@ -1,23 +1,20 @@
 import datetime
+import secrets
 from datetime import timedelta
 from typing import Optional, Tuple
 
-from fastapi import Request, status
+import bcrypt
+from fastapi import Request, Response, status
 from jose import JWTError, jwt
-from passlib.context import CryptContext
 
 from app.errors.account import AccountErrorCode
-from app.errors.common import CommonErrorCode
 from configs import funiq_ai_config
+from database import sync_redis
 
 from .datatime import utcnow
 
-# Password hashing configuration
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 # JWT configuration
 ALGORITHM = "HS256"
-
 
 # -------- Password Hashing --------
 
@@ -26,14 +23,21 @@ def hash_password(password: str) -> str:
     """
     Hash a plain text password using bcrypt.
     """
-    return pwd_context.hash(password)
+    try:
+        salt = bcrypt.gensalt(rounds=12)
+        return bcrypt.hashpw(password.encode(), salt).decode()
+    except Exception as e:
+        raise ValueError("Error during password hashing") from e
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     Verify a plain text password against its hash.
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    try:
+        return bcrypt.checkpw(plain_password.encode(), hashed_password.encode())
+    except Exception as e:
+        raise ValueError("Error during password verification") from e
 
 
 # -------- JWT Token Handling --------
@@ -100,30 +104,58 @@ def get_account_id_from_request(request: Request) -> str:
 
 def create_token_pair(data: dict) -> Tuple[str, str]:
     """Create both access and refresh tokens."""
+    account_id = data["aid"]
+
     # Create access token (short-lived)
     access_token = create_access_token(
         data=data, expires_delta=timedelta(minutes=funiq_ai_config.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
 
     # Create refresh token (long-lived)
-    refresh_data = {"aid": data["aid"], "type": "refresh", "exp": (utcnow() + timedelta(days=7)).timestamp()}
-    refresh_token = jwt.encode(refresh_data, funiq_ai_config.SECRET_KEY, algorithm=ALGORITHM)
+    refresh_token = secrets.token_urlsafe(32)
+
+    # Store in sync_redis
+    sync_redis_key = f"refresh_token:{account_id}"
+    sync_redis.setex(sync_redis_key, timedelta(days=funiq_ai_config.REFRESH_TOKEN_EXPIRE_DAYS), refresh_token)
 
     return access_token, refresh_token
 
 
 def verify_refresh_token(refresh_token: str) -> str:
     """Verify refresh token and return account ID."""
-    try:
-        payload = jwt.decode(refresh_token, funiq_ai_config.SECRET_KEY, algorithms=[ALGORITHM])
-        if payload.get("type") != "refresh":
-            raise CommonErrorCode.UNAUTHORIZED.exception(status_code=status.HTTP_401_UNAUTHORIZED)
-        return str(payload.get("aid"))
-    except JWTError as e:
-        raise AccountErrorCode.REFRESH_TOKEN_EXPIRED.exception() from e
+    for key in sync_redis.scan_iter("refresh_token:*"):
+        stored_token = sync_redis.get(key)
+        if stored_token and stored_token.decode() == refresh_token:
+            return key.decode().split(":")[1]
+    raise AccountErrorCode.REFRESH_TOKEN_EXPIRED.exception(status_code=status.HTTP_401_UNAUTHORIZED)
+
+
+def invalidate_refresh_token(account_id: str):
+    sync_redis_key = f"refresh_token:{account_id}"
+    sync_redis.delete(sync_redis_key)
 
 
 def refresh_access_token(refresh_token: str) -> str:
     """Create new access token from refresh token."""
     account_id = verify_refresh_token(refresh_token)
     return create_access_token({"aid": account_id})
+
+
+def get_refresh_token_from_cookie(request: Request) -> str:
+    return request.cookies.get(funiq_ai_config.REFRESH_TOKEN_COOKIE_NAME)
+
+
+def set_refresh_token_to_cookie(response: Response, refresh_token: str):
+    response.set_cookie(
+        funiq_ai_config.REFRESH_TOKEN_COOKIE_NAME,
+        refresh_token,
+        secure=True,
+        samesite="lax",
+        httponly=True,
+        max_age=funiq_ai_config.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+        path="/",
+    )
+
+
+def delete_refresh_token_from_cookie(response: Response):
+    response.delete_cookie(funiq_ai_config.REFRESH_TOKEN_COOKIE_NAME)

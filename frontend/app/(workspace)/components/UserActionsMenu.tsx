@@ -1,4 +1,5 @@
 'use client'
+import { logoutApi } from '@/apis/openapis/auth'
 import { useSessionCookie } from '@/hooks/useSessionCookie'
 import { I18N_COOKIE_NAME, languagesOptions } from '@/plugins/i18n/settings'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
@@ -55,7 +56,8 @@ export default function UserActionsMenu() {
     router.refresh()
   }
 
-  function handleLogout() {
+  async function handleLogout() {
+    await logoutApi()
     sessionCookie.clearAuth()
     router.push('/')
   }

@@ -1,8 +1,15 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Response
 from fastapi_async_sqlalchemy import db
 
 from app.account.service.account_service import AccountService
 from app.schemas import ResponseModel
+from utils.security import (
+    delete_refresh_token_from_cookie,
+    get_account_id_from_request,
+    get_refresh_token_from_cookie,
+    invalidate_refresh_token,
+    set_refresh_token_to_cookie,
+)
 
 from .schemas import (
     ActivateAccountRequest,
@@ -33,25 +40,19 @@ async def signup(payload: SignupRequest, request: Request):
 
 
 @auth_router.post("/login", response_model=ResponseModel[LoginResponse])
-async def login(payload: LoginRequest, request: Request):
+async def login(payload: LoginRequest, request: Request, response: Response):
     """Login with email and password"""
     access_token, refresh_token, tenant_id = await AccountService.login(db.session, payload, request)
-    return ResponseModel(data={
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "tenant_id": tenant_id
-    })
+    set_refresh_token_to_cookie(response, refresh_token)
+    return ResponseModel(data={"access_token": access_token, "tenant_id": tenant_id})
 
 
 @auth_router.post("/signup_verify", response_model=ResponseModel[SignupVerifyResponse])
-async def signup_verify(payload: SignupVerifyRequest, request: Request):
+async def signup_verify(payload: SignupVerifyRequest, request: Request, response: Response):
     """Verify signup email with verification code"""
     access_token, refresh_token, tenant_id = await AccountService.sign_up_email_verify(db.session, payload, request)
-    return ResponseModel(data={
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "tenant_id": tenant_id
-    })
+    set_refresh_token_to_cookie(response, refresh_token)
+    return ResponseModel(data={"access_token": access_token, "tenant_id": tenant_id})
 
 
 @auth_router.post("/activate_account", response_model=ResponseModel[ActivateAccountResponse])
@@ -83,11 +84,19 @@ async def resend_verification_code(payload: ResendVerificationCodeRequest):
 
 
 @auth_router.post("/activate_account_verify", response_model=ResponseModel[ActivateAccountVerifyResponse])
-async def activate_account_verify(payload: ActivateAccountVerifyRequest, request: Request):
+async def activate_account_verify(payload: ActivateAccountVerifyRequest, request: Request, response: Response):
     """Verify account activation with verification code"""
     access_token, refresh_token, tenant_id = await AccountService.activate_account_verify(db.session, payload, request)
-    return ResponseModel(data={
-        "access_token": access_token,
-        "refresh_token": refresh_token,
-        "tenant_id": tenant_id
-    })
+    set_refresh_token_to_cookie(response, refresh_token)
+    return ResponseModel(data={"access_token": access_token, "refresh_token": refresh_token, "tenant_id": tenant_id})
+
+
+@auth_router.post("/logout", response_model=ResponseModel[None])
+async def logout(request: Request, response: Response):
+    """Logout current user and invalidate their refresh token"""
+    refresh_token = get_refresh_token_from_cookie(request)
+    if refresh_token:
+        account_id = get_account_id_from_request(request)
+        invalidate_refresh_token(account_id, refresh_token)
+        delete_refresh_token_from_cookie(response)
+    return ResponseModel(data=None)

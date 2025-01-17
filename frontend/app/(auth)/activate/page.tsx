@@ -25,7 +25,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }))
 
 export default function Activate() {
-  const { t, i18n } = useTranslation(['auth', 'global'])
+  const { t } = useTranslation(['auth', 'global'])
   const router = useRouter()
   const searchParams = useSearchParams()
   const [token, setToken] = useState('')
@@ -45,7 +45,6 @@ export default function Activate() {
     try {
       const res = await activateAccountApi({
         email,
-        language: i18n.language,
       })
       if (res.data?.token) {
         setToken(res.data.token)
@@ -78,7 +77,7 @@ export default function Activate() {
   const handleVerificationSubmit = async (code: string) => {
     const res = await activateAccountVerifyApi({ token, code })
     if (res.data) {
-      setAuth(res.data.access_token, res.data.refresh_token, res.data.tenant_id ?? undefined)
+      setAuth(res.data.access_token, res.data.tenant_id ?? undefined)
       Toast.success({ message: t('account_activated') })
       router.push('/chat')
     }

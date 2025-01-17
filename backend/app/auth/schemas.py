@@ -8,13 +8,11 @@ class SignupRequest(BaseModel):
     name: str
     email: EmailStr
     password: str
-    language: str | None = None
     invite_code: str | None = None
 
 
 class ActivateAccountRequest(BaseModel):
     email: str
-    language: str | None = None
 
 
 class SignupVerifyRequest(BaseModel):
@@ -25,7 +23,6 @@ class SignupVerifyRequest(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
-    language: str | None = None
 
 
 class SignupResponse(BaseModel):
@@ -38,14 +35,12 @@ class ActivateAccountResponse(BaseModel):
 
 class LoginResponse(BaseModel):
     access_token: str
-    refresh_token: str
     tenant_id: str | None
     token_type: str = "bearer"
 
 
 class SignupVerifyResponse(BaseModel):
     access_token: str
-    refresh_token: str
     tenant_id: str | None
     token_type: str = "bearer"
 
@@ -80,7 +75,6 @@ class ActivateAccountVerifyRequest(BaseModel):
 
 class ActivateAccountVerifyResponse(BaseModel):
     access_token: str
-    refresh_token: str
     tenant_id: str | None
     token_type: str = "bearer"
 
@@ -93,9 +87,8 @@ class OAuthLoginRequest(BaseModel):
     access_token: str
     refresh_token: str | None = None
     profile_data: dict | None = None
-    language: str | None = None
     invite_code: str | None = None
-    
+
 
 class OAuthLoginResponse(BaseModel):
     access_token: str
