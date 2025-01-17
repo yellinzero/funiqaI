@@ -34,7 +34,7 @@ from tasks.email_tasks import (
     send_signup_verification_email_task,
 )
 from utils.datatime import utcnow
-from utils.security import create_token_pair, get_account_id_from_request
+from utils.security import create_token_pair, get_account_id_from_request, invalidate_refresh_token
 from utils.token_manager import AccountTokenManager, AccountTokenType
 
 token_manager = AccountTokenManager()
@@ -253,6 +253,9 @@ class AccountService:
     async def login(session: AsyncSession, payload: LoginRequest, request: Request) -> tuple[str, str, str]:
         """Authenticate an account and return JWT tokens."""
         account = await AccountService._verify_login_account(session, payload.email, payload.password)
+
+        invalidate_refresh_token(str(account.id))
+
         return await AccountService._handle_successful_auth(session, account, request)
 
     # endregion
@@ -372,6 +375,9 @@ class AccountService:
         # Update password
         account.set_password(payload.new_password)
         await account.save(session)
+
+        # Invalidate all refresh tokens for this account
+        invalidate_refresh_token(str(account.id))
 
         # Revoke token and return new access token
         await token_manager.revoke_reset_password_token(email)

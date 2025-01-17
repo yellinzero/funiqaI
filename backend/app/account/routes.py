@@ -25,18 +25,20 @@ async def get_account_info(request: Request):
     tenant_id = request.state.tenant_id
     account = await AccountService.get_account_info(db.session, request)
     user = await TenantService.get_user_by_account_id(db.session, tenant_id, account.id)
-    
-    return ResponseModel(data={
-        "id": str(account.id),
-        "email": account.email,
-        "name": account.name,
-        "language": account.language,
-        "status": account.status,
-        "last_login_at": account.last_login_at.isoformat() if account.last_login_at else None,
-        "last_login_ip": account.last_login_ip,
-        "role": user.role,
-        "avatar": user.avatar,
-    })
+
+    return ResponseModel(
+        data={
+            "id": str(account.id),
+            "email": account.email,
+            "name": account.name,
+            "language": account.language,
+            "status": account.status,
+            "last_login_at": account.last_login_at.isoformat() if account.last_login_at else None,
+            "last_login_ip": account.last_login_ip,
+            "role": user.role,
+            "avatar": user.avatar,
+        }
+    )
 
 
 @account_router.get("/tenants", response_model=ResponseModel[list[TenantResponse]])

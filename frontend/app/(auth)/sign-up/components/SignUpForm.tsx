@@ -23,7 +23,7 @@ interface SignUpFormProps {
 }
 
 export default function SignUpForm({ onSuccess }: SignUpFormProps) {
-  const { t, i18n } = useTranslation(['auth'])
+  const { t } = useTranslation(['auth'])
 
   const {
     control,
@@ -40,10 +40,7 @@ export default function SignUpForm({ onSuccess }: SignUpFormProps) {
 
   const onSubmit = async (data: SignUpFormInputs) => {
     try {
-      const res = await signupApi({
-        ...data,
-        language: i18n.language,
-      })
+      const res = await signupApi(data)
       if (res.data?.token) {
         Toast.success({ message: t('signup_success') })
         onSuccess(res.data.token, data.email)

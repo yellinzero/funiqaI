@@ -40,9 +40,9 @@ export default function SignUp() {
     startCountdown()
   }
 
-  const handleVerifyEmailSuccess = (data: { access_token: string, refresh_token: string, tenant_id?: string }) => {
+  const handleVerifyEmailSuccess = (data: { access_token: string, tenant_id?: string }) => {
     if (data) {
-      setAuth(data.access_token, data.refresh_token, data.tenant_id)
+      setAuth(data.access_token, data.tenant_id)
       router.push('/create-tenant')
     }
   }
@@ -65,7 +65,6 @@ export default function SignUp() {
       Toast.success({ message: t('email_verified_success') })
       handleVerifyEmailSuccess({
         access_token: res.data.access_token,
-        refresh_token: res.data.refresh_token,
         tenant_id: res.data.tenant_id ?? undefined,
       })
     }

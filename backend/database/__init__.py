@@ -11,6 +11,7 @@ from .core import (
     redis,
     shutdown_database,
     sync_engine,
+    sync_redis,
     transactional_session,
     update_database_schema,
 )

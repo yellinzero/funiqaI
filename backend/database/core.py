@@ -5,6 +5,7 @@ import time
 from inspect import signature
 from typing import Any, AsyncGenerator, Callable
 
+from redis import Redis as SyncRedis
 from redis.asyncio import BlockingConnectionPool, Redis
 from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
@@ -40,12 +41,17 @@ SessionFactory = async_sessionmaker(
     class_=AsyncSession,
 )
 
-# Redis client
+# Redis clients
 redis: Redis = Redis(
     connection_pool=BlockingConnectionPool.from_url(
         url=funiq_ai_config.REDIS_URL,
         max_connections=funiq_ai_config.REDIS_MAX_CONNECTIONS,
     )
+)
+
+sync_redis: SyncRedis = SyncRedis.from_url(
+    url=funiq_ai_config.REDIS_URL,
+    max_connections=funiq_ai_config.REDIS_MAX_CONNECTIONS,
 )
 
 
@@ -71,6 +77,7 @@ async def shutdown_database():
     """
     try:
         await redis.close()
+        sync_redis.close()
         await engine.dispose()
     except Exception as e:
         print(f"Error during shutdown: {e}")
@@ -83,7 +90,7 @@ async def get_session() -> AsyncGenerator[AsyncSession, None]:
     """
     async with SessionFactory() as session:
         yield session
-        
+
 
 @contextlib.asynccontextmanager
 async def transactional_session() -> AsyncGenerator[AsyncSession, None]:
@@ -111,10 +118,7 @@ def provide_session(fn: Callable[..., Any]):
     has_session = "session" in parameters  # Check if the function defines a `session` parameter
 
     # Check if the `session` parameter has a default value and is not empty
-    session_has_default = (
-        has_session
-        and parameters["session"].default is not parameters["session"].empty
-    )
+    session_has_default = has_session and parameters["session"].default is not parameters["session"].empty
 
     # Retrieve the position index of the `session` parameter
     session_idx = tuple(parameters).index("session") if has_session else None
@@ -127,7 +131,7 @@ def provide_session(fn: Callable[..., Any]):
         2. Use an explicitly passed `session` if provided; otherwise, create a new session.
         """
 
-        # Case 1: If the target function does not define `session` 
+        # Case 1: If the target function does not define `session`
         #         or `session` has a valid(including None) default value, call the function directly.
         if not has_session or session_has_default:
             return await fn(*args, **kwargs)
@@ -164,12 +168,7 @@ class RedisRateLimiter:
     A Redis-based rate limiter for tracking request limits by key (e.g., email or IP).
     """
 
-    def __init__(
-        self, 
-        prefix: str = "redis_rate_limiter", 
-        max_attempts: int = 5, 
-        time_window: int = 60
-    ):
+    def __init__(self, prefix: str = "redis_rate_limiter", max_attempts: int = 5, time_window: int = 60):
         """
         Initialize the rate limiter.
 

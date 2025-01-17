@@ -166,6 +166,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Logout
+         * @description Logout current user and invalidate their refresh token
+         */
+        post: operations["logout_auth_logout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/account/me": {
         parameters: {
             query?: never;
@@ -308,8 +328,6 @@ export interface components {
         ActivateAccountRequest: {
             /** Email */
             email: string;
-            /** Language */
-            language?: string | null;
         };
         /** ActivateAccountResponse */
         ActivateAccountResponse: {
@@ -327,8 +345,6 @@ export interface components {
         ActivateAccountVerifyResponse: {
             /** Access Token */
             access_token: string;
-            /** Refresh Token */
-            refresh_token: string;
             /** Tenant Id */
             tenant_id: string | null;
             /**
@@ -364,15 +380,11 @@ export interface components {
             email: string;
             /** Password */
             password: string;
-            /** Language */
-            language?: string | null;
         };
         /** LoginResponse */
         LoginResponse: {
             /** Access Token */
             access_token: string;
-            /** Refresh Token */
-            refresh_token: string;
             /** Tenant Id */
             tenant_id: string | null;
             /**
@@ -600,8 +612,6 @@ export interface components {
             email: string;
             /** Password */
             password: string;
-            /** Language */
-            language?: string | null;
             /** Invite Code */
             invite_code?: string | null;
         };
@@ -621,8 +631,6 @@ export interface components {
         SignupVerifyResponse: {
             /** Access Token */
             access_token: string;
-            /** Refresh Token */
-            refresh_token: string;
             /** Tenant Id */
             tenant_id: string | null;
             /**
@@ -955,6 +963,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    logout_auth_logout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseModel_NoneType_"];
                 };
             };
         };

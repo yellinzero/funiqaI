@@ -50,8 +50,8 @@ export type CustomFetchResponse<Path extends keyof paths, Method extends HttpMet
 const namespaces = ['error']
 
 // API Clients
-export const apiFetch = createClient<paths>({ baseUrl: `/api` })
-export const publicApiFetch = createClient<paths>({ baseUrl: `/api` })
+export const apiFetch = createClient<paths>({ baseUrl: `/api`, credentials: 'include' })
+export const publicApiFetch = createClient<paths>({ baseUrl: `/api`, credentials: 'include' })
 
 // Error Handling
 interface ResponseData {
@@ -83,9 +83,6 @@ const authMiddleware: Middleware = {
 
     if (session.accessToken) {
       request.headers.set('Authorization', `Bearer ${session.accessToken}`)
-    }
-    if (session.refreshToken) {
-      request.headers.set('X-Refresh-Token', session.refreshToken)
     }
     return request
   },

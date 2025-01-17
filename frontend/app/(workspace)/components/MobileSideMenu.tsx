@@ -1,4 +1,5 @@
 'use client'
+import { logoutApi } from '@/apis/openapis/auth'
 import { useSessionCookie } from '@/hooks/useSessionCookie'
 import { useUserInfo } from '@/hooks/useUserInfo'
 import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded'
@@ -6,8 +7,8 @@ import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded'
 import Avatar from '@mui/material/Avatar'
 import Button from '@mui/material/Button'
 import Divider from '@mui/material/Divider'
-import Drawer, { drawerClasses } from '@mui/material/Drawer'
 
+import Drawer, { drawerClasses } from '@mui/material/Drawer'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/navigation'
@@ -23,8 +24,10 @@ export default function MobileSideMenu({ open, toggleDrawer }: SideMenuMobilePro
   const userInfo = useUserInfo()
   const sessionCookie = useSessionCookie()
   const router = useRouter()
-  function handleLogout() {
+  async function handleLogout() {
+    await logoutApi()
     sessionCookie.clearAuth()
+
     router.push('/')
   }
   return (
