@@ -50,8 +50,14 @@ export type CustomFetchResponse<Path extends keyof paths, Method extends HttpMet
 const namespaces = ['error']
 
 // API Clients
-export const apiFetch = createClient<paths>({ baseUrl: `/api`, credentials: 'include' })
-export const publicApiFetch = createClient<paths>({ baseUrl: `/api`, credentials: 'include' })
+export const apiFetch = createClient<paths>({
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE,
+  credentials: 'include',
+})
+export const publicApiFetch = createClient<paths>({
+  baseUrl: process.env.NEXT_PUBLIC_API_BASE,
+  credentials: 'include',
+})
 
 // Error Handling
 interface ResponseData {
@@ -76,16 +82,50 @@ export class HttpError extends Error {
   }
 }
 
-// Middlewares
-const requestContextMiddleware: Middleware = {
-  async onRequest({ request }) {
+// Add new utility function for cookie handling
+async function getCookieContext() {
+  if (typeof window === 'undefined') {
+    // Server-side
+    const { cookies: cookiesClient } = await import('next/headers')
+    try {
+      const cookieStore = await cookiesClient()
+      const language = cookieStore.get(I18N_COOKIE_NAME)?.value ?? 'en'
+      const session = JSON.parse(cookieStore.get(SESSION_COOKIE_NAME)?.value ?? '{}')
+      return { language, session }
+    }
+    catch (error) {
+      console.error('Failed to access server-side cookies:', error)
+      return { language: 'en', session: {} }
+    }
+  }
+  else {
+    // Client-side
     const cookies = new Cookies()
     const language = cookies.get(I18N_COOKIE_NAME) ?? 'en'
     const session = cookies.get(SESSION_COOKIE_NAME) ?? {}
+    return { language, session }
+  }
+}
+
+// Middlewares
+const requestContextMiddleware: Middleware = {
+  async onRequest({ request }) {
+    const { language, session } = await getCookieContext()
     request.headers.set('X-LANGUAGE', language)
     request.headers.set('X-Tenant-ID', session.tenantId)
     if (session.accessToken) {
       request.headers.set('Authorization', `Bearer ${session.accessToken}`)
+    }
+
+    // FIXME: https://github.com/vercel/next.js/issues/63170
+    if (typeof window === 'undefined') {
+      const { cookies: cookiesClient } = await import('next/headers')
+      const cookieStore = await cookiesClient()
+      const cookie = cookieStore
+        .getAll()
+        .map(cookie => `${cookie.name}=${cookie.value}`)
+        .join('; ')
+      request.headers.set('Cookie', cookie)
     }
     return request
   },
@@ -93,18 +133,27 @@ const requestContextMiddleware: Middleware = {
 
 const responseMiddleware: Middleware = {
   async onResponse({ response }) {
-    const cookies = new Cookies()
     const newAccessToken = response.headers.get('X-New-Access-Token')
-    if (newAccessToken && typeof window !== 'undefined') {
-      const session = cookies.get(SESSION_COOKIE_NAME) ?? {}
-      cookies.set(SESSION_COOKIE_NAME, { ...session, accessToken: newAccessToken })
+    if (newAccessToken) {
+      if (typeof window !== 'undefined') {
+        const cookies = new Cookies()
+        const session = cookies.get(SESSION_COOKIE_NAME) ?? {}
+        cookies.set(SESSION_COOKIE_NAME, { ...session, accessToken: newAccessToken })
+      }
+      else {
+        // TODO: Server-side(if needed)
+        // const { cookies } = await import('next/headers')
+        // const cookieStore = await cookies()
+        // const session = JSON.parse(cookieStore.get(SESSION_COOKIE_NAME)?.value ?? '{}')
+        // cookieStore.set(SESSION_COOKIE_NAME, JSON.stringify({ ...session, accessToken: newAccessToken }))
+      }
     }
+
     const status = response.status
     if (status >= 400 && status < 600) {
       switch (status) {
         case 401: {
           if (typeof window !== 'undefined') {
-            cookies.remove(SESSION_COOKIE_NAME)
             window.location.href = '/sign-in'
           }
           break
@@ -130,23 +179,27 @@ export function createFetchApi(client: Client<paths>) {
     promise: ReturnType<ClientMethod<{}, Method, Path>>,
   ): Promise<CustomFetchResponse<Path, Method>> => {
     const { data, response, error } = await promise
-    const cookies = new Cookies()
 
-    const locale = cookies.get(I18N_COOKIE_NAME)
-    const { t } = await initTranslations(locale || 'en', namespaces)
+    const { language } = await getCookieContext()
+
+    const { t } = await initTranslations(language, namespaces)
     const errorCode = data?.code || error?.code
     if (errorCode && errorCode !== '0') {
-      Toast.error({ message: t(errorCode, { ns: 'error' }) || t('undefined_error', { ns: 'error' }) })
+      if (typeof window !== 'undefined') {
+        Toast.error({ message: t(errorCode, { ns: 'error' }) || t('undefined_error', { ns: 'error' }) })
+      }
       throw new HttpError(data?.message || error?.message, response, data)
     }
     else if (response.status >= 400 && response.status < 600) {
       const httpErrorMsg = t(`HCODE${response.status}`, { ns: 'error' })
-      Toast.error({ message: httpErrorMsg })
+      if (typeof window !== 'undefined') {
+        Toast.error({ message: httpErrorMsg })
+      }
       throw new HttpError(httpErrorMsg, response, data)
     }
 
     return {
-      data: data.data,
+      data: data?.data,
       error: response.error,
       response: response.response,
     }

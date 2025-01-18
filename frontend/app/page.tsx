@@ -40,7 +40,7 @@ export default async function Home() {
             },
           }}
         >
-          {t('home_description')}
+          {t('home_description', { ns: 'global' })}
         </Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
           <Link href="/sign-in" underline="hover">
@@ -55,14 +55,14 @@ export default async function Home() {
                 fontSize: '1.1rem',
               }}
             >
-              {t('sign_in')}
+              {t('sign_in', { ns: 'global' })}
             </Button>
           </Link>
           <Link href="/sign-up" underline="hover">
             <Button
               variant="text"
             >
-              {t('sign_up')}
+              {t('sign_up', { ns: 'global' })}
             </Button>
           </Link>
         </Box>

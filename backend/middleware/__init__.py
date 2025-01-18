@@ -19,6 +19,7 @@ def install_global_middlewares(app: FastAPI):
         allow_credentials=funiq_ai_config.CORS_ALLOW_CREDENTIALS,
         allow_methods=funiq_ai_config.CORS_ALLOW_METHODS,
         allow_headers=funiq_ai_config.CORS_ALLOW_HEADERS,
+        expose_headers=["X-New-Access-Token"],
     )
     app.add_middleware(SQLAlchemyMiddleware, custom_engine=engine)
     app.add_middleware(RequestContextMiddleware)
