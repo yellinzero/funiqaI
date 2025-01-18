@@ -144,14 +144,12 @@ export function createFetchApi(client: Client<paths>) {
     const { t } = await initTranslations(locale || 'en', namespaces)
     const errorCode = data?.code || error?.code
     if (errorCode && errorCode !== '0') {
-      if (typeof window !== 'undefined')
-        Toast.error({ message: t(errorCode) || t('undefined_error') })
+      Toast.error({ message: t(errorCode, { ns: 'error' }) || t('undefined_error', { ns: 'error' }) })
       throw new HttpError(data?.message || error?.message, response, data)
     }
     else if (response.status >= 400 && response.status < 600) {
-      const httpErrorMsg = t(`HCODE${response.status}`)
-      if (typeof window !== 'undefined')
-        Toast.error({ message: httpErrorMsg })
+      const httpErrorMsg = t(`HCODE${response.status}`, { ns: 'error' })
+      Toast.error({ message: httpErrorMsg })
       throw new HttpError(httpErrorMsg, response, data)
     }
 

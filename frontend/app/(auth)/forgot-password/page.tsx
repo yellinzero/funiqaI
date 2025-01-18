@@ -24,7 +24,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 }))
 
 export default function ForgotPassword() {
-  const { t } = useTranslation(['auth', 'global'])
+  const { t } = useTranslation(['auth'])
   const router = useRouter()
   const [step, setStep] = useState<1 | 2>(1)
   const [token, setToken] = useState('')

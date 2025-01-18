@@ -78,7 +78,10 @@ export default function Login() {
           sx={{ width: '100%', fontSize: '1.5rem' }}
         >
           {t('welcome', {
-            name: t('product_name'),
+            name: t('product_name', {
+              ns: 'global',
+            }),
+            ns: 'global',
           })}
         </Typography>
         <Box
@@ -102,7 +105,11 @@ export default function Login() {
                   fullWidth
                   variant="outlined"
                   error={!!errors.email}
-                  helperText={errors.email ? t('enter_valid_email') : undefined}
+                  helperText={errors.email
+                    ? t('enter_valid_email', {
+                      ns: 'global',
+                    })
+                    : undefined}
                 />
               )}
             />
@@ -122,13 +129,19 @@ export default function Login() {
                   fullWidth
                   variant="outlined"
                   error={!!errors.password}
-                  helperText={errors.password ? t('enter_valid_password') : undefined}
+                  helperText={errors.password
+                    ? t('enter_valid_password', {
+                      ns: 'global',
+                    })
+                    : undefined}
                 />
               )}
             />
           </FormControl>
           <Button type="submit" fullWidth variant="contained">
-            {t('sign_in')}
+            {t('sign_in', {
+              ns: 'global',
+            })}
           </Button>
           <Box sx={{
             width: '100%',

@@ -25,7 +25,6 @@ async def get_account_info(request: Request):
     tenant_id = request.state.tenant_id
     account = await AccountService.get_account_info(db.session, request)
     user = await TenantService.get_user_by_account_id(db.session, tenant_id, account.id)
-
     return ResponseModel(
         data={
             "id": str(account.id),

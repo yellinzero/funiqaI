@@ -1,5 +1,4 @@
 import { meOptions } from '@/apis'
-import MobileNavbar from '@/app/(workspace)/components/MobileNavbar'
 import SideMenu from '@/app/(workspace)/components/SideMenu'
 import Header from '@/app/(workspace)/components/WorkspaceHeader'
 import { getQueryClient } from '@/utils/get-query-client'
@@ -13,8 +12,6 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
   return (
     <Box sx={{ display: 'flex', height: '100vh', width: '100vw' }}>
       <SideMenu />
-      <MobileNavbar />
-      {/* Main content */}
       <Box
         component="main"
         sx={{
@@ -29,8 +26,6 @@ export default function WorkspaceLayout({ children }: { children: React.ReactNod
             alignItems: 'center',
             mx: 3,
             pb: 5,
-            mt: { xs: 8, md: 0 },
-
           }}
         >
           <Header />
