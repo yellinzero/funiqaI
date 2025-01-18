@@ -4,8 +4,8 @@ import Toast from '@/components/Toast'
 import { initTranslations } from '@/plugins/i18n'
 import { I18N_COOKIE_NAME } from '@/plugins/i18n/settings'
 import { SESSION_COOKIE_NAME } from '@/utils/constants'
-import Cookies from 'js-cookie'
 import createClient from 'openapi-fetch'
+import { Cookies } from 'react-cookie'
 
 // Types
 export type HttpMethod = 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace'
@@ -77,21 +77,11 @@ export class HttpError extends Error {
 }
 
 // Middlewares
-const authMiddleware: Middleware = {
-  async onRequest({ request }) {
-    const session = JSON.parse(Cookies.get(SESSION_COOKIE_NAME) ?? '{}')
-
-    if (session.accessToken) {
-      request.headers.set('Authorization', `Bearer ${session.accessToken}`)
-    }
-    return request
-  },
-}
-
 const requestContextMiddleware: Middleware = {
   async onRequest({ request }) {
-    const language = Cookies.get(I18N_COOKIE_NAME) ?? 'en'
-    const session = JSON.parse(Cookies.get(SESSION_COOKIE_NAME) ?? '{}')
+    const cookies = new Cookies()
+    const language = cookies.get(I18N_COOKIE_NAME) ?? 'en'
+    const session = cookies.get(SESSION_COOKIE_NAME) ?? {}
     request.headers.set('X-LANGUAGE', language)
     request.headers.set('X-Tenant-ID', session.tenantId)
     if (session.accessToken) {
@@ -103,18 +93,20 @@ const requestContextMiddleware: Middleware = {
 
 const responseMiddleware: Middleware = {
   async onResponse({ response }) {
+    const cookies = new Cookies()
     const newAccessToken = response.headers.get('X-New-Access-Token')
-    if (newAccessToken) {
-      const session = JSON.parse(Cookies.get(SESSION_COOKIE_NAME) ?? '{}')
-      Cookies.set('session', JSON.stringify({ ...session, accessToken: newAccessToken }))
+    if (newAccessToken && typeof window !== 'undefined') {
+      const session = cookies.get(SESSION_COOKIE_NAME) ?? {}
+      cookies.set(SESSION_COOKIE_NAME, { ...session, accessToken: newAccessToken })
     }
     const status = response.status
     if (status >= 400 && status < 600) {
       switch (status) {
         case 401: {
-          Cookies.remove('session')
-          if (typeof window !== 'undefined')
+          if (typeof window !== 'undefined') {
+            cookies.remove(SESSION_COOKIE_NAME)
             window.location.href = '/sign-in'
+          }
           break
         }
       }
@@ -127,7 +119,6 @@ const responseMiddleware: Middleware = {
 }
 
 // Apply middlewares
-apiFetch.use(authMiddleware)
 apiFetch.use(requestContextMiddleware)
 apiFetch.use(responseMiddleware)
 publicApiFetch.use(responseMiddleware)
@@ -139,8 +130,9 @@ export function createFetchApi(client: Client<paths>) {
     promise: ReturnType<ClientMethod<{}, Method, Path>>,
   ): Promise<CustomFetchResponse<Path, Method>> => {
     const { data, response, error } = await promise
+    const cookies = new Cookies()
 
-    const locale = Cookies.get(I18N_COOKIE_NAME)
+    const locale = cookies.get(I18N_COOKIE_NAME)
     const { t } = await initTranslations(locale || 'en', namespaces)
     const errorCode = data?.code || error?.code
     if (errorCode && errorCode !== '0') {
