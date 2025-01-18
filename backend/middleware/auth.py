@@ -21,8 +21,11 @@ class TokenRefreshMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next):
         try:
-            # Skip auth for public endpoints
-            if any(request.url.path.startswith(prefix) for prefix in self.PUBLIC_PATH_PREFIXES):
+            # Skip auth for OPTIONS requests, CORS preflight requests and public endpoints
+            if (
+                request.method == "OPTIONS"
+                or any(request.url.path.startswith(prefix) for prefix in self.PUBLIC_PATH_PREFIXES)
+            ):
                 return await call_next(request)
 
             auth_header = request.headers.get("Authorization")
