@@ -17,7 +17,6 @@ export default function SideMenu() {
       className="mt-10 box-border shrink-0"
       sx={{
         width: drawerWidth,
-        display: { xs: 'none', md: 'block' },
         [`& .${drawerClasses.paper}`]: {
           backgroundColor: 'background.paper',
           width: drawerWidth,

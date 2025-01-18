@@ -22,13 +22,15 @@ export default function Providers({ children, locale, defaultMode }: ProvidersPr
     <AppRouterCacheProvider options={{ enableCssLayer: true }}>
       <ThemeProvider theme={theme} defaultMode={defaultMode}>
         <CssBaseline enableColorScheme />
-        <QueryClientProvider client={queryClient}>
-          <I18nProvider locale={locale}>
-            <SnackbarProvider maxSnack={3}>
+        <SnackbarProvider maxSnack={3}>
+          <QueryClientProvider client={queryClient}>
+            <I18nProvider locale={locale}>
+
               {children}
-            </SnackbarProvider>
-          </I18nProvider>
-        </QueryClientProvider>
+
+            </I18nProvider>
+          </QueryClientProvider>
+        </SnackbarProvider>
       </ThemeProvider>
     </AppRouterCacheProvider>
   )

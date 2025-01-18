@@ -8,11 +8,10 @@ export default function HomePageHeader() {
     <Stack
       direction="row"
       sx={{
-        display: { xs: 'none', md: 'flex' },
+        display: 'flex',
         width: '100%',
-        alignItems: { xs: 'flex-start', md: 'center' },
+        alignItems: 'center',
         justifyContent: 'right',
-        maxWidth: { sm: '100%', md: '1700px' },
         pt: 1.5,
       }}
       spacing={2}
