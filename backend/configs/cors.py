@@ -4,7 +4,11 @@ from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
-class CrosConfig(BaseSettings):
+class CorsConfig(BaseSettings):
+    """
+    Cors-related configuration
+    """
+
     CORS_ALLOW_ORIGINS: List[str] = Field(default=["*"], description="List of allowed origins")
 
     CORS_ALLOW_CREDENTIALS: bool = Field(default=True, description="Allow credentials")

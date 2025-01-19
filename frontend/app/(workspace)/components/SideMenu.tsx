@@ -1,12 +1,16 @@
 'use client'
-import UserInfoBox from '@/components/UserInfoBox'
+import { meOptions } from '@/apis'
+import CurrentUserInfoBox from '@/components/CurrentUserInfoBox'
 import Drawer, { drawerClasses } from '@mui/material/Drawer'
 import Stack from '@mui/material/Stack'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import SideMenuContent from './SideMenuContent'
 import UserActionsMenu from './UserActionsMenu'
 
 const drawerWidth = 240
 export default function SideMenu() {
+  const { data } = useSuspenseQuery(meOptions)
+  const userInfo = data?.data
   return (
     <Drawer
       variant="permanent"
@@ -32,7 +36,7 @@ export default function SideMenu() {
           borderColor: 'divider',
         }}
       >
-        <UserInfoBox needName needEmail />
+        <CurrentUserInfoBox userInfo={userInfo} showName showEmail />
         <UserActionsMenu />
       </Stack>
     </Drawer>

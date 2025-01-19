@@ -1,18 +1,23 @@
 'use client'
-import { meOptions } from '@/apis'
+import type { IGetAccountInfoResponse } from '@/apis/types'
+
 import { Avatar, Box, Stack, Typography } from '@mui/material'
-import { useSuspenseQuery } from '@tanstack/react-query'
 
 interface IUserInfoBoxProps {
+  userInfo?: IGetAccountInfoResponse
   width?: number
   height?: number
-  needName?: boolean
-  needEmail?: boolean
+  showName?: boolean
+  showEmail?: boolean
 }
 
-export default function UserInfoBox({ width = 36, height = 36, needName = false, needEmail = false }: IUserInfoBoxProps) {
-  const { data } = useSuspenseQuery(meOptions)
-  const userInfo = data?.data
+export default function CurrentUserInfoBox({
+  userInfo,
+  width = 36,
+  height = 36,
+  showName = false,
+  showEmail = false,
+}: IUserInfoBoxProps) {
   return (
     userInfo
       ? (
@@ -24,12 +29,12 @@ export default function UserInfoBox({ width = 36, height = 36, needName = false,
               sx={{ width, height }}
             />
             <Box sx={{ mr: 'auto', display: 'flex', flexDirection: 'column', gap: 0.5, justifyContent: 'center' }}>
-              {needName && (
+              {showName && (
                 <Typography variant="body2">
                   {userInfo?.name}
                 </Typography>
               )}
-              {needEmail && (
+              {showEmail && (
                 <Typography variant="caption" sx={{ color: 'text.secondary' }}>
                   {userInfo?.email}
                 </Typography>

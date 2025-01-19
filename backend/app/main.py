@@ -10,6 +10,8 @@ from database import shutdown_database
 from middleware import install_global_middlewares
 from services.celery import init_celery
 from services.email_service import init_email_service
+from utils.loguru_handler import setup_loguru
+from utils.sentry_handler import setup_sentry
 
 
 # Define the FastAPI application with essential configurations
@@ -22,6 +24,10 @@ def create_app() -> FastAPI:
         default_response_class=ORJSONResponse,  # Use ORJSON for faster JSON serialization
         lifespan=lifespan,  # Register lifecycle hooks
     )
+    
+    # Initialize logging and Sentry
+    setup_loguru()
+    setup_sentry()
 
     # Register exception handlers
     register_exception_handlers(app)

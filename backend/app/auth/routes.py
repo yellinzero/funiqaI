@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Request, Response
 from fastapi_async_sqlalchemy import db
+from loguru import logger
 
 from app.account.service.account_service import AccountService
 from app.schemas import ResponseModel
 from utils.security import (
     delete_refresh_token_from_cookie,
-    get_account_id_from_request,
     get_refresh_token_from_cookie,
     invalidate_refresh_token,
     set_refresh_token_to_cookie,
@@ -95,8 +95,11 @@ async def activate_account_verify(payload: ActivateAccountVerifyRequest, request
 async def logout(request: Request, response: Response):
     """Logout current user and invalidate their refresh token"""
     refresh_token = get_refresh_token_from_cookie(request)
+    logger.info("Processing logout request")
     if refresh_token:
-        account_id = get_account_id_from_request(request)
-        invalidate_refresh_token(account_id, refresh_token)
+        invalidate_refresh_token(refresh_token=refresh_token)
         delete_refresh_token_from_cookie(response)
+        logger.info("User logged out successfully")
+    else:
+        logger.info("Logout requested with no refresh token")
     return ResponseModel(data=None)

@@ -23,7 +23,7 @@ const MenuItem = styled(MuiMenuItem)({
 })
 
 export default function UserActionsMenu() {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [mainAnchorEl, setMainAnchorEl] = React.useState<null | HTMLElement>(null)
   const [langAnchorEl, setLangAnchorEl] = React.useState<null | HTMLElement>(null)
   const mainMenuOpen = Boolean(mainAnchorEl)
@@ -89,8 +89,12 @@ export default function UserActionsMenu() {
           },
         }}
       >
-        <MenuItem onClick={handleMainMenuClose}>My account</MenuItem>
-        <MenuItem onClick={handleMainMenuClose}>Settings</MenuItem>
+        <MenuItem onClick={handleMainMenuClose}>{t('my_account', {
+          ns: 'global'
+        })}</MenuItem>
+        <MenuItem onClick={handleMainMenuClose}>{t('settings', {
+          ns: 'global'
+        })}</MenuItem>
         <MenuItem
           onClick={handleLangMenuOpen}
           sx={{
@@ -100,7 +104,9 @@ export default function UserActionsMenu() {
             },
           }}
         >
-          <ListItemText>Language</ListItemText>
+          <ListItemText>{t('language', {
+            ns: 'global'
+          })}</ListItemText>
         </MenuItem>
         <Divider />
         <MenuItem
@@ -112,7 +118,9 @@ export default function UserActionsMenu() {
             },
           }}
         >
-          <ListItemText>Logout</ListItemText>
+          <ListItemText>{t('logout', {
+            ns: 'global'
+          })}</ListItemText>
           <ListItemIcon>
             <LogoutRoundedIcon fontSize="small" />
           </ListItemIcon>

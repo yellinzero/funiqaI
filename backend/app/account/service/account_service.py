@@ -2,6 +2,7 @@
 import secrets
 
 from fastapi import Request, status
+from loguru import logger
 from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -57,6 +58,7 @@ class AccountService:
     @staticmethod
     async def signup(session: AsyncSession, payload: SignupRequest, request: Request) -> str:
         """Register a new account."""
+        logger.info(f"Starting signup process for email: {payload.email}")
 
         # Check if the email/name is already registered
         result = await session.execute(
@@ -66,10 +68,12 @@ class AccountService:
         existing_account: Account | None = result.scalars().one_or_none()
         if existing_account:
             if existing_account.email == payload.email:
+                logger.warning(f"Signup failed - email already registered: {payload.email}")
                 raise AccountErrorCode.EMAIL_ALREADY_REGISTERED.exception(
                     data={"email": payload.email}, status_code=status.HTTP_400_BAD_REQUEST
                 )
             elif existing_account.name == payload.name:
+                logger.warning(f"Signup failed - name already registered: {payload.name}")
                 raise AccountErrorCode.NAME_ALREADY_REGISTERED.exception(
                     data={"name": payload.name}, status_code=status.HTTP_400_BAD_REQUEST
                 )
@@ -118,6 +122,7 @@ class AccountService:
 
         # Commit account creation
         await session.commit()
+        logger.info(f"Successfully created new account for: {payload.email}")
 
         # For normal signup, send verification email
         token = await AccountService.send_sign_up_verification_email(account)
@@ -252,11 +257,19 @@ class AccountService:
     @staticmethod
     async def login(session: AsyncSession, payload: LoginRequest, request: Request) -> tuple[str, str, str]:
         """Authenticate an account and return JWT tokens."""
-        account = await AccountService._verify_login_account(session, payload.email, payload.password)
+        logger.info(f"Login attempt for email: {payload.email}")
 
-        invalidate_refresh_token(str(account.id))
+        try:
+            account = await AccountService._verify_login_account(session, payload.email, payload.password)
+            invalidate_refresh_token(account_id=str(account.id))
 
-        return await AccountService._handle_successful_auth(session, account, request)
+            tokens = await AccountService._handle_successful_auth(session, account, request)
+            logger.info(f"Successful login for email: {payload.email}")
+            return tokens
+
+        except Exception as e:
+            logger.error(f"Login failed for email: {payload.email} - Error: {e!s}")
+            raise
 
     # endregion
 
@@ -352,13 +365,17 @@ class AccountService:
     @staticmethod
     async def reset_password(session: AsyncSession, payload: ResetPasswordRequest) -> None:
         """Reset password using verification code."""
+        logger.info("Starting password reset process")
+
         # Verify token and code
         token_data = await token_manager.get_reset_password_verification_data(payload.token)
         if not token_data:
+            logger.warning("Password reset failed - verification code expired")
             raise CommonErrorCode.EMAIL_VERIFICATION_CODE_EXPIRED.exception(status_code=status.HTTP_400_BAD_REQUEST)
 
         email = token_data.get("email")
         if token_data.get("code") != payload.code:
+            logger.warning(f"Password reset failed - invalid verification code for email: {email}")
             raise CommonErrorCode.INVALID_VERIFICATION_CODE.exception(
                 data={"email": email}, status_code=status.HTTP_400_BAD_REQUEST
             )
@@ -375,9 +392,11 @@ class AccountService:
         # Update password
         account.set_password(payload.new_password)
         await account.save(session)
+        logger.info(f"Successfully reset password for email: {email}")
 
         # Invalidate all refresh tokens for this account
-        invalidate_refresh_token(str(account.id))
+        invalidate_refresh_token(account_id=str(account.id))
+        logger.warning(f"Invalidated refresh tokens for account: {account.id}")
 
         # Revoke token and return new access token
         await token_manager.revoke_reset_password_token(email)
@@ -479,97 +498,109 @@ class AccountService:
         """
         Handle OAuth login/registration flow
         """
-        # Find existing OAuth provider link
-        result = await session.execute(
-            select(OAuthProvider).where(
-                OAuthProvider.provider_name == payload.provider, OAuthProvider.provider_id == payload.provider_user_id
-            )
-        )
-        oauth_provider = result.scalars().one_or_none()
+        logger.info(f"Starting OAuth login process for provider: {payload.provider}")
 
-        invite = None
-
-        if payload.invite_code:
+        try:
+            # Find existing OAuth provider link
             result = await session.execute(
-                select(TenantInvite).where(
-                    TenantInvite.code == payload.invite_code, TenantInvite.status == TenantInviteStatus.PENDING
+                select(OAuthProvider).where(
+                    OAuthProvider.provider_name == payload.provider,
+                    OAuthProvider.provider_id == payload.provider_user_id,
                 )
             )
-            invite = result.scalars().one_or_none()
-            if not invite or (invite.expires_at and invite.expires_at < utcnow().replace(tzinfo=None)):
-                raise AccountErrorCode.INVALID_INVITE_CODE.exception(
-                    data={"invite_code": payload.invite_code}, status_code=status.HTTP_400_BAD_REQUEST
-                )
+            oauth_provider = result.scalars().one_or_none()
 
-        if oauth_provider:
-            oauth_provider.access_token = payload.access_token
-            oauth_provider.refresh_token = payload.refresh_token
-            oauth_provider.profile_data = payload.profile_data
-            await oauth_provider.save(session)
+            invite = None
 
-            account = oauth_provider.account
-            account.last_login_at = utcnow().replace(tzinfo=None)
-            account.last_login_ip = request.client.host
-
-            if invite:
+            if payload.invite_code:
                 result = await session.execute(
-                    select(User).where(User.account_id == account.id, User.tenant_id == invite.tenant_id)
-                )
-                existing_user = result.scalars().one_or_none()
-
-                if not existing_user:
-                    user = User(
-                        account_id=account.id,
-                        tenant_id=invite.tenant_id,
-                        role=TenantUserRole.MEMBER,
-                        invite_code=invite.code,
+                    select(TenantInvite).where(
+                        TenantInvite.code == payload.invite_code, TenantInvite.status == TenantInviteStatus.PENDING
                     )
-                    session.add(user)
-
-                    invite.status = TenantInviteStatus.USED
-                    invite.used_at = utcnow().replace(tzinfo=None)
-                    session.add(invite)
-
-                    account.last_login_tenant_id = invite.tenant_id
-
-            await account.save(session)
-
-        else:
-            result = await session.execute(select(Account).where(Account.email == payload.email))
-            account = result.scalars().one_or_none()
-
-            if not account:
-                account = Account(
-                    email=payload.email,
-                    name=payload.name,
-                    status=AccountStatus.ACTIVE,
-                    last_login_ip=request.client.host,
-                    language=payload.language or "en",
-                    last_login_tenant_id=invite.tenant_id if invite else None,
                 )
-                await account.save(session)
+                invite = result.scalars().one_or_none()
+                if not invite or (invite.expires_at and invite.expires_at < utcnow().replace(tzinfo=None)):
+                    raise AccountErrorCode.INVALID_INVITE_CODE.exception(
+                        data={"invite_code": payload.invite_code}, status_code=status.HTTP_400_BAD_REQUEST
+                    )
+
+            if oauth_provider:
+                logger.info(f"Found existing OAuth provider link for email: {payload.email}")
+                oauth_provider.access_token = payload.access_token
+                oauth_provider.refresh_token = payload.refresh_token
+                oauth_provider.profile_data = payload.profile_data
+                await oauth_provider.save(session)
+
+                account = oauth_provider.account
+                account.last_login_at = utcnow().replace(tzinfo=None)
+                account.last_login_ip = request.client.host
 
                 if invite:
-                    user = User(
-                        account_id=account.id,
-                        tenant_id=invite.tenant_id,
-                        role=TenantUserRole.MEMBER,
-                        invite_code=invite.code,
+                    result = await session.execute(
+                        select(User).where(User.account_id == account.id, User.tenant_id == invite.tenant_id)
                     )
-                    session.add(user)
+                    existing_user = result.scalars().one_or_none()
 
-                    invite.status = TenantInviteStatus.USED
-                    invite.used_at = utcnow().replace(tzinfo=None)
-                    session.add(invite)
+                    if not existing_user:
+                        user = User(
+                            account_id=account.id,
+                            tenant_id=invite.tenant_id,
+                            role=TenantUserRole.MEMBER,
+                            invite_code=invite.code,
+                        )
+                        session.add(user)
 
-            oauth_provider = OAuthProvider(
-                provider_name=payload.provider,
-                provider_id=payload.provider_user_id,
-                access_token=payload.access_token,
-                refresh_token=payload.refresh_token,
-                profile_data=payload.profile_data,
-                account_id=account.id,
-            )
-            await oauth_provider.save(session)
+                        invite.status = TenantInviteStatus.USED
+                        invite.used_at = utcnow().replace(tzinfo=None)
+                        session.add(invite)
 
-        return await AccountService._handle_successful_auth(session, account, request)
+                        account.last_login_tenant_id = invite.tenant_id
+
+                await account.save(session)
+
+            else:
+                logger.info(f"Creating new OAuth account for email: {payload.email}")
+                result = await session.execute(select(Account).where(Account.email == payload.email))
+                account = result.scalars().one_or_none()
+
+                if not account:
+                    account = Account(
+                        email=payload.email,
+                        name=payload.name,
+                        status=AccountStatus.ACTIVE,
+                        last_login_ip=request.client.host,
+                        language=payload.language or "en",
+                        last_login_tenant_id=invite.tenant_id if invite else None,
+                    )
+                    await account.save(session)
+
+                    if invite:
+                        user = User(
+                            account_id=account.id,
+                            tenant_id=invite.tenant_id,
+                            role=TenantUserRole.MEMBER,
+                            invite_code=invite.code,
+                        )
+                        session.add(user)
+
+                        invite.status = TenantInviteStatus.USED
+                        invite.used_at = utcnow().replace(tzinfo=None)
+                        session.add(invite)
+
+                oauth_provider = OAuthProvider(
+                    provider_name=payload.provider,
+                    provider_id=payload.provider_user_id,
+                    access_token=payload.access_token,
+                    refresh_token=payload.refresh_token,
+                    profile_data=payload.profile_data,
+                    account_id=account.id,
+                )
+                await oauth_provider.save(session)
+
+            tokens = await AccountService._handle_successful_auth(session, account, request)
+            logger.info(f"Successfully completed OAuth login for email: {payload.email}")
+            return tokens
+
+        except Exception as e:
+            logger.error(f"OAuth login failed for provider {payload.provider} - Error: {e!s}")
+            raise
