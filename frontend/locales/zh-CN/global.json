@@ -7,5 +7,9 @@
   "store": "商店",
   "integrationHub": "集成中心",
   "sign_in": "登录",
-  "sign_up": "注册"
+  "sign_up": "注册",
+  "my_account": "我的账号",
+  "settings": "设置",
+  "language": "语言",
+  "logout": "退出登录"
 }

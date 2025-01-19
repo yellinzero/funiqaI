@@ -1,12 +1,28 @@
+import type { IGetAccountInfoResponse } from '@/apis/types'
+import { getAccountInfoApi } from '@/apis/openapis/account'
+import CurrentUserInfoBox from '@/components/CurrentUserInfoBox'
 import HomePageHeader from '@/components/HomePageHeader'
 import { LogoWithName } from '@/components/SiteLogo'
 import { initTranslations } from '@/plugins/i18n'
 import { getLocaleFromServer } from '@/plugins/i18n/server'
 import { Box, Button, Link, Typography } from '@mui/material'
+import { cookies } from 'next/headers'
 
 export default async function Home() {
   const locale = await getLocaleFromServer()
   const { t } = await initTranslations(locale, ['global'])
+  let userInfo: IGetAccountInfoResponse | undefined
+  const session = (await cookies()).get('session')?.value
+  if(session) {
+    try {
+      const { data } = await getAccountInfoApi()
+      userInfo = data
+    }
+    catch (_error) {
+      // ignore
+    }
+  }
+
   return (
     <Box sx={{
       width: '100vw',
@@ -42,30 +58,33 @@ export default async function Home() {
         >
           {t('home_description', { ns: 'global' })}
         </Typography>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
-          <Link href="/sign-in" underline="hover">
-            <Button
-              variant="contained"
-              color="primary"
-              size="large"
-              sx={{
-                px: 4,
-                py: 1,
-                borderRadius: 2,
-                fontSize: '1.1rem',
-              }}
-            >
-              {t('sign_in', { ns: 'global' })}
-            </Button>
-          </Link>
-          <Link href="/sign-up" underline="hover">
-            <Button
-              variant="text"
-            >
-              {t('sign_up', { ns: 'global' })}
-            </Button>
-          </Link>
-        </Box>
+        {userInfo && <Link href="/chat" underline="none"><CurrentUserInfoBox userInfo={userInfo} showName /></Link>}
+        {!userInfo && (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'center' }}>
+            <Link href="/sign-in" underline="hover">
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                sx={{
+                  px: 4,
+                  py: 1,
+                  borderRadius: 2,
+                  fontSize: '1.1rem',
+                }}
+              >
+                {t('sign_in', { ns: 'global' })}
+              </Button>
+            </Link>
+            <Link href="/sign-up" underline="hover">
+              <Button
+                variant="text"
+              >
+                {t('sign_up', { ns: 'global' })}
+              </Button>
+            </Link>
+          </Box>
+        )}
       </Box>
     </Box>
   )

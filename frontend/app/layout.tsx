@@ -1,13 +1,21 @@
 import { initTranslations } from '@/plugins/i18n'
 import { getLocaleFromServer } from '@/plugins/i18n/server'
-import { roboto } from '@/theme'
 
+import { Roboto } from 'next/font/google'
 import InitColorSchemeScript from '@mui/material/InitColorSchemeScript'
 import React from 'react'
-import Providers from '../components/Providers'
-import '@/assets/css/globals.css'
+import Providers from '@/components/Providers'
 
 const namespaces = ['global']
+
+export const roboto = Roboto({
+  weight: ['300', '400', '500', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-roboto',
+  preload: false,
+})
+
 export default async function RootLayout({
   children,
 }: Readonly<{

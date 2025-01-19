@@ -130,9 +130,19 @@ def verify_refresh_token(refresh_token: str) -> str:
     raise AccountErrorCode.REFRESH_TOKEN_EXPIRED.exception(status_code=status.HTTP_401_UNAUTHORIZED)
 
 
-def invalidate_refresh_token(account_id: str):
-    sync_redis_key = f"refresh_token:{account_id}"
-    sync_redis.delete(sync_redis_key)
+def invalidate_refresh_token(account_id: Optional[str] = None, refresh_token: Optional[str] = None):
+    """Invalidate refresh token either by account_id or by token value."""
+    if refresh_token:
+        # if provide refresh token
+        for key in sync_redis.scan_iter("refresh_token:*"):
+            stored_token = sync_redis.get(key)
+            if stored_token and stored_token.decode() == refresh_token:
+                sync_redis.delete(key)
+                return
+    elif account_id:
+        # if provide account id
+        sync_redis_key = f"refresh_token:{account_id}"
+        sync_redis.delete(sync_redis_key)
 
 
 def refresh_access_token(refresh_token: str) -> str:

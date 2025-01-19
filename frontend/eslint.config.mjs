@@ -23,6 +23,14 @@ export default antfu({
       'warn',
       { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
     ],
+    'no-unused-vars': [
+      'warn',
+      { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+    ],
+    'import/no-unused-vars': [
+      'warn',
+      { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+    ],
   },
 }).append(
   ...compat.extends('plugin:@next/next/recommended'),
