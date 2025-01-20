@@ -17,12 +17,23 @@ import * as React from 'react'
 import { useCookies } from 'react-cookie'
 import { useTranslation } from 'react-i18next'
 import MenuButton from './SideMenuButton'
+import CurrentUserInfoBox from '@/components/CurrentUserInfoBox'
+import { Stack, Box } from '@mui/material'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { meOptions } from '@/apis'
 
 const MenuItem = styled(MuiMenuItem)({
   margin: '2px 0',
 })
 
-export default function UserActionsMenu() {
+interface Props {
+  expanded: boolean
+  showContent: boolean
+}
+
+export default function UserActionsMenu({ expanded, showContent }: Props) {
+  const { data } = useSuspenseQuery(meOptions)
+  const userInfo = data?.data
   const { t, i18n } = useTranslation()
   const [mainAnchorEl, setMainAnchorEl] = React.useState<null | HTMLElement>(null)
   const [langAnchorEl, setLangAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -61,15 +72,39 @@ export default function UserActionsMenu() {
     sessionCookie.clearAuth()
     router.push('/')
   }
+
   return (
     <>
-      <MenuButton
-        aria-label="Open menu"
-        onClick={handleMainMenuClick}
-        sx={{ borderColor: 'transparent' }}
+      <Stack
+        direction="row"
+        sx={{
+          p: 1,
+          gap: 1,
+          width: '100%',
+          alignItems: 'center',
+          justifyContent: expanded ? 'space-between' : 'center',
+          borderTop: '1px solid',
+          borderColor: 'divider',
+        }}
       >
-        <MoreVertRoundedIcon />
-      </MenuButton>
+        {expanded && showContent ? (
+          <>
+            <CurrentUserInfoBox userInfo={userInfo} showName showEmail />
+            <MenuButton
+              aria-label="Open menu"
+              onClick={handleMainMenuClick}
+              sx={{ borderColor: 'transparent' }}
+            >
+              <MoreVertRoundedIcon />
+            </MenuButton>
+          </>
+        ) : (
+          <Box onClick={handleMainMenuClick} sx={{ cursor: 'pointer' }}>
+            <CurrentUserInfoBox userInfo={userInfo} />
+          </Box>
+        )}
+      </Stack>
+
       <Menu
         anchorEl={mainAnchorEl}
         id="main-menu"

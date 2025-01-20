@@ -1,1 +1,1 @@
-export const themeCookieName = 'theme'
+export const THEME_COOKIE_NAME = 'theme'

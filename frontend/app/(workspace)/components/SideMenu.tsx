@@ -1,44 +1,55 @@
 'use client'
-import { meOptions } from '@/apis'
-import CurrentUserInfoBox from '@/components/CurrentUserInfoBox'
 import Drawer, { drawerClasses } from '@mui/material/Drawer'
-import Stack from '@mui/material/Stack'
-import { useSuspenseQuery } from '@tanstack/react-query'
 import SideMenuContent from './SideMenuContent'
 import UserActionsMenu from './UserActionsMenu'
+import SideMenuHeader from './SideMenuHeader'
+import { useState, useRef } from 'react'
 
-const drawerWidth = 240
+const expandedWidth = 240
+const collapsedWidth = 64
+
 export default function SideMenu() {
-  const { data } = useSuspenseQuery(meOptions)
-  const userInfo = data?.data
+  const [expanded, setExpanded] = useState(true)
+  const [transitionComplete, setTransitionComplete] = useState(true)
+  const drawerRef = useRef<HTMLDivElement>(null)
+
+  const handleTransitionEnd = (event: React.TransitionEvent) => {
+    if (event.target === drawerRef.current) {
+      setTransitionComplete(true)
+    }
+  }
+
+  const handleToggle = () => {
+    setTransitionComplete(false)
+    setExpanded(!expanded)
+  }
+
   return (
     <Drawer
       variant="permanent"
-      className="mt-10 box-border shrink-0"
+      ref={drawerRef}
+      onTransitionEnd={handleTransitionEnd}
       sx={{
-        width: drawerWidth,
+        width: expanded ? expandedWidth : collapsedWidth,
+        transition: theme => theme.transitions.create('width'),
         [`& .${drawerClasses.paper}`]: {
           backgroundColor: 'background.paper',
-          width: drawerWidth,
+          width: expanded ? expandedWidth : collapsedWidth,
+          transition: theme => theme.transitions.create('width'),
           boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          overflowX: 'hidden',
         },
       }}
     >
-      <SideMenuContent />
-      <Stack
-        direction="row"
-        sx={{
-          p: 2,
-          gap: 1,
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderTop: '1px solid',
-          borderColor: 'divider',
-        }}
-      >
-        <CurrentUserInfoBox userInfo={userInfo} showName showEmail />
-        <UserActionsMenu />
-      </Stack>
+      <SideMenuHeader expanded={expanded} onToggle={handleToggle} />
+      <SideMenuContent expanded={expanded} showContent={transitionComplete} />
+      <UserActionsMenu
+        expanded={expanded}
+        showContent={transitionComplete}
+      />
     </Drawer>
   )
 }

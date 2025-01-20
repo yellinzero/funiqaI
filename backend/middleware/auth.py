@@ -29,7 +29,6 @@ class TokenRefreshMiddleware(BaseHTTPMiddleware):
             ):
                 logger.debug(f"Skipping auth for public path: {request.url.path}")
                 return await call_next(request)
-
             auth_header = request.headers.get("Authorization")
             refresh_token = get_refresh_token_from_cookie(request)
 
@@ -43,7 +42,9 @@ class TokenRefreshMiddleware(BaseHTTPMiddleware):
             try:
                 verify_refresh_token(refresh_token)
                 logger.debug("Refresh token verified successfully")
-            except (FuniqAIError, RedisError) as e:
+            except FuniqAIError as e:
+                return self.handle_error(e)
+            except (RedisError) as e:
                 logger.error(f"Refresh token verification failed: {e!s}")
                 raise CommonErrorCode.UNAUTHORIZED.exception(status_code=status.HTTP_401_UNAUTHORIZED) from e
 
@@ -68,14 +69,15 @@ class TokenRefreshMiddleware(BaseHTTPMiddleware):
                 except Exception as e:
                     # Let business logic errors propagate
                     logger.error(f"Error occurred after token refresh: {e!s}")
-                    raise
+                    raise e
 
-        except (FuniqAIError, JWTError, ValueError, RedisError) as e:
-            # Only handle authentication-related errors
+        except FuniqAIError as e:
             logger.error(f"Authentication error: {e!s}")
-            if isinstance(e, FuniqAIError):
-                return self.handle_error(e)
-            return self.handle_error(CommonErrorCode.UNAUTHORIZED.exception(status_code=status.HTTP_401_UNAUTHORIZED))
+            return self.handle_error(e)
+        except Exception as e:
+            # Only handle authentication-related errors
+            logger.error(f"Unexpected error: {e!s}")
+            raise e
 
     def handle_error(self, exc: FuniqAIError):
         logger.error(f"Handling authentication error: {exc!s}")

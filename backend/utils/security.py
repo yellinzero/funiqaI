@@ -106,17 +106,20 @@ def create_token_pair(data: dict) -> Tuple[str, str]:
     """Create both access and refresh tokens."""
     account_id = data["aid"]
 
-    # Create access token (short-lived)
-    access_token = create_access_token(
-        data=data, expires_delta=timedelta(minutes=funiq_ai_config.ACCESS_TOKEN_EXPIRE_MINUTES)
-    )
-
     # Create refresh token (long-lived)
     refresh_token = secrets.token_urlsafe(32)
 
     # Store in sync_redis
     sync_redis_key = f"refresh_token:{account_id}"
     sync_redis.setex(sync_redis_key, timedelta(days=funiq_ai_config.REFRESH_TOKEN_EXPIRE_DAYS), refresh_token)
+
+    # Add refresh token to access token data
+    data["refresh_token"] = refresh_token
+
+    # Create access token (short-lived) with refresh token included
+    access_token = create_access_token(
+        data=data, expires_delta=timedelta(minutes=funiq_ai_config.ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
 
     return access_token, refresh_token
 
@@ -160,7 +163,7 @@ def set_refresh_token_to_cookie(response: Response, refresh_token: str):
         funiq_ai_config.REFRESH_TOKEN_COOKIE_NAME,
         refresh_token,
         secure=True,
-        samesite="lax",
+        samesite="none",
         httponly=True,
         max_age=funiq_ai_config.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
         path="/",

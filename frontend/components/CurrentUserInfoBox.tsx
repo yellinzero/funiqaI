@@ -21,7 +21,7 @@ export default function CurrentUserInfoBox({
   return (
     userInfo
       ? (
-          <Stack direction="row" sx={{ gap: 1, alignItems: 'center' }}>
+          <Stack direction="row" sx={{ gap: showName || showEmail ? 1 : 0, alignItems: 'center', justifyContent: 'center' }}>
             <Avatar
               sizes="small"
               alt={userInfo?.name ?? ''}
