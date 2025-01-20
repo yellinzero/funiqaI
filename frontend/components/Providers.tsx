@@ -2,7 +2,7 @@
 import type { Locale } from '@/plugins/i18n/settings'
 import I18nProvider from '@/components/I18nProvider'
 import { theme } from '@/theme'
-import { themeCookieName } from '@/theme/configs'
+import { THEME_COOKIE_NAME } from '@/theme/configs'
 import { getQueryClient } from '@/utils/get-query-client'
 import { CssBaseline } from '@mui/material'
 
@@ -19,10 +19,10 @@ interface ProvidersProps {
 
 export default function Providers({ children, locale }: ProvidersProps) {
   const [cookies, setCookie] = useCookies()
-  let themeCookie = cookies[themeCookieName]
+  let themeCookie = cookies[THEME_COOKIE_NAME]
   if (!themeCookie) {
     themeCookie = 'system'
-    setCookie(themeCookieName, themeCookie)
+    setCookie(THEME_COOKIE_NAME, themeCookie)
   }
   const queryClient = getQueryClient()
   return (

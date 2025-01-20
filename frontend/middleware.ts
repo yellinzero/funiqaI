@@ -12,7 +12,7 @@ const publicRoutes = [
   '/activate',
 ]
 
-export default async function middleware(req: NextRequest) {
+export default async function middleware(req: NextRequest, res: NextResponse) {
   // 2. Check if the current route is protected or public
   const path = req.nextUrl.pathname
   const isPublicRoute = publicRoutes.includes(path)

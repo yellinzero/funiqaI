@@ -1,9 +1,9 @@
 export const loginUrl = '/auth/login' as const
 export const signupUrl = '/auth/signup' as const
-export const signupVerifyUrl = '/auth/signup_verify' as const
-export const activateAccountUrl = '/auth/activate_account' as const
-export const activateAccountVerifyUrl = '/auth/activate_account_verify' as const
-export const forgotPasswordUrl = '/auth/forgot_password' as const
-export const resetPasswordUrl = '/auth/reset_password' as const
-export const resendVerificationCodeUrl = '/auth/resend_verification_code' as const
+export const signupVerifyUrl = '/auth/signup-verify' as const
+export const activateAccountUrl = '/auth/activate-account' as const
+export const activateAccountVerifyUrl = '/auth/activate-account-verify' as const
+export const forgotPasswordUrl = '/auth/forgot-password' as const
+export const resetPasswordUrl = '/auth/reset-password' as const
+export const resendVerificationCodeUrl = '/auth/resend-verification-code' as const
 export const logoutUrl = '/auth/logout' as const

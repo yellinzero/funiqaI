@@ -6,6 +6,8 @@ import { I18N_COOKIE_NAME } from '@/plugins/i18n/settings'
 import { SESSION_COOKIE_NAME } from '@/utils/constants'
 import createClient from 'openapi-fetch'
 import { Cookies } from 'react-cookie'
+import { permanentRedirect, redirect, RedirectType } from 'next/navigation'
+import { NextResponse } from 'next/server'
 
 // Types
 export type HttpMethod = 'get' | 'put' | 'post' | 'delete' | 'options' | 'head' | 'patch' | 'trace'
@@ -111,6 +113,7 @@ async function getCookieContext() {
 const requestContextMiddleware: Middleware = {
   async onRequest({ request }) {
     const { language, session } = await getCookieContext()
+
     request.headers.set('X-LANGUAGE', language)
     request.headers.set('X-Tenant-ID', session.tenantId)
     if (session.accessToken) {
@@ -153,9 +156,9 @@ const responseMiddleware: Middleware = {
     if (status >= 400 && status < 600) {
       switch (status) {
         case 401: {
-          if (typeof window !== 'undefined') {
-            window.location.href = '/sign-in'
-          }
+          redirect('sign-in')
+        }
+        default: {
           break
         }
       }
@@ -179,7 +182,6 @@ export function createFetchApi(client: Client<paths>) {
     promise: ReturnType<ClientMethod<{}, Method, Path>>,
   ): Promise<CustomFetchResponse<Path, Method>> => {
     const { data, response, error } = await promise
-
     const { language } = await getCookieContext()
 
     const { t } = await initTranslations(language, namespaces)

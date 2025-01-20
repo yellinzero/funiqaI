@@ -17,6 +17,7 @@ from app.auth.schemas import (
     SignupVerifyRequest,
 )
 from app.errors.account import AccountErrorCode
+from app.errors.base import FuniqAIError
 from app.errors.common import CommonErrorCode
 from app.models.account import (
     Account,
@@ -205,7 +206,7 @@ class AccountService:
         account: Account | None = result.scalars().one_or_none()
 
         if not account or (password and not account.verify_password(password)):
-            raise AccountErrorCode.INVALID_EMAIL_PASSWORD.exception(status_code=status.HTTP_401_UNAUTHORIZED)
+            raise AccountErrorCode.INVALID_EMAIL_PASSWORD.exception(status_code=status.HTTP_404_NOT_FOUND)
 
         if account.status != AccountStatus.ACTIVE:
             raise AccountErrorCode.ACCOUNT_NOT_ACTIVE.exception(status_code=status.HTTP_403_FORBIDDEN)
@@ -267,6 +268,8 @@ class AccountService:
             logger.info(f"Successful login for email: {payload.email}")
             return tokens
 
+        except FuniqAIError as e:
+            raise e
         except Exception as e:
             logger.error(f"Login failed for email: {payload.email} - Error: {e!s}")
             raise
@@ -601,6 +604,8 @@ class AccountService:
             logger.info(f"Successfully completed OAuth login for email: {payload.email}")
             return tokens
 
+        except FuniqAIError as e:
+            raise e
         except Exception as e:
             logger.error(f"OAuth login failed for provider {payload.provider} - Error: {e!s}")
             raise

@@ -9,7 +9,7 @@ import { useColorScheme } from '@mui/material/styles'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'
 import { useCookies } from 'react-cookie'
-import { themeCookieName } from './configs'
+import { THEME_COOKIE_NAME } from './configs'
 
 export default function ColorModeIconDropdown(props: IconButtonOwnProps) {
   const router = useRouter()
@@ -24,7 +24,7 @@ export default function ColorModeIconDropdown(props: IconButtonOwnProps) {
     setAnchorEl(null)
   }
   const handleMode = (targetMode: 'system' | 'light' | 'dark') => () => {
-    setCookie(themeCookieName, targetMode)
+    setCookie(THEME_COOKIE_NAME, targetMode)
     router.refresh()
     setMode(targetMode)
     handleClose()

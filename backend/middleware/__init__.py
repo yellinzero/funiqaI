@@ -13,6 +13,9 @@ from middleware.request_context import RequestContextMiddleware
 
 
 def install_global_middlewares(app: FastAPI):
+    app.add_middleware(RequestContextMiddleware)
+    app.add_middleware(TokenRefreshMiddleware)
+    # must be after TokenRefreshMiddleware, ensure return response is correct(including CORS headers)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=funiq_ai_config.CORS_ALLOW_ORIGINS,
@@ -22,5 +25,3 @@ def install_global_middlewares(app: FastAPI):
         expose_headers=["X-New-Access-Token"],
     )
     app.add_middleware(SQLAlchemyMiddleware, custom_engine=engine)
-    app.add_middleware(RequestContextMiddleware)
-    app.add_middleware(TokenRefreshMiddleware)
