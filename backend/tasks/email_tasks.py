@@ -5,6 +5,7 @@ from typing import Optional
 from celery import shared_task
 
 from services.email_service import email_service
+from utils.i18n import set_current_locale
 from utils.template_renderer import template_renderer
 
 
@@ -26,8 +27,9 @@ def send_signup_verification_email_task(language: str, to: str, code: str) -> Op
     start_at = time.perf_counter()
 
     try:
+        set_current_locale(language)
         # Render the email content with the appropriate language template
-        template_path = f"{language}/signup_verification_email_template.html"
+        template_path = "signup_verification_email_template.html"
         html_content = template_renderer.render(template_path, to=to, code=code)
 
         # Send the email
@@ -61,8 +63,9 @@ def send_reset_password_verification_email_task(language: str, to: str, code: st
     start_at = time.perf_counter()
 
     try:
+        set_current_locale(language)
         # Render the email content with the appropriate language template
-        template_path = f"{language}/reset_password_verification_email_template.html"
+        template_path = "reset_password_verification_email_template.html"
         html_content = template_renderer.render(template_path, to=to, code=code)
 
         # Send the email
@@ -96,8 +99,9 @@ def send_activate_account_email_task(language: str, to: str, code: str) -> Optio
     start_at = time.perf_counter()
 
     try:
+        set_current_locale(language)
         # Render the email content with the appropriate language template
-        template_path = f"{language}/activation_verification_email_template.html"
+        template_path = "activation_verification_email_template.html"
         html_content = template_renderer.render(template_path, to=to, code=code)
 
         # Send the email

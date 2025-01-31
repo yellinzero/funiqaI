@@ -114,7 +114,7 @@ const requestContextMiddleware: Middleware = {
   async onRequest({ request }) {
     const { language, session } = await getCookieContext()
 
-    request.headers.set('X-LANGUAGE', language)
+    request.headers.set(I18N_COOKIE_NAME, language)
     request.headers.set('X-Tenant-ID', session.tenantId)
     if (session.accessToken) {
       request.headers.set('Authorization', `Bearer ${session.accessToken}`)
@@ -173,6 +173,7 @@ const responseMiddleware: Middleware = {
 // Apply middlewares
 apiFetch.use(requestContextMiddleware)
 apiFetch.use(responseMiddleware)
+publicApiFetch.use(requestContextMiddleware)
 publicApiFetch.use(responseMiddleware)
 
 // API Factory

@@ -5,15 +5,16 @@ Manage global middlewares
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_async_sqlalchemy import SQLAlchemyMiddleware
+from starlette_csrf import CSRFMiddleware
 
 from configs import funiq_ai_config
 from database import engine
 from middleware.auth import TokenRefreshMiddleware
+from middleware.i18n import I18nMiddleware
 from middleware.request_context import RequestContextMiddleware
 
 
 def install_global_middlewares(app: FastAPI):
-    app.add_middleware(RequestContextMiddleware)
     app.add_middleware(TokenRefreshMiddleware)
     # must be after TokenRefreshMiddleware, ensure return response is correct(including CORS headers)
     app.add_middleware(
@@ -24,4 +25,6 @@ def install_global_middlewares(app: FastAPI):
         allow_headers=funiq_ai_config.CORS_ALLOW_HEADERS,
         expose_headers=["X-New-Access-Token"],
     )
+    app.add_middleware(RequestContextMiddleware)
+    app.add_middleware(I18nMiddleware)
     app.add_middleware(SQLAlchemyMiddleware, custom_engine=engine)

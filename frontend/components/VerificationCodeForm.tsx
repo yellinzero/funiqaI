@@ -13,7 +13,7 @@ import * as z from 'zod'
 
 interface VerificationCodeFormProps {
   onSubmit: (code: string) => Promise<void>
-  submitButtonText: string
+  submitButtonText?: string
   countdown: number
   onResend: () => void
   errorMessage?: string
@@ -30,9 +30,9 @@ export default function VerificationCodeForm({
   submitButtonText,
   countdown,
   onResend,
-  errorMessage = 'verification_failed',
+  errorMessage,
 }: VerificationCodeFormProps) {
-  const { t } = useTranslation()
+  const { t } = useTranslation(['auth'])
 
   const {
     control,
@@ -65,7 +65,7 @@ export default function VerificationCodeForm({
     }
     catch (e) {
       console.error('Verification error:', e)
-      Toast.error({ message: t(errorMessage) })
+      Toast.error({ message: errorMessage ?? t('verification_failed') })
     }
   }
 
@@ -113,7 +113,7 @@ export default function VerificationCodeForm({
         )}
       </FormControl>
       <Button type="submit" fullWidth variant="contained">
-        {t(submitButtonText)}
+        {submitButtonText ?? t('verify')}
       </Button>
       <Button
         variant="text"

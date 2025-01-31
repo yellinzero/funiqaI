@@ -5,6 +5,7 @@ from .apps import AppsConfig
 from .celery import CeleryConfig
 from .cors import CorsConfig
 from .database import DatabaseConfig, RedisConfig
+from .language import LanguageConfig
 from .log_config import LogConfig
 from .mail import MailConfig
 from .package import PackageInfo
@@ -23,9 +24,11 @@ class FuniqAIConfigSettings(
     CorsConfig,
     LogConfig,
     SentryConfig,
+    LanguageConfig,
 ):
     DEBUG: bool
     SECRET_KEY: str
+    CSRF_SECRET_KEY: str
     REFRESH_TOKEN_COOKIE_NAME: str
         
     DEPLOY_ENVIRONMENT: str = Field(

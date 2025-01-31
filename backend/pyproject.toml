@@ -2,7 +2,11 @@
 name = "funiq-ai-server"
 version = "0.1.0"
 readme = "README.md"
-package-mode = false
+authors = ["Yellin"]
+description = "backend for funiq-ai"
+packages = [
+    { include = "cli.py" }
+]
 
 [build-system]
 requires = ["poetry-core"]
@@ -19,6 +23,7 @@ exclude = [
     "__pycache__/*",
     "build/*",
     "dist/*",
+    "tests/*"
 ]
 # Maximum line length for the project (commonly 88 or 120 characters)
 line-length = 120
@@ -38,7 +43,7 @@ select = [
     "N",    # pep8-naming: Enforce naming conventions
     "PT",   # flake8-pytest-style: Improve pytest structure and readability
     "PLC",  # pylint-compatible: Provide enhanced rule suggestions
-    "RUF",  # ruff-specific: Ruff’s custom rules
+    "RUF",  # ruff-specific: Ruff's custom rules
     "S",    # bandit: Security linting for common Python vulnerabilities
     "SIM",  # flake8-simplify: Suggest simpler alternatives for complex logic
     "UP",   # pyupgrade: Recommend modern Python syntax
@@ -58,7 +63,6 @@ ignore = [
     "SIM117", # Allow multiple with statements for better readability
     "B006", # Ignore mutable argument defaults in certain cases
     "PT011", # Allow broad exception handling in pytest raises
-  
 ]
 
 # Per-file specific ignores for project-specific exceptions
@@ -66,11 +70,6 @@ ignore = [
 "__init__.py" = [
     "F401", # Allow unused imports in __init__.py for module initialization
     "F811", # Allow redefinition of imports in __init__.py
-]
-"tests/*" = [
-    "F401", # Ignore unused imports in test files
-    "F811", # Allow redefinition of variables in test files
-    "S101", # Use assert instead of raise
 ]
 "configs/*" = [
     "N802", # Ignore invalid function names in config files
@@ -129,3 +128,9 @@ jinja2 = "^3.1.5"
 premailer = "^3.10.0"
 aiosqlite = "^0.20.0"
 sentry-sdk = "^2.20.0"
+starlette-csrf = "^3.0.0"
+babel = "^2.16.0"
+
+
+[tool.poetry.scripts]
+cli = "cli:main"

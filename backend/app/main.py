@@ -10,6 +10,7 @@ from database import shutdown_database
 from middleware import install_global_middlewares
 from services.celery import init_celery
 from services.email_service import init_email_service
+from utils.i18n import register_all_translation_domains
 from utils.loguru_handler import setup_loguru
 from utils.sentry_handler import setup_sentry
 
@@ -25,6 +26,8 @@ def create_app() -> FastAPI:
         lifespan=lifespan,  # Register lifecycle hooks
     )
     
+    # Register i18n
+    register_all_translation_domains()
     # Initialize logging and Sentry
     setup_loguru()
     setup_sentry()
