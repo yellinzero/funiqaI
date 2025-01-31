@@ -78,7 +78,7 @@ export default function SignUp() {
         sx={{ width: '100%', fontSize: '1.5rem' }}
       >
         {t('welcome', {
-          name: t('product_name'),
+          name: t('product_name', { ns: 'global' }),
         })}
       </Typography>
       <Typography
@@ -86,16 +86,14 @@ export default function SignUp() {
         variant="h4"
         sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
       >
-        {showVerifyEmail ? t('verify_email') : t('sign_up')}
+        {showVerifyEmail ? t('verify_email') : t('sign_up', { ns: 'global' })}
       </Typography>
       {showVerifyEmail
         ? (
             <VerificationCodeForm
               onSubmit={handleVerificationSubmit}
-              submitButtonText="verify"
               countdown={countdown}
               onResend={handleResendCode}
-              errorMessage="verification_failed"
             />
           )
         : (

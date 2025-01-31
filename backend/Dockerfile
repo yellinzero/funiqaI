@@ -15,7 +15,7 @@ COPY pyproject.toml poetry.lock /app/
 
 # Install dependencies without creating a virtual environment
 RUN poetry config virtualenvs.create false \
-    && poetry install --without dev --no-interaction --no-ansi \
+    && poetry install --without dev --no-root --no-interaction --no-ansi \
     && rm -rf ~/.cache/pypoetry
 
 # Copy the entrypoint script and set executable permissions

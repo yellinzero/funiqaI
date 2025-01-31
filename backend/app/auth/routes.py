@@ -56,16 +56,16 @@ async def signup_verify(payload: SignupVerifyRequest, request: Request, response
 
 
 @auth_router.post("/activate-account", response_model=ResponseModel[ActivateAccountResponse])
-async def activate_account(payload: ActivateAccountRequest):
+async def activate_account(payload: ActivateAccountRequest, request: Request):
     """Send activation email for inactive account"""
-    token = await AccountService.activate_account(db.session, payload)
+    token = await AccountService.activate_account(db.session, payload, request)
     return ResponseModel(data={"token": token})
 
 
 @auth_router.post("/forgot-password", response_model=ResponseModel[ForgotPasswordResponse])
-async def forgot_password(payload: ForgotPasswordRequest):
+async def forgot_password(payload: ForgotPasswordRequest, request: Request):
     """Send password reset email"""
-    token = await AccountService.send_reset_password_email(db.session, payload)
+    token = await AccountService.send_reset_password_email(db.session, payload, request)
     return ResponseModel(data={"token": token})
 
 
@@ -77,9 +77,9 @@ async def reset_password(payload: ResetPasswordRequest):
 
 
 @auth_router.post("/resend-verification-code", response_model=ResponseModel[ResendVerificationCodeResponse])
-async def resend_verification_code(payload: ResendVerificationCodeRequest):
+async def resend_verification_code(payload: ResendVerificationCodeRequest, request: Request):
     """Resend verification code for signup/activation/password reset"""
-    token = await AccountService.resend_verification_code(db.session, payload.email, payload.code_type)
+    token = await AccountService.resend_verification_code(db.session, payload.email, payload.code_type, request)
     return ResponseModel(data={"token": token})
 
 

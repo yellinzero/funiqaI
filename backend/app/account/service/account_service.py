@@ -126,7 +126,7 @@ class AccountService:
         logger.info(f"Successfully created new account for: {payload.email}")
 
         # For normal signup, send verification email
-        token = await AccountService.send_sign_up_verification_email(account)
+        token = await AccountService.send_sign_up_verification_email(account, request)
         return token
 
     @staticmethod
@@ -165,7 +165,7 @@ class AccountService:
         return await AccountService._handle_successful_auth(session, account, request)
 
     @staticmethod
-    async def send_sign_up_verification_email(account: Account) -> str:
+    async def send_sign_up_verification_email(account: Account, request: Request) -> str:
         """
         Send a signup verification email with a verification token.
         :param account: Account object
@@ -179,7 +179,7 @@ class AccountService:
         code = "".join([str(secrets.randbelow(10)) for _ in range(6)])
         token = await token_manager.generate_signup_email_verification_token(account.email, code)
         send_signup_verification_email_task.delay(
-            language=account.language or "en",
+            language=request.state.language or "en",
             to=account.email,
             code=code,
         )
@@ -287,7 +287,7 @@ class AccountService:
         return account
 
     @staticmethod
-    async def send_activate_account_email(account: Account) -> str:
+    async def send_activate_account_email(account: Account, request: Request) -> str:
         """
         Send an account activation email with a verification code.
         :param account: Account object
@@ -301,7 +301,7 @@ class AccountService:
         code = "".join([str(secrets.randbelow(10)) for _ in range(6)])
         token = await token_manager.generate_activate_account_token(account.email, code)
         send_activate_account_email_task.delay(
-            language=account.language or "en",
+            language=request.state.language or account.language or "en",
             to=account.email,
             code=code,
         )
@@ -309,7 +309,7 @@ class AccountService:
         return token
 
     @staticmethod
-    async def activate_account(session: AsyncSession, payload: SignupRequest) -> str:
+    async def activate_account(session: AsyncSession, payload: SignupRequest, request: Request) -> str:
         """
         Activate an account by verifying email/name and send a verification email.
         :param session: Database session
@@ -327,14 +327,14 @@ class AccountService:
             raise AccountErrorCode.ACCOUNT_ALREADY_ACTIVE.exception(
                 data={"email": payload.email}, status_code=status.HTTP_400_BAD_REQUEST
             )
-        token = await AccountService.send_activate_account_email(account)
+        token = await AccountService.send_activate_account_email(account, request)
         return token
 
     # endregion
 
     # region Password Management
     @staticmethod
-    async def send_reset_password_email(session: AsyncSession, payload: ForgotPasswordRequest) -> str:
+    async def send_reset_password_email(session: AsyncSession, payload: ForgotPasswordRequest, request: Request) -> str:
         """Send password reset email with verification code."""
         # Check rate limiting
         if await AccountService.reset_password_limit.check_limit_exceeded(payload.email):
@@ -357,7 +357,7 @@ class AccountService:
 
         # Send email
         send_reset_password_verification_email_task.delay(
-            language=account.language or "en",
+            language=request.state.language or account.language or "en",
             to=account.email,
             code=code,
         )
@@ -407,7 +407,9 @@ class AccountService:
     # endregion
 
     @staticmethod
-    async def resend_verification_code(session: AsyncSession, email: str, code_type: AccountTokenType) -> str:
+    async def resend_verification_code(
+        session: AsyncSession, email: str, code_type: AccountTokenType, request: Request
+    ) -> str:
         """
         Resend verification code based on type.
         :param session: Database session
@@ -426,11 +428,11 @@ class AccountService:
 
         # Send verification code based on type
         if code_type == AccountTokenType.SIGNUP_EMAIL:
-            return await AccountService.send_sign_up_verification_email(account)
+            return await AccountService.send_sign_up_verification_email(account, request)
         elif code_type == AccountTokenType.ACTIVATE_ACCOUNT_EMAIL:
-            return await AccountService.send_activate_account_email(account)
+            return await AccountService.send_activate_account_email(account, request)
         elif code_type == AccountTokenType.RESET_PASSWORD_EMAIL:
-            return await AccountService.send_reset_password_email(session, ForgotPasswordRequest(email=email))
+            return await AccountService.send_reset_password_email(session, ForgotPasswordRequest(email=email), request)
 
     # endregion
 

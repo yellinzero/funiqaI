@@ -1,7 +1,9 @@
 import logging
 import smtplib
+from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formataddr, make_msgid
 
 
 class SMTPClient:
@@ -32,10 +34,12 @@ class SMTPClient:
                 smtp.login(self.username, self.password)
 
             msg = MIMEMultipart()
-            msg["Subject"] = mail["subject"]
-            msg["From"] = self._from
-            msg["To"] = mail["to"]
-            msg.attach(MIMEText(mail["html"], "html"))
+            msg["Message-ID"] = make_msgid(domain=self.username)
+            msg["Subject"] = Header(mail["subject"], "utf-8").encode()
+            msg["From"] = formataddr((Header("Funiq AI", "utf-8").encode(), self._from))
+            msg["To"] = formataddr((Header(mail["to"], "utf-8").encode(), mail["to"]))
+            
+            msg.attach(MIMEText(mail["html"], "html", "utf-8"))
 
             smtp.sendmail(self._from, mail["to"], msg.as_string())
         except smtplib.SMTPException as e:

@@ -1,6 +1,6 @@
 export const fallbackLang = 'en'
-export const languages = [fallbackLang, 'zh-CN']
-export const I18N_COOKIE_NAME = 'i18next'
+export const languages = [fallbackLang, 'zh_CN']
+export const I18N_COOKIE_NAME = 'X-LANGUAGE'
 export const defaultNS = 'global'
 
 export function getOptions(lang = fallbackLang, ns = defaultNS) {
@@ -21,6 +21,6 @@ export const languagesOptions = [{
   value: 'en',
   label: 'English',
 }, {
-  value: 'zh-CN',
+  value: 'zh_CN',
   label: '简体中文',
 }]

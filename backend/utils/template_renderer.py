@@ -4,6 +4,8 @@ from typing import Union
 
 import jinja2
 
+from utils.i18n import NullTranslations, get_current_locale_translator, translation_registry
+
 
 class TemplateRenderer:
     def __init__(self, template_dir: Union[str, pathlib.Path]):
@@ -16,6 +18,22 @@ class TemplateRenderer:
         self.environment = jinja2.Environment(
             loader=jinja2.FileSystemLoader(self.template_dir),
             autoescape=True,
+            extensions=["jinja2.ext.i18n"],
+        )
+
+        def get_translations():
+            locale_translator = get_current_locale_translator()
+
+            locale_code = locale_translator.language
+            if locale_translator.territory:
+                locale_code = f"{locale_translator.language}_{locale_translator.territory}"
+
+            return translation_registry.translations.get("templates", {}).get(locale_code, NullTranslations())
+
+        # install translations
+        self.environment.install_gettext_callables(
+            lambda x: get_translations().ugettext(x),
+            lambda s, p, n: get_translations().ungettext(s, p, n),
         )
 
     def render(self, template_name: str, **context) -> str:
@@ -45,8 +63,8 @@ class TemplateRenderer:
             return template.render(**context)
         except jinja2.TemplateError as e:
             raise RuntimeError(f"Error rendering template string: {e}") from e
-        
-        
+
+
 @cache
 def _get_template(template_renderer: TemplateRenderer, template_name: str) -> jinja2.Template:
     """
@@ -59,6 +77,6 @@ def _get_template(template_renderer: TemplateRenderer, template_name: str) -> ji
         return template_renderer.environment.get_template(template_name)
     except jinja2.TemplateNotFound as err:
         raise FileNotFoundError(f"Template '{template_name}' not found in {template_renderer.template_dir}") from err
-    
-    
-template_renderer = TemplateRenderer('templates')
+
+
+template_renderer = TemplateRenderer("templates")

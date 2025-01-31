@@ -68,7 +68,7 @@ frontend/
 ├── utils/          # Utility functions
 └── locales/        # i18n translation files
     ├── en/         # English translations
-    └── zh-CN/      # Chinese translations
+    └── zh_CN/      # Chinese translations
 ```
 
 ## 🔧 Development Tools
@@ -84,7 +84,7 @@ frontend/
 
 The application supports multiple languages:
 - English (en)
-- Chinese (zh-CN)
+- Chinese (zh_CN)
 
 Translation files are located in the `locales` directory.
 

@@ -1,0 +1,80 @@
+# Chinese (Simplified, China) translations for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-01-25 14:15+0800\n"
+"PO-Revision-Date: 2025-01-25 14:22+0800\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: zh_Hans_CN\n"
+"Language-Team: zh_Hans_CN <LL@li.org>\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.16.0\n"
+
+#: templates/activation_verification_email_template.html:6
+#: templates/activation_verification_email_template.html:88
+msgid "Activate Your Account"
+msgstr "激活您的账户"
+
+#: templates/activation_verification_email_template.html:90
+msgid ""
+"Please copy and paste this code to activate your account. This code is "
+"valid for the next 10 minutes only."
+msgstr "请复制并粘贴此验证码以激活您的账户。此验证码仅在接下来的10分钟内有效。"
+
+#: templates/activation_verification_email_template.html:96
+msgid ""
+"If you did not request this activation, please ignore this email. Your "
+"account is safe."
+msgstr "如果您未请求此激活，请忽略此电子邮件。您的账户是安全的。"
+
+#: templates/activation_verification_email_template.html:99
+#: templates/reset_password_verification_email_template.html:99
+#: templates/signup_verification_email_template.html:99
+msgid "This is an automated message. Please do not reply to this email."
+msgstr "这是一封自动生成的邮件。请不要回复此邮件。"
+
+#: templates/reset_password_verification_email_template.html:6
+msgid "Password Reset Code"
+msgstr "密码重置验证码"
+
+#: templates/reset_password_verification_email_template.html:88
+msgid "Reset Your Password"
+msgstr "重置您的密码"
+
+#: templates/reset_password_verification_email_template.html:90
+msgid ""
+"Please copy and paste this code to reset your password. This code is "
+"valid for the next 10 minutes only."
+msgstr "请复制并粘贴此验证码以重置您的密码。此验证码仅在接下来的10分钟内有效。"
+
+#: templates/reset_password_verification_email_template.html:96
+msgid ""
+"If you did not request this reset, please ignore this email. Your account"
+" is safe."
+msgstr "如果您未请求此重置，请忽略此电子邮件。您的账户是安全的。"
+
+#: templates/signup_verification_email_template.html:6
+#: templates/signup_verification_email_template.html:88
+msgid "Signup Verification Code"
+msgstr "注册验证码"
+
+#: templates/signup_verification_email_template.html:90
+msgid ""
+"Please copy and paste this code into the verification form. This code is "
+"valid for the next 10 minutes only."
+msgstr "请复制并粘贴此验证码到验证表单中。此验证码仅在接下来的10分钟内有效。"
+
+#: templates/signup_verification_email_template.html:96
+msgid ""
+"If you did not request this verification, please ignore this email. Your "
+"account is safe."
+msgstr "如果您未请求此验证，请忽略此电子邮件。您的账户是安全的。"
+
